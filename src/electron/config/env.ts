@@ -79,7 +79,7 @@ export function getAppName(): string {
   if (app && app.getName) {
     return app.getName();
   }
-  return 'Claude-Cowork';
+  return 'AICowork';
 }
 
 /** 获取系统信息 */

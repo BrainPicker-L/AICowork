@@ -295,7 +295,7 @@ function App() {
           className="flex items-center justify-center gap-2 h-12 border-b border-ink-900/10 bg-surface-cream select-none"
           style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
         >
-          <span className="text-sm font-medium text-ink-700">{activeSession?.title || "Agent Cowork"}</span>
+          <span className="text-sm font-medium text-ink-700">{activeSession?.title || "AICowork"}</span>
           {/* 记忆状态指示器 - 主页面标题旁边 */}
           {activeSession?.memoryStatus ? (
             <div

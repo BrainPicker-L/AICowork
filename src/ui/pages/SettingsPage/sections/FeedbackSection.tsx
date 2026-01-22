@@ -15,7 +15,7 @@ export function FeedbackSection() {
 
   // 反馈链接配置
   const feedbackLinks = {
-    bugReport: 'https://github.com/Pan519/Claude-Cowork',
+    bugReport: 'https://github.com/Pan519/AICowork',
     featureRequest: 'https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv',
   };
 

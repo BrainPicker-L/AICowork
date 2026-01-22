@@ -76,7 +76,7 @@ export default {
 		subtitle: "获取使用帮助和文档",
 		quickStart: {
 			title: "快速开始",
-			description: "了解如何使用 Agent Cowork 开始第一个任务",
+			description: "了解如何使用 AICowork 开始第一个任务",
 		},
 		faq: {
 			title: "常见问题",
@@ -97,7 +97,7 @@ export default {
 			title: "Bug 报告",
 			description: "在 GitHub 上提交问题报告",
 			link: "前往 GitHub",
-			url: "https://github.com/Pan519/Claude-Cowork",
+			url: "https://github.com/Pan519/AICowork",
 		},
 		featureRequest: {
 			title: "功能建议",
@@ -108,8 +108,8 @@ export default {
 	},
 
 	about: {
-		title: "关于 Agent Cowork",
-		subtitle: "AI 协作工作台——Agent Cowork！",
+		title: "关于 AICowork",
+		subtitle: "AI 协作工作台——AICowork！",
 		version: {
 			title: "版本信息",
 			description: "版本 1.0.0",
@@ -126,7 +126,7 @@ export default {
 			title: "许可证",
 			description: "MIT",
 		},
-		tagline: "Agent Cowork 让 AI 成为你的工作协作伙伴。",
+		tagline: "AICowork 让 AI 成为你的工作协作伙伴。",
 	},
 
 	language: {
@@ -534,7 +534,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "暂无消息",
-		startConversation: "开始与 Agent Cowork 对话",
+		startConversation: "开始与 AICowork 对话",
 		beginningOfConversation: "对话开始",
 		loadingMessages: "加载中...",
 		newMessages: "新消息",

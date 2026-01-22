@@ -1423,7 +1423,7 @@ describe('MemvidService', () => {
 **测试准备**
 ```bash
 # 1. 清理现有测试数据
-rm -rf ~/Library/Application\ Support/agent-cowork/memory.mv2
+rm -rf ~/Library/Application\ Support/aicowork/memory.mv2
 
 # 2. 启动应用
 npm run dev

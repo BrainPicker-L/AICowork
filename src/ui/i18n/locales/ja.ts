@@ -73,7 +73,7 @@ export default {
 		title: "ヘルプ",
 		quickStart: {
 			title: "クイックスタート",
-			description: "Agent Cowork を使用して最初のタスクを開始する方法を学ぶ",
+			description: "AICowork を使用して最初のタスクを開始する方法を学ぶ",
 		},
 		faq: {
 			title: "よくある質問",
@@ -98,7 +98,7 @@ export default {
 	},
 
 	about: {
-		title: "Agent Cowork について",
+		title: "AICowork について",
 		version: {
 			title: "バージョン情報",
 			description: "バージョン 1.0.0",
@@ -383,7 +383,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "まだメッセージがありません",
-		startConversation: "Agent Cowork との会話を開始",
+		startConversation: "AICowork との会話を開始",
 		beginningOfConversation: "会話の始まり",
 		loadingMessages: "読み込み中...",
 		newMessages: "新しいメッセージ",

@@ -190,8 +190,8 @@ Error: EACCES: permission denied, open '.../cli.js'
 
 Electron 应用已经包含了 Node.js 运行时：
 - Windows: `electron.exe` 包含 Node.js
-- macOS: `Agent Cowork.app/Contents/MacOS/Agent Cowork` 包含 Node.js
-- Linux: `agent-cowork` 二进制文件包含 Node.js
+- macOS: `AICowork.app/Contents/MacOS/AICowork` 包含 Node.js
+- Linux: `aicowork` 二进制文件包含 Node.js
 
 使用 `fork()` 时，会自动使用这个内置的 Node.js。
 

@@ -70,7 +70,7 @@ export default {
 
 	help: {
 		title: "幫助",
-		quickStart: { title: "快速開始", description: "了解如何使用 Agent Cowork 開始第一個任務" },
+		quickStart: { title: "快速開始", description: "了解如何使用 AICowork 開始第一個任務" },
 		faq: { title: "常見問題", description: "查看常見問題和解決方案" },
 		docs: { title: "文檔鏈接", description: "訪問官方文檔獲取更多信息" },
 		tip: "提示：遇到問題可以先查看常見問題，或者通過反饋渠道聯繫我們。",
@@ -79,18 +79,18 @@ export default {
 
 	feedback: {
 		title: "反饋",
-		bugReport: { title: "Bug 報告", description: "在 GitHub 上提交問題報告", url: "https://github.com/Pan519/Claude-Cowork" },
+		bugReport: { title: "Bug 報告", description: "在 GitHub 上提交問題報告", url: "https://github.com/Pan519/AICowork" },
 		featureRequest: { title: "功能建議", description: "提出您希望看到的新功能", url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv" },
 		thankYou: "感謝您的反饋！我們會認真閱讀每一條反饋意見。",
 	},
 
 	about: {
-		title: "關於 Agent Cowork",
+		title: "關於 AICowork",
 		version: { title: "版本信息", description: "版本 1.0.0" },
 		techStack: { title: "技術棧", description: "Electron + React + TypeScript + Claude Agent SDK" },
 		license: { title: "許可證", description: "MIT" },
-		subtitle: "AI 協作工作台——Agent Cowork！",
-		tagline: "Agent Cowork 讓 AI 成為你的工作協作夥伴。",
+		subtitle: "AI 協作工作台——AICowork！",
+		tagline: "AICowork 讓 AI 成為你的工作協作夥伴。",
 	},
 
 	language: {
@@ -277,7 +277,7 @@ export default {
 
 	app: {
 		noMessagesYet: "暫無訊息",
-		startConversation: "開始與 Agent Cowork 對話",
+		startConversation: "開始與 AICowork 對話",
 		beginningOfConversation: "對話開始",
 		loadingMessages: "載入中...",
 		newMessages: "新訊息",

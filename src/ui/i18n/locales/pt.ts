@@ -73,7 +73,7 @@ export default {
 		title: "Ajuda",
 		quickStart: {
 			title: "Início Rápido",
-			description: "Aprenda a usar o Agent Cowork para iniciar sua primeira tarefa",
+			description: "Aprenda a usar o AICowork para iniciar sua primeira tarefa",
 		},
 		faq: {
 			title: "Perguntas Frequentes",
@@ -98,7 +98,7 @@ export default {
 	},
 
 	about: {
-		title: "Sobre o Agent Cowork",
+		title: "Sobre o AICowork",
 		version: {
 			title: "Versão",
 			description: "Versão 1.0.0",
@@ -383,7 +383,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "Nenhuma mensagem ainda",
-		startConversation: "Iniciar uma conversa com o Agent Cowork",
+		startConversation: "Iniciar uma conversa com o AICowork",
 		beginningOfConversation: "Início da conversa",
 		loadingMessages: "Carregando...",
 		newMessages: "Novas mensagens",

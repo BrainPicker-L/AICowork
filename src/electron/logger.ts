@@ -87,7 +87,7 @@ function getSessionLogger(sessionId: string, cwd?: string): winston.Logger {
     }
 
     // 创建会话日志目录（在任务文件夹内）
-    const sessionLogDir = path.join(cwd, '.agent-cowork', 'logs');
+    const sessionLogDir = path.join(cwd, '.aicowork', 'logs');
 
     // 确保日志目录存在
     if (!fs.existsSync(sessionLogDir)) {

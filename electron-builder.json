@@ -1,6 +1,6 @@
 {
-    "appId": "com.devagentforge.agentcowork",
-    "productName": "Agent Cowork",
+    "appId": "com.devagentforge.aicowork",
+    "productName": "AICowork",
     "files": [
         "dist-electron/**/*",
         "dist-react/**/*",
