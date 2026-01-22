@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if not exist \".orchestrator\" mkdir \".orchestrator\")",
+      "Bash(if not exist \".orchestrator\\\\agent_tasks\" mkdir \".orchestrator\\\\agent_tasks\")",
+      "Bash(if not exist \".orchestrator\\\\results\" mkdir \".orchestrator\\\\results\")"
+    ]
+  }
+}
