@@ -2,7 +2,7 @@
  * Runner 模块类型定义
  */
 
-import type { Session } from "../session-store.js";
+import type { Session } from "../../storage/session-store.js";
 import type { ServerEvent } from "../../types.js";
 import type { PermissionResult } from "@anthropic-ai/claude-agent-sdk";
 

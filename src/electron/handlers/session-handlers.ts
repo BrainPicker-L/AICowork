@@ -5,7 +5,7 @@
 
 import { log } from "../logger.js";
 import { runClaude, type RunnerHandle } from "../libs/runner.js";
-import type { SessionStore, Session } from "../libs/session-store.js";
+import type { SessionStore, Session } from '../storage/session-store.js';
 import type { ClientEvent, ServerEvent } from "../types.js";
 
 // 提取特定事件类型的辅助类型

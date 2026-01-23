@@ -1,7 +1,7 @@
 import { BrowserWindow } from "electron";
 import type { ClientEvent, ServerEvent } from "./types.js";
 import { runClaude, type RunnerHandle } from "./libs/runner.js";
-import { SessionStore } from "./libs/session-store.js";
+import { SessionStore } from './storage/session-store.js';
 import { app } from "electron";
 import { join } from "path";
 import { log } from "./logger.js";
@@ -14,8 +14,8 @@ import {
   handleSessionDelete,
   handlePermissionResponse,
 } from "./handlers/session-handlers.js";
-import { fetchModelList, fetchModelLimits } from "./libs/config-store.js";
-import type { ApiConfig } from "./libs/config-store.js";
+import { fetchModelList, fetchModelLimits } from './storage/config-store.js';
+import type { ApiConfig } from './storage/config-store.js';
 
 let sessions: SessionStore;
 const runnerHandles = new Map<string, RunnerHandle>();

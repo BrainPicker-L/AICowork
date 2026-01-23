@@ -4,8 +4,8 @@
  * 支持双后端：Memvid SDK（主要）和文件系统（后备）
  */
 
-import { getMemvidStore } from './memvid-store.js';
-import { getFsMemoryStore } from './fs-memory-store.js';
+import { getMemvidStore } from '../storage/memvid-store.js';
+import { getFsMemoryStore } from '../storage/fs-memory-store.js';
 import { log } from '../logger.js';
 
 /**

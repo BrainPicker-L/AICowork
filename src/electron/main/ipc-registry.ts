@@ -8,8 +8,8 @@ import { getMainWindow } from "./window-manager.js";
 import { wrapIpcHandler } from "../middleware/ipc-error-handler.js";
 import { getStaticData, pollResources } from "../test.js";
 import { handleClientEvent, sessions } from "../ipc-handlers.js";
-import { generateSessionTitle } from "../libs/util.js";
-import { getCurrentApiConfig } from "../libs/claude-settings.js";
+import { generateSessionTitle } from '../utils/util.js';
+import { getCurrentApiConfig } from '../services/claude-settings.js';
 import { testApiConnection } from "../api-tester.js";
 import type { ClientEvent } from "../types.js";
 import { SLASH_COMMANDS_CACHE_TTL } from "../config/network-constants.js";
@@ -179,7 +179,7 @@ function setupSlashCommandsCache(): void {
                 return slashCommandsCache;
             }
 
-            const { getSlashCommands } = await import("../libs/slash-commands.js");
+            const { getSlashCommands } = await import("../services/slash-commands.js");
             const commands = await getSlashCommands();
 
             // 更新缓存

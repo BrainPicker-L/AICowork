@@ -8,7 +8,7 @@ import { execSync } from "child_process";
 import { isDev, DEV_PORT } from "../util.js";
 import { stopPolling } from "../test.js";
 import { cleanupAllSessions } from "../ipc-handlers.js";
-import { getMemvidStore } from "../libs/memvid-store.js";
+import { getMemvidStore } from "../storage/memvid-store.js";
 import { log } from "../logger.js";
 
 let cleanupComplete = false;
@@ -34,7 +34,7 @@ export function cleanup(): void {
 
     // 销毁 SDK 配置缓存
     try {
-        const { destroyConfigCache } = require("../libs/sdk-config-cache.js");
+        const { destroyConfigCache } = require("../managers/sdk-config-cache.js");
         destroyConfigCache();
         log.info('[cleanup] SDK config cache destroyed');
     } catch (err) {

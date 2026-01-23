@@ -196,7 +196,7 @@ async function loadAgents(): Promise<{ agents: Record<string, SdkAgentConfig>; d
     // 方法 2: 从 UI 全局配置读取（userData/agents/global-config.json）
     if (!defaultAgent) {
       try {
-        const { getGlobalConfig } = await import('./agents-store.js');
+        const { getGlobalConfig } = await import('../storage/agents-store.js');
         const uiGlobalConfig = await getGlobalConfig();
         if (uiGlobalConfig.defaultAgentId) {
           defaultAgent = uiGlobalConfig.defaultAgentId;

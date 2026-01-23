@@ -6,8 +6,8 @@
 import { query, type SDKMessage, type PermissionResult } from "@anthropic-ai/claude-agent-sdk";
 import type { ServerEvent } from "../../types.js";
 import type { RunnerOptions, RunnerHandle, MemoryConfig } from "./types.js";
-import type { Session } from "../session-store.js";
-import type { SdkNativeConfig } from "../sdk-native-loader.js";
+import type { Session } from "../../storage/session-store.js";
+import type { SdkNativeConfig } from "../../utils/sdk-native-loader.js";
 
 import {
   getCurrentApiConfig,
@@ -15,12 +15,12 @@ import {
   buildEnvForConfigWithProxy,
   checkProxyNeeded,
   getClaudeCodePath
-} from "../claude-settings.js";
-import { getEnhancedEnv } from "../util.js";
+} from "../../services/claude-settings.js";
+import { getEnhancedEnv } from "../../utils/util.js";
 import { addLanguagePreference } from "../../utils/language-detector.js";
-import { transformSlashCommand } from "../slash-commands.js";
-import { getMemoryToolConfig } from "../memory-tools.js";
-import { getCachedSdkNativeConfig } from "../sdk-config-cache.js";
+import { transformSlashCommand } from "../../services/slash-commands.js";
+import { getMemoryToolConfig } from "../../utils/memory-tools.js";
+import { getCachedSdkNativeConfig } from "../../managers/sdk-config-cache.js";
 
 import { PerformanceMonitor } from "./performance-monitor.js";
 import { getMemoryGuidancePrompt, triggerAutoMemoryAnalysis } from "./memory-manager.js";
@@ -131,7 +131,7 @@ export async function runClaude(options: RunnerOptions): Promise<RunnerHandle> {
 
       // 6. 获取 MCP 服务器（使用管理器实例池）
       perfMonitor.mark('MCP Server Acquisition');
-      const { getMcpServerManager } = await import("../mcp-server-manager.js");
+      const { getMcpServerManager } = await import("../../managers/mcp-server-manager.js");
       const mcpManager = getMcpServerManager();
       const mcpServers = await mcpManager.acquireServers();
       perfMonitor.measure('MCP Server Acquisition');

@@ -2,9 +2,9 @@ import { app } from "electron";
 import { readFileSync, existsSync, mkdirSync, writeFileSync, promises as fs } from "fs";
 import { join } from "path";
 import { log } from "../logger.js";
-import { getProviderDefaults } from "./api-adapter.js";
+import { getProviderDefaults } from "../libs/api-adapter.js";
 import type { ApiProvider } from "../config/constants.js";
-import { saveApiConfigToEnv } from "./env-file.js";
+import { saveApiConfigToEnv } from "../utils/env-file.js";
 
 // 使用 fs.promises 进行异步操作
 const { writeFile, access } = fs;
@@ -495,7 +495,7 @@ export function saveApiConfig(config: ApiConfig): void {
   // 清除代理检测缓存，确保下次运行时重新检测
   try {
     // 动态导入避免循环依赖（ESM 使用 import 而非 require）
-    import("./claude-settings.js").then((module) => {
+    import("../services/claude-settings.js").then((module) => {
       if (module.clearProxyCache) {
         module.clearProxyCache();
       }

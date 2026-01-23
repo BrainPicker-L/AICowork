@@ -3,10 +3,10 @@
  * 处理自动记忆分析和存储功能
  */
 
-import type { Session } from "../session-store.js";
+import type { Session } from "../../storage/session-store.js";
 import type { ServerEvent } from "../../types.js";
 import type { MemoryConfig } from "./types.js";
-import { memoryStore } from "../memory-tools.js";
+import { memoryStore } from "../../utils/memory-tools.js";
 
 // 记忆指南系统提示缓存
 let memoryGuidancePromptCache: string | null = null;
@@ -134,7 +134,7 @@ export async function triggerAutoMemoryAnalysis(
   }
 
   // 获取 API 配置
-  const { getCurrentApiConfig } = await import("../claude-settings.js");
+  const { getCurrentApiConfig } = await import("../../services/claude-settings.js");
   const config = getCurrentApiConfig();
   if (!config) {
     log.warn('[Auto Memory] No API config available');

@@ -8,8 +8,8 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { app } from 'electron';
 import { log } from '../logger.js';
-import { loadSdkNativeConfig, type SdkNativeConfig } from './sdk-native-loader.js';
-import { loadMcpServers, type McpServerConfig } from './mcp-store.js';
+import { loadSdkNativeConfig, type SdkNativeConfig } from '../utils/sdk-native-loader.js';
+import { loadMcpServers, type McpServerConfig } from '../storage/mcp-store.js';
 
 /**
  * 缓存的配置数据

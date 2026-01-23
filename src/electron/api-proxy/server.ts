@@ -6,7 +6,7 @@
 import { createServer, IncomingMessage, ServerResponse, Server } from 'http';
 import { log } from '../logger.js';
 import { estimateTokens } from './token-counter.js';
-import { saveApiConfig, type ApiConfig } from '../libs/config-store.js';
+import { saveApiConfig, type ApiConfig } from '../storage/config-store.js';
 import type { AnthropicRequest } from '../libs/api-adapter.js';
 import { getApiAdapter } from '../libs/api-adapter.js';
 

@@ -10,11 +10,11 @@
 
 import { app, Menu } from "electron";
 import { log, logStartup, setupErrorHandling } from "./logger.js";
-import { precheckProxyNeeds } from "./libs/claude-settings.js";
+import { precheckProxyNeeds } from './services/claude-settings.js';
 import { setupLifecycleEventHandlers } from "./main/lifecycle.js";
 import { createMainWindow } from "./main/window-manager.js";
 import { registerIpcHandlers } from "./main/ipc-registry.js";
-import "./libs/claude-settings.js";
+import "./services/claude-settings.js";
 
 /**
  * 初始化异步任务
@@ -28,7 +28,7 @@ function initializeAsyncTasks(): void {
 
     // 启动时预加载 SDK 配置
     // 优化：提前缓存配置，减少会话启动时的3-5秒延迟
-    import("./libs/sdk-config-cache.js").then((cacheModule) => {
+    import("./managers/sdk-config-cache.js").then((cacheModule) => {
         cacheModule.initializeConfigCache().catch((error) => {
             log.warn('[Main] SDK 配置缓存初始化失败（不影响使用）:', error);
         });
@@ -37,7 +37,7 @@ function initializeAsyncTasks(): void {
     });
 
     // 从 .env 文件加载环境变量
-    import("./libs/env-file.js").then((envModule) => {
+    import("./utils/env-file.js").then((envModule) => {
         try {
             const envVars = envModule.readEnvFile ? envModule.readEnvFile() : {};
             Object.assign(process.env, envVars);

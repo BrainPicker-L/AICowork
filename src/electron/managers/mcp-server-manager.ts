@@ -4,11 +4,11 @@
  */
 
 import { log } from "../logger.js";
-import { loadMcpServers, type McpServerConfig } from "./mcp-store.js";
+import { loadMcpServers, type McpServerConfig } from "../storage/mcp-store.js";
 import { getCachedMcpServers } from "./sdk-config-cache.js";
-import { createMemoryMcpServer } from "./memory-mcp-server.js";
-import { createClaudeMemoryToolServer } from "./claude-memory-mcp-server.js";
-import { getMemoryToolConfig } from "./memory-tools.js";
+import { createMemoryMcpServer } from "../utils/memory-mcp-server.js";
+import { createClaudeMemoryToolServer } from "../utils/claude-memory-mcp-server.js";
+import { getMemoryToolConfig } from "../utils/memory-tools.js";
 
 /**
  * MCP 服务器实例类型

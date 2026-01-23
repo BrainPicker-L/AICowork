@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
-import { loadApiConfig, saveApiConfig, type ApiConfig } from "./config-store.js";
+import { loadApiConfig, saveApiConfig, type ApiConfig } from "../storage/config-store.js";
 import { startProxyServer, stopProxyServer, getProxyStatus } from "../api-proxy/index.js";
 import { app } from "electron";
 import { log } from "../logger.js";
@@ -324,7 +324,7 @@ export async function checkProxyNeeded(config: ApiConfig): Promise<boolean> {
 
     // 保存检测结果到配置文件，避免下次重复检测
     try {
-      const { saveApiConfig, loadAllApiConfigs } = await import('./config-store.js');
+      const { saveApiConfig, loadAllApiConfigs } = await import('../storage/config-store.js');
       const store = loadAllApiConfigs();
       if (store) {
         const existingConfig = store.configs.find(c => c.id === config.id);
