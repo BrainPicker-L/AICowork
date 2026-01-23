@@ -1,7 +1,7 @@
 # Agent-03: 类型定义与配置分析
 
 ## 输入参数
-- 项目根目录: c:\myproject\Claude-Cowork
+- 项目根目录: c:\myproject\AICowork
 - 分析文件列表:
   - types/index.d.ts
   - src/ui/electron.d.ts

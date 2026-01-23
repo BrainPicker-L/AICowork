@@ -1,7 +1,7 @@
 # Agent-01: Electron主进程代码分析
 
 ## 输入参数
-- 项目根目录: c:\myproject\Claude-Cowork
+- 项目根目录: c:\myproject\AICowork
 - 分析文件列表:
   - src/electron/main.ts
   - src/electron/ipc-handlers.ts

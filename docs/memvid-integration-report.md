@@ -1,6 +1,6 @@
 # Memvid AI 内存系统集成研究报告
 
-> **作者**: Alan
+> **作者**: Alan, Muprprpr
 > **创建日期**: 2025-01-21
 > **版本**: 1.0.0
 > **许可证**: AGPL-3.0
@@ -23,11 +23,11 @@
 
 ### 1.1 研究背景
 
-**Claude-Cowork** 是一个基于 Electron 的 AI 协作平台，当前使用 better-sqlite3 作为本地数据库。为了增强 AI 的长期记忆能力和知识管理能力，我们研究了 **Memvid** —— 一个专为 AI 代理设计的单文件内存系统。
+**AICowork** 是一个基于 Electron 的 AI 协作平台，当前使用 better-sqlite3 作为本地数据库。为了增强 AI 的长期记忆能力和知识管理能力，我们研究了 **Memvid** —— 一个专为 AI 代理设计的单文件内存系统。
 
 ### 1.2 研究目标
 
-1. 评估 Memvid 是否适合作为 Claude-Cowork 的内存层
+1. 评估 Memvid 是否适合作为 AICowork 的内存层
 2. 设计可行的集成方案
 3. 提供完整的实施路径和最佳实践
 4. 评估技术风险和收益
@@ -408,7 +408,7 @@ const response: SearchResponse = await memvid.search(request);
 
 **最终推荐: 方案 A (Node.js SDK)**
 
-对于 Claude-Cowork 项目，方案 A 是唯一合理的选择：
+对于 AICowork 项目，方案 A 是唯一合理的选择：
 - ✅ 零额外配置
 - ✅ 完整功能支持
 - ✅ 官方长期维护

@@ -11,7 +11,7 @@ Memvid 是一个单文件 AI 内存系统，具有以下特性：
 - **本地优先** - 无需数据库，完全离线工作
 - **跨平台 SDK** - Rust 核心，Node.js/Python SDK
 
-### 当前项目（Claude-Cowork）分析
+### 当前项目（AICowork）分析
 - **前端**: React + TypeScript + Tailwind CSS
 - **后端**: Electron (Node.js)
 - **数据库**: better-sqlite3
@@ -22,7 +22,7 @@ Memvid 是一个单文件 AI 内存系统，具有以下特性：
 
 ## 二、集成目标
 
-将 Memvid 作为 AI 对话的持久化内存层，为 Claude-Cowork 提供：
+将 Memvid 作为 AI 对话的持久化内存层，为 AICowork 提供：
 
 1. **对话历史记忆** - 存储和检索历史对话内容
 2. **知识库管理** - 存储文档、笔记、代码片段

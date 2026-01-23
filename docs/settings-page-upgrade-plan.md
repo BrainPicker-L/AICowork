@@ -535,6 +535,6 @@ export function McpSection() {
 
 ---
 
-**作者**: Alan
+**作者**: Alan, Muprprpr
 **创建日期**: 2026-01-21
 **许可证**: AGCPA v3.0

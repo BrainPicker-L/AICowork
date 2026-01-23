@@ -1,7 +1,7 @@
-# Claude-Cowork Skill/Rule/Plugin 系统实现计划
+# AICowork Skill/Rule/Plugin 系统实现计划
 
-> **项目**: Claude-Cowork - Skill/Rule/Plugin 功能实现
-> **作者**: Alan
+> **项目**: AICowork - Skill/Rule/Plugin 功能实现
+> **作者**: Alan, Muprprpr
 > **创建日期**: 2026-01-20
 > **预计工期**: 约 18-20 天
 
@@ -9,7 +9,7 @@
 
 ## 一、需求概述
 
-参考 Claude 官方的 Claude-cowork，为 Claude-Cowork 桌面应用添加以下功能：
+参考 Claude 官方的 Claude-cowork，为 AICowork 桌面应用添加以下功能：
 
 1. **Skill（技能）系统** - 技能卡片展示、启用/禁用、参数配置
 2. **Scenario（场景）系统** - 场景卡片、快速启动、收藏功能

@@ -1,7 +1,7 @@
 # Agent-02: React前端代码分析
 
 ## 输入参数
-- 项目根目录: c:\myproject\Claude-Cowork
+- 项目根目录: c:\myproject\AICowork
 - 分析文件列表:
   - src/ui/App.tsx
   - src/ui/main.tsx

@@ -1,7 +1,7 @@
 # Agent-04: 共享模块与工具函数分析
 
 ## 输入参数
-- 项目根目录: c:\myproject\Claude-Cowork
+- 项目根目录: c:\myproject\AICowork
 - 分析目录:
   - src/shared/
   - 所有utils/目录

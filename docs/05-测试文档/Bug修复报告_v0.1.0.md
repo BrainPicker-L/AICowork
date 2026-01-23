@@ -1,4 +1,4 @@
-# Claude-Cowork Bug 修复报告
+# AICowork Bug 修复报告
 
 > **文档类型**: Bug 修复报告
 > **报告日期**: 2026-01-20

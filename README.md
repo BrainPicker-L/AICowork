@@ -534,7 +534,7 @@ AGPL-3.0 是一个强 copyleft 自由软件许可证，与 GPL 类似，但额�
 
 ## 联系方式
 
-- **作者**: Alan
+- **作者**: Alan, Muprprpr
 - **项目地址**: [https://github.com/Pan519/AICowork](https://github.com/Pan519/AICowork)
 - **问题反馈**: [Issues](https://github.com/Pan519/AICowork/issues)
 
@@ -544,6 +544,6 @@ AGPL-3.0 是一个强 copyleft 自由软件许可证，与 GPL 类似，但额�
 
 **如果这个项目对你有帮助，请给一个 ⭐️ Star！**
 
-Made with ❤️ by Alan
+Made with ❤️ by Alan & Muprprpr
 
 </div>
