@@ -2,10 +2,6 @@
  * 前端日志工具
  *
  * 将前端日志通过 IPC 发送到主进程的 winston 日志系统
- *
- * @author: Alan
- * @copyright: Copyright © 2026
- * @created: 2026-01-20
  */
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';

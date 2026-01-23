@@ -1,9 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-21
- * @Email       None
- *
  * 斜杠命令管理 - 动态获取可用的斜杠命令列表
  *
  * 实现机制：

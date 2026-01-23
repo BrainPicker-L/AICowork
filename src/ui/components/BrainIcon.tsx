@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-22
- * @updated     2026-01-22
- * @Email       None
- *
  * Brain 图标组件 - 支持动态颜色
  * 使用包装器 + CSS 类方式，确保 SVG 图标正确着色
  */

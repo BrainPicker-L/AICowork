@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-21
- * @updated     2026-01-21
- * @Email       None
- *
  * 增强的 Markdown 渲染组件
  * 支持 SVG 图表、代码块、表格等多种渲染类型
  */

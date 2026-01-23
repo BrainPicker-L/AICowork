@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-21
- * @updated     2026-01-21
- * @Email       None
- *
  * Agents 管理区域
  * 支持全局配置和自定义 Agent 管理
  */

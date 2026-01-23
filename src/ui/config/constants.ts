@@ -1,9 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-20
- * @Email       None
- *
  * 前端常量配置
  * 统一管理 UI 尺寸、默认值、动画时间等常量
  */

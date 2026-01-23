@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-21
- * @updated     2026-01-21
- * @Email       None
- *
  * Skills 管理存储库
  * 管理用户自定义技能的创建、读取、删除操作
  */

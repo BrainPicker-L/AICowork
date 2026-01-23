@@ -1,9 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-20
- * @Email       None
- *
  * 类型守卫和运行时类型验证
  * 提供安全的类型检查和验证函数
  */

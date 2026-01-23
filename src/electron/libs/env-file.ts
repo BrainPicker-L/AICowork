@@ -1,9 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-20
- * @Email       None
- *
  * 环境变量文件管理
  * 将用户配置保存到本地 .env 文件，实现持久化
  */

@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-21
- * @updated     2026-01-21
- * @Email       None
- *
  * Agents 管理存储库
  * 管理自定义 Agent 类型的创建、读取、更新、删除操作
  */

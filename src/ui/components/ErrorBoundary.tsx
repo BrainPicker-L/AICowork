@@ -3,12 +3,6 @@
  *
  * 捕获子组件树中的 JavaScript 错误，记录错误日志，
  * 并显示备用 UI 而不是使整个应用崩溃
- *
- * @author: Alan
- * @copyright: Copyright © 2026
- * @created: 2026-01-20
- * @Email: alan@example.com
- * @license: AGCPA v3.0
  */
 
 import { Component, ReactNode } from "react";

@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-22
- * @updated     2026-01-22
- * @Email       None
- *
  * 记忆 MCP 服务器
  * 使用 SDK MCP 功能注册记忆工具
  */

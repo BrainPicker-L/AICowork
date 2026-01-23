@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-21
- * @updated     2026-01-21
- * @Email       None
- *
  * Rules 规则管理区域
  * 管理项目自定义规则文件（.claude/rules/）
  */

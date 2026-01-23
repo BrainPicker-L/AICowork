@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-22
- * @updated     2026-01-22
- * @Email       None
- *
  * Claude Memory Tool MCP 服务器
  * 实现 memory_20250818 工具类型的标准命令
  */

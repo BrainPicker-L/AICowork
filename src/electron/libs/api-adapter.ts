@@ -1,9 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-20
- * @Email       None
- *
  * 多厂商 API 转换器
  * 将不同厂商的 API 格式转换为 Anthropic 兼容格式
  */

@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-21
- * @updated     2026-01-21
- * @Email       None
- *
  * Claude.md 配置管理区域
  * 管理项目级别的 CLAUDE.md 配置文件
  */

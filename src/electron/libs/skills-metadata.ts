@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-22
- * @updated     2026-01-22
- * @Email       None
- *
  * 技能元数据存储 - 存储用户的备注和标签
  * 不修改原始技能文件，元数据独立存储
  */

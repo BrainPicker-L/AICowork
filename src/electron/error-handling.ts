@@ -1,13 +1,3 @@
-/**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-20
- * @Email       None
- *
- * 全局错误处理
- * 捕获未处理的异常和 Promise rejection
- */
-
 import { log } from './logger.js';
 
 /**

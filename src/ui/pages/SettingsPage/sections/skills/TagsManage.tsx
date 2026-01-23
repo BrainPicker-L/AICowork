@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-22
- * @updated     2026-01-22
- * @Email       None
- *
  * TagsManage - 标签管理组件
  * 创建、编辑、删除标签，管理技能与标签的关联
  */

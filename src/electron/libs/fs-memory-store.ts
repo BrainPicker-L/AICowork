@@ -1,10 +1,4 @@
 /**
- * @author      Alan
- * @copyright   AGCPA v3.0
- * @created     2026-01-22
- * @updated     2026-01-22
- * @Email       None
- *
  * 文件系统记忆存储库
  * 使用简单的 JSON 文件存储实现 AI 记忆功能
  * 当 Memvid SDK 不可用时作为后备方案
