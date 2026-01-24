@@ -340,7 +340,6 @@ function App() {
   }, [resetToLatest]);
 
   const handleNewSession = useCallback(() => {
-    useAppStore.getState().setActiveSessionId(null);
     setShowStartModal(true);
   }, [setShowStartModal]);
 
