@@ -407,7 +407,7 @@ function App() {
         </div>
 
         {/* 固定的会话状态指示器栏 - 合并显示状态和超时提示 */}
-        <div className="sticky top-0 z-10 bg-surface-cream/95 backdrop-blur-sm border-b border-ink-900/5 px-8 py-1.5">
+        <div className="sticky top-0 z-10 bg-surface-cream/95 backdrop-blur-sm border-b border-ink-900/5 px-8 py-1.5 empty-none">
           <SessionStatusIndicator
             status={sessionStatus}
             elapsedSeconds={showTimeoutWarning && responseStartTime ? Math.floor((Date.now() - responseStartTime) / 1000) : undefined}

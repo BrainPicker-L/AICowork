@@ -171,3 +171,10 @@ code, pre, textarea.mono, input.mono {
 .text-muted-light svg * {
   stroke: var(--color-muted-light) !important;
 }
+
+/* 会话状态指示器栏 - 当容器为空时隐藏 */
+
+/* 空div自动隐藏 */
+.empty-none:empty {
+  display: none;
+}
