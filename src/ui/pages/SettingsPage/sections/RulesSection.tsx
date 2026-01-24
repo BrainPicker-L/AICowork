@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 // 规则文件接口
 interface RuleFile {
@@ -193,6 +194,7 @@ export function RulesSection() {
   };
 
   return (
+    <TooltipProvider>
     <section className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-ink-900">规则管理</h1>
@@ -205,30 +207,42 @@ export function RulesSection() {
         {/* 左侧：规则列表 - 占40% */}
         <div className="w-2/5 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-ink-900">规则文件 ({rules.length})</h2>
-            <button
-              type="button"
-              className="text-sm px-4 py-2 rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors shadow-soft"
-              onClick={handleCreateRule}
-            >
-              + 新建
-            </button>
-          </div>
+          <h2 className="text-sm font-medium text-ink-900">规则文件 ({rules.length})</h2>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="text-sm px-4 py-2 rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors shadow-soft cursor-pointer"
+                onClick={handleCreateRule}
+              >
+                + 新建
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              创建新的规则文件
+            </TooltipContent>
+          </Tooltip>
+        </div>
 
           {/* 从模板创建 */}
           <div className="space-y-2">
             <p className="text-xs text-muted">从模板创建：</p>
             <div className="flex flex-wrap gap-2">
               {RULE_TEMPLATES.map((template) => (
-                <button
-                  key={template.name}
-                  type="button"
-                  className="text-sm px-4 py-2 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary hover:border-accent/50 transition-colors"
-                  onClick={() => handleCreateFromTemplate(template)}
-                  title={template.description}
-                >
-                  {template.name}
-                </button>
+                <Tooltip key={template.name}>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-sm px-4 py-2 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary hover:border-accent/50 transition-colors cursor-pointer"
+                      onClick={() => handleCreateFromTemplate(template)}
+                    >
+                      {template.name}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                    {template.description}
+                  </TooltipContent>
+                </Tooltip>
               ))}
             </div>
           </div>
@@ -265,19 +279,25 @@ export function RulesSection() {
                         {new Date(rule.modified).toLocaleString()}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      className="text-xs text-muted hover:text-error p-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteRule(rule);
-                      }}
-                      title="删除"
-                    >
-                      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                      </svg>
-                    </button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="text-xs text-muted hover:text-error p-1 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteRule(rule);
+                          }}
+                        >
+                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                        删除规则文件
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
               ))
@@ -301,34 +321,55 @@ export function RulesSection() {
                 <div className="flex gap-2">
                   {!editing ? (
                     <>
-                      <button
-                        type="button"
-                        className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors"
-                        onClick={() => setEditing(true)}
-                      >
-                        编辑
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors cursor-pointer"
+                            onClick={() => setEditing(true)}
+                          >
+                            编辑
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          开始编辑规则文件
+                        </TooltipContent>
+                      </Tooltip>
                     </>
                   ) : (
                     <>
-                      <button
-                        type="button"
-                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors disabled:opacity-50"
-                        onClick={handleSaveRule}
-                        disabled={saving}
-                      >
-                        {saving ? '保存中...' : '保存'}
-                      </button>
-                      <button
-                        type="button"
-                        className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors"
-                        onClick={() => {
-                          setEditing(false);
-                          setEditContent(selectedRule.content);
-                        }}
-                      >
-                        取消
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className="text-xs px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors disabled:opacity-50 cursor-pointer"
+                            onClick={handleSaveRule}
+                            disabled={saving}
+                          >
+                            {saving ? '保存中...' : '保存'}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          {saving ? '保存中...' : '保存规则文件'}
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors cursor-pointer"
+                            onClick={() => {
+                              setEditing(false);
+                              setEditContent(selectedRule.content);
+                            }}
+                          >
+                            取消
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          取消编辑，恢复原始内容
+                        </TooltipContent>
+                      </Tooltip>
                     </>
                   )}
                 </div>
@@ -365,5 +406,6 @@ export function RulesSection() {
         </div>
       </div>
     </section>
+    </TooltipProvider>
   );
 }

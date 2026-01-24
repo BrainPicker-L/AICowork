@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 type OutputConfig = {
   format: 'markdown' | 'plain' | 'html' | 'json';
@@ -103,25 +104,28 @@ export function OutputSection() {
 
   if (loading) {
     return (
-      <section className="space-y-6">
-        <header>
-          <h1 className="text-2xl font-semibold text-ink-900">{t("output.title")}</h1>
-          <p className="mt-2 text-sm text-muted">
-            {t("output.subtitle")}
-          </p>
-        </header>
+      <TooltipProvider>
+        <section className="space-y-6">
+          <header>
+            <h1 className="text-2xl font-semibold text-ink-900">{t("output.title")}</h1>
+            <p className="mt-2 text-sm text-muted">
+              {t("output.subtitle")}
+            </p>
+          </header>
 
-        <div className="flex items-center justify-center py-12">
-          <svg aria-hidden="true" className="w-8 h-8 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-        </div>
-      </section>
+          <div className="flex items-center justify-center py-12">
+            <svg aria-hidden="true" className="w-8 h-8 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          </div>
+        </section>
+      </TooltipProvider>
     );
   }
 
   return (
+    <TooltipProvider>
     <section className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-ink-900">{t("output.title")}</h1>
@@ -260,20 +264,34 @@ export function OutputSection() {
 
         {/* 操作按钮 */}
         <div className="flex gap-3 pt-2">
-          <button
-            className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleSave}
-            disabled={saving || !hasChanges}
-          >
-            {saving ? '保存中...' : '保存配置'}
-          </button>
-          <button
-            className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2.5 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleReset}
-            disabled={saving}
-          >
-            重置为默认
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                onClick={handleSave}
+                disabled={saving || !hasChanges}
+              >
+                {saving ? '保存中...' : '保存配置'}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              {saving ? '保存中...' : '保存输出样式配置'}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2.5 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                onClick={handleReset}
+                disabled={saving}
+              >
+                重置为默认
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              将所有配置重置为默认值
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
@@ -283,5 +301,6 @@ export function OutputSection() {
         </p>
       </aside>
     </section>
+    </TooltipProvider>
   );
 }

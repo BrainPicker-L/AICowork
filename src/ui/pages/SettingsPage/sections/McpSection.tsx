@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { Trash2, Edit2, X, ChevronDown, ChevronUp, Shield, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface McpServerConfig {
   name: string;
@@ -275,6 +276,7 @@ export function McpSection() {
   };
 
   return (
+    <TooltipProvider>
     <section className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
@@ -286,7 +288,7 @@ export function McpSection() {
         {viewMode === 'list' && (
           <button
             onClick={handleAdd}
-            className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors"
+            className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors cursor-pointer"
           >
             {t('mcp.addServer')}
           </button>
@@ -347,30 +349,48 @@ export function McpSection() {
                           )}
                         </span>
                       )}
-                      <button
-                        className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-surface transition-colors"
-                        onClick={(e) => { e.stopPropagation(); handleEdit(server); }}
-                        title={t('mcp.actions.edit')}
-                      >
-                        <Edit2 className="w-4 h-4" strokeWidth={2} />
-                      </button>
-                      <button
-                        className="p-1.5 rounded-lg text-muted hover:text-success hover:bg-surface transition-colors"
-                        onClick={(e) => { e.stopPropagation(); handleTestServer(server); }}
-                        title="测试连接"
-                      >
-                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}>
-                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                          <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
-                      </button>
-                      <button
-                        className="p-1.5 rounded-lg text-muted hover:text-error hover:bg-surface transition-colors"
-                        onClick={(e) => { e.stopPropagation(); handleDelete(server.name); }}
-                        title={t('mcp.actions.delete')}
-                      >
-                        <Trash2 className="w-4 h-4" strokeWidth={2} />
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-surface transition-colors cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); handleEdit(server); }}
+                          >
+                            <Edit2 className="w-4 h-4" strokeWidth={2} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          {t('mcp.actions.edit')}
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="p-1.5 rounded-lg text-muted hover:text-success hover:bg-surface transition-colors cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); handleTestServer(server); }}
+                          >
+                            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}>
+                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                              <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          测试连接
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="p-1.5 rounded-lg text-muted hover:text-error hover:bg-surface transition-colors cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(server.name); }}
+                          >
+                            <Trash2 className="w-4 h-4" strokeWidth={2} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          {t('mcp.actions.delete')}
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
 
@@ -468,12 +488,19 @@ export function McpSection() {
               <h2 className="text-lg font-medium text-ink-900">
                 {viewMode === 'add' ? t('mcp.form.addTitle') : t('mcp.form.editTitle')}
               </h2>
-              <button
-                onClick={handleCancel}
-                className="p-1.5 rounded-full text-muted hover:bg-surface-tertiary hover:text-ink-700 transition-colors"
-              >
-                <X className="w-5 h-5" strokeWidth={2} />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleCancel}
+                    className="p-1.5 rounded-full text-muted hover:bg-surface-tertiary hover:text-ink-700 transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" strokeWidth={2} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  取消操作
+                </TooltipContent>
+              </Tooltip>
             </div>
 
             {/* 从模板快速添加 */}
@@ -743,5 +770,6 @@ export function McpSection() {
         </p>
       </aside>
     </section>
+    </TooltipProvider>
   );
 }

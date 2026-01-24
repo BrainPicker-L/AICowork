@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { PermissionsStore } from "../../../electron.d";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 type ViewMode = 'list' | 'create';
 
@@ -122,6 +123,7 @@ export function PermissionsSection() {
 	};
 
 	return (
+		<TooltipProvider>
 		<section className="space-y-6">
 			<header>
 			<h1 className="text-2xl font-semibold text-ink-900">{t("permissions.title")}</h1>
@@ -203,19 +205,33 @@ export function PermissionsSection() {
 						)}
 
 						<div className="flex gap-3">
-							<button
-								className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-								onClick={handleCreateRule}
-								disabled={saving}
-							>
-								{saving ? '保存中...' : '保存规则'}
-							</button>
-							<button
-								className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2.5 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors"
-								onClick={() => setViewMode('list')}
-							>
-								取消
-							</button>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+										onClick={handleCreateRule}
+										disabled={saving}
+									>
+										{saving ? '保存中...' : '保存规则'}
+									</button>
+								</TooltipTrigger>
+								<TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+									{saving ? '保存中...' : '保存权限规则'}
+								</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2.5 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors cursor-pointer"
+										onClick={() => setViewMode('list')}
+									>
+										取消
+									</button>
+								</TooltipTrigger>
+								<TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+									取消创建权限规则
+								</TooltipContent>
+							</Tooltip>
 						</div>
 					</div>
 
@@ -293,15 +309,21 @@ export function PermissionsSection() {
 												<p className="mt-1 text-xs text-muted">{rule.description}</p>
 											)}
 										</div>
-										<button
-											className="text-xs text-muted hover:text-error p-1"
-											onClick={() => handleDeleteRule(rule.tool)}
-											title="删除规则"
-										>
-											<svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-												<path d="M18 6L6 18M6 6l12 12" />
-											</svg>
-										</button>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<button
+													className="text-xs text-muted hover:text-error p-1 cursor-pointer"
+													onClick={() => handleDeleteRule(rule.tool)}
+												>
+													<svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+														<path d="M18 6L6 18M6 6l12 12" />
+													</svg>
+												</button>
+											</TooltipTrigger>
+											<TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+												删除权限规则
+											</TooltipContent>
+										</Tooltip>
 									</div>
 								</div>
 							))}
@@ -309,12 +331,19 @@ export function PermissionsSection() {
 					)}
 
 					<div className="flex gap-3">
-						<button
-							className="flex-1 py-3 rounded-xl bg-accent text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors"
-							onClick={() => setViewMode('create')}
-						>
-							添加权限规则
-						</button>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<button
+									className="flex-1 py-3 rounded-xl bg-accent text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors cursor-pointer"
+									onClick={() => setViewMode('create')}
+								>
+									添加权限规则
+								</button>
+							</TooltipTrigger>
+							<TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+								创建新的权限规则
+							</TooltipContent>
+						</Tooltip>
 					</div>
 
 					<aside className="p-4 rounded-xl bg-surface-secondary border border-ink-900/5">
@@ -325,5 +354,6 @@ export function PermissionsSection() {
 				</>
 			)}
 		</section>
+		</TooltipProvider>
 	);
 }

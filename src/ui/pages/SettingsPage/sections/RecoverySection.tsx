@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { SessionInfo } from "../../../electron.d";
 import { useAppStore } from "../../../store/useAppStore";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 /**
  * 时间格式化工具函数
@@ -170,6 +171,7 @@ export function RecoverySection() {
 	};
 
 	return (
+		<TooltipProvider>
 		<section className="space-y-6">
 			<header className="flex items-center justify-between">
 				<div>
@@ -178,13 +180,20 @@ export function RecoverySection() {
 						{t("recovery.description")}
 					</p>
 				</div>
-				<button
-					onClick={loadSessions}
-					className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-					disabled={loading}
-				>
-					{loading ? t("recovery.loading") || "加载中..." : t("recovery.refresh") || "刷新列表"}
-				</button>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<button
+							onClick={loadSessions}
+							className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+							disabled={loading}
+						>
+							{loading ? t("recovery.loading") || "加载中..." : t("recovery.refresh") || "刷新列表"}
+						</button>
+					</TooltipTrigger>
+					<TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+						{loading ? "加载中..." : "刷新会话列表"}
+					</TooltipContent>
+				</Tooltip>
 			</header>
 
 			{error && (
@@ -245,23 +254,36 @@ export function RecoverySection() {
 										)}
 									</div>
 									<div className="flex items-center gap-2">
-										<button
-											className="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs font-medium hover:bg-accent/20 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-											onClick={(e) => { e.stopPropagation(); handleRecoverSession(session.sessionId); }}
-											disabled={recovering === session.sessionId}
-										>
-											{recovering === session.sessionId ? "恢复中..." : t("recovery.recover")}
-										</button>
-										<button
-											className="text-xs text-muted hover:text-error p-1 transition-colors"
-											onClick={(e) => { e.stopPropagation(); handleDeleteSession(session.sessionId, session.title || "未命名会话"); }}
-											title="删除会话"
-										>
-											<svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-												<path d="M18 6L6 18M6 6l12 12" />
-											</svg>
-										</button>
-									</div>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														className="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs font-medium hover:bg-accent/20 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+														onClick={(e) => { e.stopPropagation(); handleRecoverSession(session.sessionId); }}
+														disabled={recovering === session.sessionId}
+													>
+														{recovering === session.sessionId ? "恢复中..." : t("recovery.recover")}
+													</button>
+												</TooltipTrigger>
+												<TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+													{recovering === session.sessionId ? "恢复中..." : "恢复此会话"}
+												</TooltipContent>
+											</Tooltip>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														className="text-xs text-muted hover:text-error p-1 transition-colors cursor-pointer"
+														onClick={(e) => { e.stopPropagation(); handleDeleteSession(session.sessionId, session.title || "未命名会话"); }}
+													>
+														<svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+															<path d="M18 6L6 18M6 6l12 12" />
+														</svg>
+													</button>
+												</TooltipTrigger>
+												<TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+													删除会话
+												</TooltipContent>
+											</Tooltip>
+										</div>
 								</div>
 							</div>
 						))}
@@ -343,5 +365,6 @@ export function RecoverySection() {
 				</p>
 			</aside>
 		</section>
+		</TooltipProvider>
 	);
 }

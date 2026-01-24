@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { BrainIcon } from "../../../components/BrainIcon";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 // 记忆文档接口
 interface MemoryDocument {
@@ -627,6 +628,7 @@ export function MemorySection() {
   };
 
   return (
+    <TooltipProvider>
     <section className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
@@ -649,12 +651,19 @@ export function MemorySection() {
       <div className="rounded-xl border border-ink-900/10 bg-surface-secondary p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-medium text-ink-900">记忆配置</h3>
-          <button
-            className="text-xs text-accent hover:text-accent-hover transition-colors"
-            onClick={() => setShowSettings(!showSettings)}
-          >
-            {showSettings ? '隐藏' : '显示'}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="text-xs text-accent hover:text-accent-hover transition-colors cursor-pointer"
+                onClick={() => setShowSettings(!showSettings)}
+              >
+                {showSettings ? '隐藏' : '显示'}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              {showSettings ? '隐藏记忆配置' : '显示记忆配置'}
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {showSettings && (
@@ -825,13 +834,19 @@ export function MemorySection() {
                       className="group relative flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface border border-ink-900/10 text-xs text-ink-700"
                     >
                       <span>{tag}</span>
-                      <button
-                        className="opacity-0 group-hover:opacity-100 text-error hover:text-error/80 transition-opacity"
-                        onClick={() => handleDeleteTag(tag)}
-                        title="删除标签"
-                      >
-                        ×
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="opacity-0 group-hover:opacity-100 text-error hover:text-error/80 transition-opacity cursor-pointer"
+                            onClick={() => handleDeleteTag(tag)}
+                          >
+                            ×
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          删除标签
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   ))}
                   {availableTags.length === 0 && !showTagInput && (
@@ -874,12 +889,19 @@ export function MemorySection() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    className="w-full py-2 rounded-xl border border-dashed border-ink-900/10 text-xs text-muted hover:border-accent/50 hover:text-accent transition-colors"
-                    onClick={() => setShowSettingsTagInput(true)}
-                  >
-                    + 新建标签
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        className="w-full py-2 rounded-xl border border-dashed border-ink-900/10 text-xs text-muted hover:border-accent/50 hover:text-accent transition-colors cursor-pointer"
+                        onClick={() => setShowSettingsTagInput(true)}
+                      >
+                        + 新建标签
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                      创建新的记忆标签
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
               <p className="text-xs text-muted mt-1">
@@ -901,50 +923,81 @@ export function MemorySection() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
-          <button
-            className="rounded-xl bg-accent px-6 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:opacity-50"
-            onClick={handleSearch}
-            disabled={isSearching || !searchQuery.trim()}
-          >
-            {isSearching ? '搜索中...' : '搜索'}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="rounded-xl bg-accent px-6 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:opacity-50 cursor-pointer"
+                onClick={handleSearch}
+                disabled={isSearching || !searchQuery.trim()}
+              >
+                {isSearching ? '搜索中...' : '搜索'}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              {isSearching ? '搜索中...' : '搜索记忆文档'}
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* 操作按钮组 */}
         <div className="flex gap-3">
-          <button
-            className="flex-1 py-3 rounded-xl border border-dashed border-ink-900/10 text-sm text-muted hover:border-accent/50 hover:text-accent transition-colors"
-            onClick={() => setIsCreating(!isCreating)}
-          >
-            {isCreating ? '取消创建' : '+ 添加新记忆'}
-          </button>
-          <button
-            className="flex-1 py-3 rounded-xl border border-dashed border-ink-900/10 text-sm text-muted hover:border-accent/50 hover:text-accent transition-colors"
-            onClick={() => setIsAsking(!isAsking)}
-          >
-            {isAsking ? '取消问答' : '💬 AI 问答'}
-          </button>
-          <button
-            className={`py-3 px-4 rounded-xl border text-sm transition-colors ${
-              isMultiSelectMode
-                ? 'bg-accent text-white border-accent'
-                : 'border-ink-900/10 text-muted hover:border-accent/50 hover:text-accent'
-            }`}
-            onClick={() => {
-              setIsMultiSelectMode(!isMultiSelectMode);
-              setSelectedIds(new Set());
-            }}
-            title={isMultiSelectMode ? '退出多选' : '进入多选模式'}
-          >
-            {isMultiSelectMode ? '✓ 多选' : '多选'}
-          </button>
-          <button
-            className="py-3 px-4 rounded-xl border border-ink-900/10 text-sm text-muted hover:text-error hover:border-error/50 transition-colors"
-            onClick={handleClearAll}
-            title="清空所有记忆"
-          >
-            清空
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="flex-1 py-3 rounded-xl border border-dashed border-ink-900/10 text-sm text-muted hover:border-accent/50 hover:text-accent transition-colors cursor-pointer"
+                onClick={() => setIsCreating(!isCreating)}
+              >
+                {isCreating ? '取消创建' : '+ 添加新记忆'}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              {isCreating ? '取消创建新记忆' : '创建新记忆'}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="flex-1 py-3 rounded-xl border border-dashed border-ink-900/10 text-sm text-muted hover:border-accent/50 hover:text-accent transition-colors cursor-pointer"
+                onClick={() => setIsAsking(!isAsking)}
+              >
+                {isAsking ? '取消问答' : '💬 AI 问答'}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              {isAsking ? '取消AI问答' : '使用AI问答'}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className={`py-3 px-4 rounded-xl border text-sm transition-colors cursor-pointer ${isMultiSelectMode
+                  ? 'bg-accent text-white border-accent'
+                  : 'border-ink-900/10 text-muted hover:border-accent/50 hover:text-accent'}`}
+                onClick={() => {
+                  setIsMultiSelectMode(!isMultiSelectMode);
+                  setSelectedIds(new Set());
+                }}
+              >
+                {isMultiSelectMode ? '✓ 多选' : '多选'}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              {isMultiSelectMode ? '退出多选模式' : '进入多选模式'}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="py-3 px-4 rounded-xl border border-ink-900/10 text-sm text-muted hover:text-error hover:border-error/50 transition-colors cursor-pointer"
+                onClick={handleClearAll}
+              >
+                清空
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+              清空所有记忆
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* 批量操作栏 */}
@@ -960,24 +1013,45 @@ export function MemorySection() {
               <span className="text-sm text-ink-900">已选 {selectedIds.size} 条</span>
             </div>
             <div className="flex gap-2">
-              <button
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-error text-white hover:bg-error/90 transition-colors"
-                onClick={handleBatchDelete}
-              >
-                删除选中
-              </button>
-              <button
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-surface border border-ink-900/10 text-ink-700 hover:bg-ink-900/5 transition-colors"
-                onClick={handleBatchExport}
-              >
-                导出选中
-              </button>
-              <button
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-muted hover:text-ink-700 transition-colors"
-                onClick={() => setSelectedIds(new Set())}
-              >
-                取消选择
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-error text-white hover:bg-error/90 transition-colors cursor-pointer"
+                    onClick={handleBatchDelete}
+                  >
+                    删除选中
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  删除选中的记忆文档
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-surface border border-ink-900/10 text-ink-700 hover:bg-ink-900/5 transition-colors cursor-pointer"
+                    onClick={handleBatchExport}
+                  >
+                    导出选中
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  导出选中的记忆文档
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-muted hover:text-ink-700 transition-colors cursor-pointer"
+                    onClick={() => setSelectedIds(new Set())}
+                  >
+                    取消选择
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  取消所有选中项
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         )}
@@ -1043,12 +1117,19 @@ export function MemorySection() {
               <div className="grid gap-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-medium text-muted">标签</label>
-                  <button
-                    className="text-xs text-accent hover:text-accent-hover"
-                    onClick={() => setShowTagInput(!showTagInput)}
-                  >
-                    {showTagInput ? '−' : '+ 新建标签'}
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        className="text-xs text-accent hover:text-accent-hover cursor-pointer"
+                        onClick={() => setShowTagInput(!showTagInput)}
+                      >
+                        {showTagInput ? '−' : '+ 新建标签'}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                      {showTagInput ? '取消新建标签' : '新建标签'}
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
 
                 {/* 新建标签输入 */}
@@ -1134,12 +1215,19 @@ export function MemorySection() {
           <div className="rounded-xl border border-accent/20 bg-accent-light/5 p-4 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-accent">编辑记忆</h3>
-              <button
-                className="text-xs text-muted hover:text-ink-700 transition-colors"
-                onClick={handleCancelEdit}
-              >
-                取消
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="text-xs text-muted hover:text-ink-700 transition-colors cursor-pointer"
+                    onClick={handleCancelEdit}
+                  >
+                    取消
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  取消编辑记忆
+                </TooltipContent>
+              </Tooltip>
             </div>
 
             <div className="grid gap-1.5">
@@ -1196,12 +1284,19 @@ export function MemorySection() {
             <div className="grid gap-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium text-muted">标签</label>
-                <button
-                  className="text-xs text-accent hover:text-accent-hover"
-                  onClick={() => setShowEditTagInput(!showEditTagInput)}
-                >
-                  {showEditTagInput ? '−' : '+ 新建标签'}
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="text-xs text-accent hover:text-accent-hover cursor-pointer"
+                      onClick={() => setShowEditTagInput(!showEditTagInput)}
+                    >
+                      {showEditTagInput ? '−' : '+ 新建标签'}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                    {showEditTagInput ? '取消新建标签' : '新建标签'}
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               {/* 新建标签输入 */}
@@ -1277,13 +1372,20 @@ export function MemorySection() {
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAskQuestion()}
               />
-              <button
-                className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:opacity-50"
-                onClick={handleAskQuestion}
-                disabled={askingQuestion || !question.trim()}
-              >
-                {askingQuestion ? '思考中...' : '提问'}
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:opacity-50 cursor-pointer"
+                    onClick={handleAskQuestion}
+                    disabled={askingQuestion || !question.trim()}
+                  >
+                    {askingQuestion ? '思考中...' : '提问'}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  {askingQuestion ? '思考中...' : '向AI提问'}
+                </TooltipContent>
+              </Tooltip>
             </div>
             {answer && (
               <div className="rounded-xl bg-surface p-3 text-sm text-ink-700">
@@ -1390,5 +1492,6 @@ export function MemorySection() {
         </p>
       </aside>
     </section>
+    </TooltipProvider>
   );
 }

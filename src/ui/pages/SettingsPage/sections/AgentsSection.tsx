@@ -5,6 +5,13 @@
 
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+// Radix UI Tooltip components
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
 
 // Agent 配置接口
 interface AgentConfig {
@@ -383,13 +390,14 @@ export function AgentsSection() {
   }
 
   return (
-    <section className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-ink-900">{t('agents.title')}</h1>
-        <p className="mt-2 text-sm text-muted">
-          {t('agents.description')}
-        </p>
-      </header>
+    <TooltipProvider delayDuration={200}>
+      <section className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold text-ink-900">{t('agents.title')}</h1>
+          <p className="mt-2 text-sm text-muted">
+            {t('agents.description')}
+          </p>
+        </header>
 
       {/* 全局配置 */}
       <div className="p-4 rounded-xl border border-ink-900/10 bg-surface">
@@ -529,15 +537,22 @@ export function AgentsSection() {
                           <span className="text-xs text-muted w-6">{index + 1}.</span>
                           <span className="text-sm text-ink-900">{agent?.name || agentId}</span>
                         </div>
-                        <button
-                          className="text-xs text-error hover:text-error-hover"
-                          onClick={() => {
-                            const newSequence = orchestration.agentSequence.filter(id => id !== agentId);
-                            updateOrchestration('agentSequence', newSequence);
-                          }}
-                        >
-                          移除
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="text-xs text-error hover:text-error-hover cursor-pointer"
+                              onClick={() => {
+                                const newSequence = orchestration.agentSequence.filter(id => id !== agentId);
+                                updateOrchestration('agentSequence', newSequence);
+                              }}
+                            >
+                              移除
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-ink-900 text-white text-xs px-3 py-1.5 rounded-md shadow-lg">
+                            <p>从序列中移除此Agent</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     );
                   })}
@@ -548,38 +563,52 @@ export function AgentsSection() {
             {/* 添加 Agent 到序列 */}
             <div className="flex gap-2 flex-wrap">
               {BUILTIN_AGENTS.map(agent => (
-                <button
-                  key={agent.id}
-                  className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                    orchestration.agentSequence.includes(agent.id)
-                      ? 'bg-accent text-white'
-                      : 'bg-surface-secondary text-ink-700 hover:bg-ink-900/5'
-                  }`}
-                  onClick={() => {
-                    if (!orchestration.agentSequence.includes(agent.id)) {
-                      updateOrchestration('agentSequence', [...orchestration.agentSequence, agent.id]);
-                    }
-                  }}
-                >
-                  {agent.name}
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      key={agent.id}
+                      className={`text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                        orchestration.agentSequence.includes(agent.id)
+                          ? 'bg-accent text-white'
+                          : 'bg-surface-secondary text-ink-700 hover:bg-ink-900/5'
+                      }`}
+                      onClick={() => {
+                        if (!orchestration.agentSequence.includes(agent.id)) {
+                          updateOrchestration('agentSequence', [...orchestration.agentSequence, agent.id]);
+                        }
+                      }}
+                    >
+                      {agent.name}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-ink-900 text-white text-xs px-3 py-1.5 rounded-md shadow-lg">
+                    <p>将{agent.name}添加到序列</p>
+                  </TooltipContent>
+                </Tooltip>
               ))}
               {agents.filter(a => a.type === 'custom').map(agent => (
-                <button
-                  key={agent.id}
-                  className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                    orchestration.agentSequence.includes(agent.id)
-                      ? 'bg-accent text-white'
-                      : 'bg-surface-secondary text-ink-700 hover:bg-ink-900/5'
-                  }`}
-                  onClick={() => {
-                    if (!orchestration.agentSequence.includes(agent.id)) {
-                      updateOrchestration('agentSequence', [...orchestration.agentSequence, agent.id]);
-                    }
-                  }}
-                >
-                  {agent.name}
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      key={agent.id}
+                      className={`text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                        orchestration.agentSequence.includes(agent.id)
+                          ? 'bg-accent text-white'
+                          : 'bg-surface-secondary text-ink-700 hover:bg-ink-900/5'
+                      }`}
+                      onClick={() => {
+                        if (!orchestration.agentSequence.includes(agent.id)) {
+                          updateOrchestration('agentSequence', [...orchestration.agentSequence, agent.id]);
+                        }
+                      }}
+                    >
+                      {agent.name}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-ink-900 text-white text-xs px-3 py-1.5 rounded-md shadow-lg">
+                    <p>将{agent.name}添加到序列</p>
+                  </TooltipContent>
+                </Tooltip>
               ))}
             </div>
           </div>
@@ -746,18 +775,32 @@ export function AgentsSection() {
                         <p className="text-xs text-muted truncate">{agent.description}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button
-                          className="text-xs text-accent hover:text-accent-hover px-2 py-1"
-                          onClick={() => handleEditAgent(agent.id)}
-                        >
-                          编辑
-                        </button>
-                        <button
-                          className="text-xs text-error hover:text-error-hover px-2 py-1"
-                          onClick={() => handleDeleteAgent(agent.id)}
-                        >
-                          删除
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="text-xs text-accent hover:text-accent-hover px-2 py-1 cursor-pointer"
+                              onClick={() => handleEditAgent(agent.id)}
+                            >
+                              编辑
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-ink-900 text-white text-xs px-3 py-1.5 rounded-md shadow-lg">
+                            <p>编辑此自定义Agent</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="text-xs text-error hover:text-error-hover px-2 py-1 cursor-pointer"
+                              onClick={() => handleDeleteAgent(agent.id)}
+                            >
+                              删除
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-ink-900 text-white text-xs px-3 py-1.5 rounded-md shadow-lg">
+                            <p>删除此自定义Agent</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                   ))}
@@ -1035,5 +1078,6 @@ export function AgentsSection() {
         </p>
       </aside>
     </section>
+    </TooltipProvider>
   );
 }

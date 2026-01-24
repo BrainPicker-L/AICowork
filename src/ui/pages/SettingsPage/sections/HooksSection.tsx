@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { HookConfig, HooksStore } from "../../../electron.d";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 type ViewMode = 'list' | 'create';
 
@@ -116,6 +117,7 @@ export function HooksSection() {
   };
 
   return (
+    <TooltipProvider>
     <section className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-ink-900">{t('hooks.title')}</h1>
@@ -194,19 +196,33 @@ export function HooksSection() {
             )}
 
             <div className="flex gap-3">
-              <button
-                className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={handleCreateHook}
-                disabled={saving}
-              >
-                {saving ? '保存中...' : '保存钩子'}
-              </button>
-              <button
-                className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2.5 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors"
-                onClick={() => setViewMode('list')}
-              >
-                取消
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                    onClick={handleCreateHook}
+                    disabled={saving}
+                  >
+                    {saving ? '保存中...' : '保存钩子'}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  保存钩子配置
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2.5 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors cursor-pointer"
+                    onClick={() => setViewMode('list')}
+                  >
+                    取消
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  取消创建钩子
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
 
@@ -286,15 +302,21 @@ export function HooksSection() {
                             {hook.command}
                           </p>
                         </div>
-                        <button
-                          className="text-xs text-muted hover:text-error p-1"
-                          onClick={() => handleDeleteHook('preToolUse', hook.hook)}
-                          title="删除钩子"
-                        >
-                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                          </svg>
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="text-xs text-muted hover:text-error p-1 cursor-pointer"
+                              onClick={() => handleDeleteHook('preToolUse', hook.hook)}
+                            >
+                              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                            删除钩子
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                   ))}
@@ -324,15 +346,21 @@ export function HooksSection() {
                             {hook.command}
                           </p>
                         </div>
-                        <button
-                          className="text-xs text-muted hover:text-error p-1"
-                          onClick={() => handleDeleteHook('postToolUse', hook.hook)}
-                          title="删除钩子"
-                        >
-                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                          </svg>
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="text-xs text-muted hover:text-error p-1 cursor-pointer"
+                              onClick={() => handleDeleteHook('postToolUse', hook.hook)}
+                            >
+                              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                            删除钩子
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                   ))}
@@ -342,12 +370,19 @@ export function HooksSection() {
           )}
 
           <div className="flex gap-3">
-            <button
-              className="flex-1 py-3 rounded-xl bg-accent text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors"
-              onClick={() => setViewMode('create')}
-            >
-              添加新钩子
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="flex-1 py-3 rounded-xl bg-accent text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors cursor-pointer"
+                  onClick={() => setViewMode('create')}
+                >
+                  添加新钩子
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                创建新的钩子配置
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           <aside className="p-4 rounded-xl bg-surface-secondary border border-ink-900/5">
@@ -358,5 +393,6 @@ export function HooksSection() {
         </>
       )}
     </section>
+    </TooltipProvider>
   );
 }

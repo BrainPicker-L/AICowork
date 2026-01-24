@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 // Claude.md 配置接口
 interface ClaudeConfig {
@@ -176,6 +177,7 @@ export function ClaudeMdSection() {
   };
 
   return (
+    <TooltipProvider>
     <section className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
@@ -197,26 +199,47 @@ export function ClaudeMdSection() {
           {/* 操作按钮 */}
           <div className="flex gap-2">
             {config?.exists && !editing && (
-              <button
-                className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors"
-                onClick={() => setEditing(true)}
-              >
-                编辑
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors cursor-pointer"
+                    onClick={() => setEditing(true)}
+                  >
+                    编辑
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  开始编辑Claude.md配置文件
+                </TooltipContent>
+              </Tooltip>
             )}
-            <button
-              className="text-xs px-3 py-1.5 rounded-lg border border-dashed border-ink-900/10 text-muted hover:border-accent/50 hover:text-accent transition-colors"
-              onClick={() => setShowTemplate(!showTemplate)}
-            >
-              {showTemplate ? '关闭模板' : '使用模板'}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="text-xs px-3 py-1.5 rounded-lg border border-dashed border-ink-900/10 text-muted hover:border-accent/50 hover:text-accent transition-colors cursor-pointer"
+                  onClick={() => setShowTemplate(!showTemplate)}
+                >
+                  {showTemplate ? '关闭模板' : '使用模板'}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                {showTemplate ? '关闭模板选择' : '选择模板创建配置'}
+              </TooltipContent>
+            </Tooltip>
             {config?.exists && (
-              <button
-                className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 text-muted hover:text-error hover:border-error/50 transition-colors"
-                onClick={handleDelete}
-              >
-                删除
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="text-xs px-3 py-1.5 rounded-lg border border-ink-900/10 text-muted hover:text-error hover:border-error/50 transition-colors cursor-pointer"
+                    onClick={handleDelete}
+                  >
+                    删除
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  删除Claude.md配置文件
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
 
@@ -226,15 +249,21 @@ export function ClaudeMdSection() {
               <p className="text-xs font-medium text-muted">选择模板：</p>
               <div className="grid gap-2">
                 {CLAUDE_MD_TEMPLATES.map((template) => (
-                  <button
-                    key={template.name}
-                    className="w-full text-left p-3 rounded-xl border border-ink-900/10 bg-surface hover:border-accent/50 hover:bg-accent/5 transition-colors"
-                    onClick={() => handleUseTemplate(template)}
-                  >
-                    <div className="text-sm font-medium text-ink-900">{template.name}</div>
-                    <p className="text-xs text-muted mt-1">{template.description}</p>
-                  </button>
-                ))}
+                <Tooltip key={template.name}>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="w-full text-left p-3 rounded-xl border border-ink-900/10 bg-surface hover:border-accent/50 hover:bg-accent/5 transition-colors cursor-pointer"
+                      onClick={() => handleUseTemplate(template)}
+                    >
+                      <div className="text-sm font-medium text-ink-900">{template.name}</div>
+                      <p className="text-xs text-muted mt-1">{template.description}</p>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                    使用{template.name}模板创建配置
+                  </TooltipContent>
+                </Tooltip>
+              ))}
               </div>
             </div>
           )}
@@ -259,28 +288,49 @@ export function ClaudeMdSection() {
                       placeholder="输入 Claude.md 配置内容（支持 Markdown 格式）..."
                     />
                     <div className="flex gap-2">
-                      <button
-                        className="flex-1 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:opacity-50"
-                        onClick={handleSave}
-                        disabled={saving || !editContent.trim()}
-                      >
-                        {saving ? '保存中...' : '保存'}
-                      </button>
-                      <button
-                        className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors"
-                        onClick={() => {
-                          setEditing(false);
-                          setEditContent(config?.content || '');
-                        }}
-                      >
-                        取消
-                      </button>
-                      <button
-                        className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-muted hover:text-accent hover:border-accent/50 transition-colors"
-                        onClick={handleReset}
-                      >
-                        重置
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="flex-1 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-hover transition-colors disabled:opacity-50 cursor-pointer"
+                            onClick={handleSave}
+                            disabled={saving || !editContent.trim()}
+                          >
+                            {saving ? '保存中...' : '保存'}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          {saving ? '保存中...' : '保存Claude.md配置'}
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-ink-700 hover:bg-surface-tertiary transition-colors cursor-pointer"
+                            onClick={() => {
+                              setEditing(false);
+                              setEditContent(config?.content || '');
+                            }}
+                          >
+                            取消
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          取消编辑，恢复原始内容
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="rounded-xl border border-ink-900/10 bg-surface px-4 py-2 text-sm text-muted hover:text-accent hover:border-accent/50 transition-colors cursor-pointer"
+                            onClick={handleReset}
+                          >
+                            重置
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                          重置为默认模板
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                 ) : (
@@ -369,27 +419,42 @@ export function ClaudeMdSection() {
           <div className="rounded-xl border border-ink-900/10 bg-surface-secondary p-4">
             <h3 className="text-sm font-medium text-ink-900 mb-3">快捷操作</h3>
             <div className="space-y-2">
-              <button
-                className="w-full text-left px-3 py-2 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors text-xs text-ink-700"
-                onClick={() => {
-                  window.electron.openClaudeDirectory();
-                }}
-              >
-                📂 打开配置目录
-              </button>
-              <button
-                className="w-full text-left px-3 py-2 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors text-xs text-ink-700"
-                onClick={() => {
-                  setEditContent(CLAUDE_MD_TEMPLATES[0].content);
-                  setEditing(true);
-                }}
-              >
-                📋 加载基础模板
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="w-full text-left px-3 py-2 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors text-xs text-ink-700 cursor-pointer"
+                    onClick={() => {
+                      window.electron.openClaudeDirectory();
+                    }}
+                  >
+                    📂 打开配置目录
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  打开Claude配置文件所在目录
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="w-full text-left px-3 py-2 rounded-lg border border-ink-900/10 bg-surface hover:bg-surface-tertiary transition-colors text-xs text-ink-700 cursor-pointer"
+                    onClick={() => {
+                      setEditContent(CLAUDE_MD_TEMPLATES[0].content);
+                      setEditing(true);
+                    }}
+                  >
+                    📋 加载基础模板
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                  加载基础配置模板到编辑器
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>
       </div>
     </section>
+    </TooltipProvider>
   );
 }

@@ -469,6 +469,11 @@ export function ApiSection() {
 
   // 切换激活配置
   const handleSetActiveConfig = async (activeId: string) => {
+    // 如果已经是当前配置，直接返回，不执行任何操作
+    if (activeId === allConfigs.activeConfigId) {
+      return;
+    }
+    
     try {
       const result = await window.electron.setActiveApiConfig(activeId);
       if (result.success) {
@@ -860,8 +865,9 @@ export function ApiSection() {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              className={`text-xs p-1 rounded hover:bg-surface-tertiary transition-colors cursor-pointer ${config.id === allConfigs.activeConfigId ? 'text-accent' : 'text-muted hover:text-accent'}`}
+                              className={`text-xs p-1 rounded hover:bg-surface-tertiary transition-colors cursor-pointer ${config.id === allConfigs.activeConfigId ? 'text-accent opacity-50 cursor-default' : 'text-muted hover:text-accent'}`}
                               onClick={() => handleSetActiveConfig(config.id)}
+                              disabled={config.id === allConfigs.activeConfigId}
                             >
                               <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="12" cy="12" r="9" />
