@@ -292,7 +292,7 @@ describe('API 配置验证', () => {
     it('月之暗面 API Key 格式验证', () => {
       const config: ApiConfig = {
         apiKey: 'sk-abcdefghijklmnopqrstuvwxyz123456789',
-        baseURL: 'https://api.moonshot.cn',
+        baseURL: 'https://api.moonshot.cn/anthropic',
         model: 'moonshot-v1-128k',
         apiType: 'moonshot',
       };
@@ -302,6 +302,18 @@ describe('API 配置验证', () => {
       expect(result.valid).toBe(true);
     });
 
+    it('MiniMax API Key 格式验证', () => {
+      const config: ApiConfig = {
+        apiKey: 'sk-abcdefghijklmnopqrstuvwxyz123456789',
+        baseURL: 'https://api.minimaxi.com/anthropic',
+        model: 'MiniMax-M2.1',
+        apiType: 'minimax',
+      };
+
+      const result = validateApiConfig(config);
+
+      expect(result.valid).toBe(true);
+    });
     it('七牛云 API Key 格式验证', () => {
       const config: ApiConfig = {
         apiKey: 'sk-abcdefghijklmnopqrstuvwxyz123456',
@@ -331,7 +343,7 @@ describe('API 配置验证', () => {
     it('MiniMax API Key 格式验证', () => {
       const config: ApiConfig = {
         apiKey: 'sk-abcdefghijklmnopqrstuvwxyz123456',
-        baseURL: 'https://api.minimaxi.com',
+        baseURL: 'https://api.minimaxi.com/anthropic',
         model: 'MiniMax-M2.1',
         apiType: 'minimax',
       };

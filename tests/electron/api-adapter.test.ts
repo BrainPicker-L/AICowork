@@ -43,7 +43,7 @@ describe('getProviderDefaults', () => {
 
   it('应该返回 MiniMax 的默认配置', () => {
     const defaults = getProviderDefaults('minimax');
-    expect(defaults.baseURL).toBe('https://api.minimaxi.com');
+    expect(defaults.baseURL).toBe('https://api.minimaxi.com/anthropic');
     expect(defaults.models).toContain('MiniMax-M2.1');
     expect(defaults.defaultModel).toBeDefined();
   });
@@ -57,7 +57,7 @@ describe('getProviderDefaults', () => {
 
   it('应该返回月之暗面的默认配置', () => {
     const defaults = getProviderDefaults('moonshot');
-    expect(defaults.baseURL).toBe('https://api.moonshot.cn');
+    expect(defaults.baseURL).toBe('https://api.moonshot.cn/anthropic');
     expect(defaults.models).toContain('moonshot-v1-128k');
     expect(defaults.defaultModel).toBeDefined();
   });

@@ -191,7 +191,7 @@ export function getAllPresetUrls(): Array<{ provider: string; name: string; url:
     {
       provider: 'moonshot',
       name: '月之暗面 (Kimi)',
-      url: 'https://api.moonshot.cn',
+      url: 'https://api.moonshot.cn/anthropic',
       description: '月之暗面 Kimi API 端点'
     },
     {

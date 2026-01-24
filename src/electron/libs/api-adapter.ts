@@ -71,9 +71,9 @@ const PROVIDER_DEFAULTS: Record<ApiProvider, { baseURL: string; models: string[]
     defaultModel: 'qwen-plus',
   },
   moonshot: {
-    baseURL: 'https://api.moonshot.cn',
-    models: ['moonshot-v1-128k', 'moonshot-v1-32k', 'moonshot-v1-8k'],
-    defaultModel: 'moonshot-v1-128k',
+    baseURL: 'https://api.moonshot.cn/anthropic',
+    models: ['kimi-k2-turbo-preview', 'kimi-k2-0905','moonshot-v1-128k', 'moonshot-v1-32k', 'moonshot-v1-8k'],
+    defaultModel: 'kimi-k2-turbo-preview',
   },
   n1n: {
     baseURL: 'https://api.n1n.ai',
@@ -81,7 +81,7 @@ const PROVIDER_DEFAULTS: Record<ApiProvider, { baseURL: string; models: string[]
     defaultModel: 'claude-sonnet-4-20250514',
   },
   minimax: {
-    baseURL: 'https://api.minimaxi.com',
+    baseURL: 'https://api.minimaxi.com/anthropic',
     models: ['MiniMax-M2.1', 'MiniMax-M2.1-lightning', 'MiniMax-M2'],
     defaultModel: 'MiniMax-M2.1',
   },
