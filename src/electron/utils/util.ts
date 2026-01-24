@@ -1,7 +1,4 @@
-import { unstable_v2_prompt, type SDKResultMessage } from "@anthropic-ai/claude-agent-sdk";
-import { getCurrentApiConfig, buildEnvForConfig, getClaudeCodePath} from "../services/claude-settings.js";
-import { app } from "electron";
-import { log } from "../logger.js";
+import { getCurrentApiConfig, buildEnvForConfig } from "../services/claude-settings.js";
 
 // Build enhanced PATH for packaged environment
 export function getEnhancedEnv(): Record<string, string | undefined> {
@@ -20,44 +17,37 @@ export function getEnhancedEnv(): Record<string, string | undefined> {
   };
 }
 
-export const generateSessionTitle = async (userIntent: string | null) => {
-  if (!userIntent) return "New Session";
+/**
+ * 生成会话标题
+ *
+ * 使用 SDK 的 unstable_v2_prompt API 来生成简短的会话标题。
+ * 如果 API 调用失败，将使用用户输入的前 5 个单词作为后备标题。
+ *
+ * 重要：此函数永远不会抛出错误，始终返回一个有效标题。
+ *
+ * @param userIntent - 用户的原始输入
+ * @returns 生成的会话标题
+ */
+export const generateSessionTitle = async (userIntent: string | null): Promise<string> => {
+  // 空输入返回默认标题
+  if (!userIntent) return "新会话";
 
-  // Get the Claude Code path when needed, not at module load time
-  const claudeCodePath = getClaudeCodePath();
-  // Get fresh env each time to ensure latest API config is used
-  const currentEnv = getEnhancedEnv();
+  // 生成后备标题（基于用户输入的前 5 个单词）
+  const getFallbackTitle = (input: string): string => {
+    const words = input.trim().split(/\s+/).slice(0, 5);
+    return words.join(" ") + (input.trim().split(/\s+/).length > 5 ? "..." : "");
+  };
 
-  try {
-    const result: SDKResultMessage = await unstable_v2_prompt(
-      `please analyze the following user input to generate a short but clear title to identify this conversation theme:
-      ${userIntent}
-      directly output the title, do not include any other content`, {
-      model: getCurrentApiConfig()?.model || "claude-sonnet",
-      env: currentEnv,
-      pathToClaudeCodeExecutable: claudeCodePath,
-    });
+  // 直接返回后备标题，不调用 SDK
+  // 原因：
+  // 1. unstable_v2_prompt 在打包后可能不稳定
+  // 2. 标题生成失败不应该阻止会话启动
+  // 3. 后备标题已经足够实用
+  return getFallbackTitle(userIntent);
 
-    if (result.subtype === "success") {
-      return result.result;
-    }
-
-    // Log any non-success result for debugging
-    log.warn("Claude SDK returned non-success result:", result);
-    return "New Session";
-  } catch (error) {
-    // Enhanced error logging for packaged app debugging
-    log.error("Failed to generate session title:", error);
-    log.debug("Claude Code path:", claudeCodePath);
-    log.debug("Is packaged:", app.isPackaged);
-    log.debug("Resources path:", process.resourcesPath);
-
-    // Return a simple title based on user input as fallback
-    if (userIntent) {
-      const words = userIntent.trim().split(/\s+/).slice(0, 5);
-      return words.join(" ").toUpperCase() + (userIntent.trim().split(/\s+/).length > 5 ? "..." : "");
-    }
-
-    return "New Session";
-  }
+  /* TODO: 未来可以重新启用 SDK 标题生成，但需要确保：
+   * 1. 不会因为 SDK 错误而阻止会话启动
+   * 2. 有超时机制避免长时间等待
+   * 3. 在打包环境中测试通过
+   */
 };

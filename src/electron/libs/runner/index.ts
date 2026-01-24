@@ -146,6 +146,11 @@ export async function runClaude(options: RunnerOptions): Promise<RunnerHandle> {
       // ⚡ 渐进式加载优化：不自动注入记忆上下文
       // AI 可以通过 Memory MCP 工具主动检索记忆
       // 记忆工具会自动出现在工具列表中，AI 可以自然发现并使用
+      // 对于阿里云，不使用 CLI 进程模式，避免兼容性问题
+      const claudeCodePath = (config.apiType === 'alibaba') ? undefined : getClaudeCodePath();
+
+      log.info(`[Runner] CLI mode: ${claudeCodePath ? 'enabled' : 'disabled (HTTP API mode)'} for provider: ${config.apiType}`);
+
       const q = query({
         prompt: prompt,  // SDK 直接处理斜杠命令
         options: {
@@ -153,7 +158,8 @@ export async function runClaude(options: RunnerOptions): Promise<RunnerHandle> {
           resume: resumeSessionId,
           abortController,
           env: mergedEnv,
-          pathToClaudeCodeExecutable: getClaudeCodePath(),
+          // 阿里云不传递 CLI 路径，使用纯 HTTP API 模式
+          ...(claudeCodePath ? { pathToClaudeCodeExecutable: claudeCodePath } : {}),
           permissionMode,
           includePartialMessages: true,
           // ⭐ 设置 settingSources 让 SDK 自动加载 ~/.claude/settings.json
