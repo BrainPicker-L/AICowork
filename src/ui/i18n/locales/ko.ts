@@ -41,20 +41,13 @@ export default {
 			system: "시스템",
 		},
 		navigation: {
-			help: "도움말",
 			feedback: "피드백",
 			about: "정보",
 			language: "언어",
 			api: "API 설정",
 			mcp: "MCP 설정",
-			skills: "스킬",
-			plugins: "플러그인",
-			memory: "메모리",
-			agents: "에이전트",
-			hooks: "후크",
 			permissions: "권한",
 			output: "출력 스타일",
-			recovery: "세션 복구",
 			rules: "규칙",
 			claudeMd: "Claude.md",
 		},
@@ -92,11 +85,6 @@ export default {
 			description: "GitHub에서 문제 보고서 제출",
 			link: "GitHub로 이동",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "기능 요청",
-			description: "보고 싶은 새로운 기능을 제안하세요",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "피드백 주셔서 감사합니다! 모든 피드백을 신중하게 검토하겠습니다.",
 	},
@@ -300,26 +288,7 @@ export default {
 			installed: "설치됨",
 		},
 		hint: "플러그인 명령 형식은 /plugin-name:command-name입니다.",
-	},
-
-	memory: {
-		title: "메모리",
-		description: "메모리 기능을 구성하여 AI에 중요한 정보를 기억하도록 하세요",
-		underDevelopment: "메모리 기능은 개발 중입니다...",
-		reservedArea: "이 영역은 memvid 프로젝트 기능을 위해 예약되어 있습니다",
-		comingSoon: "곧 출시",
-		comingSoonDescription: "메모리 기능을 사용하면 AI가 여러 세션 간에 정보를 공유하여 지속적인 컨텍스트 메모리를 실현할 수 있습니다.",
-	},
-
-	agents: {
-		title: "에이전트",
-		description: "AI 에이전트를 구성하여 병렬 작업 처리를 실현",
-		underDevelopment: "에이전트 구성 기능은 개발 중입니다...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "복잡한 작업의 효율을 높이기 위해 최대 10개의 하위 에이전트를 병렬로 시작할 수 있지만 비용도 그에 비례 증가합니다(N×).",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "후크",
 		description: "이벤트 후크를 구성하여 특정 타이밍에 작업을 자동으로 트리거",
 		postToolUse: {
@@ -510,6 +479,7 @@ export default {
 		placeholder: "에이전트가 처리할 내용을 설명하세요...",
 		stopSession: "세션 중지",
 		sendPrompt: "프롬프트 보내기",
+		selectWorkingDir: "작업 디렉토리 선택",
 	},
 
 	// Common

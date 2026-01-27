@@ -45,20 +45,13 @@ export default {
 			system: "系统",
 		},
 		navigation: {
-			help: "帮助",
 			feedback: "反馈",
 			about: "关于",
 			language: "语言",
 			api: "API 设置",
 			mcp: "MCP 设置",
-			skills: "技能",
-			plugins: "插件",
-			memory: "记忆",
-			agents: "代理",
-			hooks: "钩子",
 			permissions: "权限",
 			output: "输出样式",
-			recovery: "会话恢复",
 			rules: "规则",
 			claudeMd: "Claude.md",
 		},
@@ -69,25 +62,6 @@ export default {
 	},
 
 	// Settings Sections
-	help: {
-		title: "帮助",
-		subtitle: "获取使用帮助和文档",
-		quickStart: {
-			title: "快速开始",
-			description: "了解如何使用 AICowork 开始第一个任务",
-		},
-		faq: {
-			title: "常见问题",
-			description: "查看常见问题和解决方案",
-		},
-		docs: {
-			title: "文档链接",
-			description: "访问官方文档获取更多信息",
-		},
-		tip: "提示：遇到问题可以先查看常见问题，或者通过反馈渠道联系我们。",
-		helpUrl: "https://ima.qq.com/note/share/_AwZPbuK9wucK5gWaVdjNQ?channel=4",
-	},
-
 	feedback: {
 		title: "反馈",
 		subtitle: "提交问题和建议，帮助我们改进",
@@ -96,11 +70,6 @@ export default {
 			description: "在 GitHub 上提交问题报告",
 			link: "前往 GitHub",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "功能建议",
-			description: "提出您希望看到的新功能",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "感谢您的反馈！我们会认真阅读每一条反馈意见。",
 	},
@@ -286,66 +255,6 @@ export default {
 		hintPath: "~/.qwen/settings.json",
 	},
 
-	skills: {
-		title: "技能",
-		description: "管理自定义技能，AI 会根据 SKILL.md 中的指导自动执行",
-		loading: "加载中...",
-		noSkills: "暂无已安装的技能",
-		noSkillsHint: "将 Skills 放入 ~/.claude/skills/ 目录后即可自动识别",
-		openDirectory: "打开 Skills 目录",
-		source: {
-			skill: "技能",
-			plugin: "插件",
-		},
-		hint: "Skills 存储在 ~/.claude/skills/ 目录中。每个技能文件夹包含一个 SKILL.md 文件，AI 会根据内容自动执行。",
-	},
-
-	plugins: {
-		title: "插件",
-		description: "管理已安装的插件",
-		noPlugins: "暂无已安装的插件",
-		status: {
-			installed: "已安装",
-		},
-		hint: "插件命令格式为 /plugin-name:command-name。",
-	},
-
-	memory: {
-		title: "记忆",
-		description: "配置记忆功能，让 AI 记住重要信息",
-		underDevelopment: "Memory 功能正在开发中...",
-		reservedArea: "此区域预留给 memvid 项目功能",
-		comingSoon: "即将推出",
-		comingSoonDescription: "Memory 功能将允许 AI 在多个会话之间共享信息，实现持久化的上下文记忆。",
-	},
-
-	agents: {
-		title: "代理",
-		description: "配置 AI 代理，实现并行任务处理",
-		underDevelopment: "Agents 配置功能正在开发中...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "最多可以同时启动 10 个子代理并行处理任务，但请注意成本会相应增加（N×）。",
-	},
-
-	hooks: {
-		title: "钩子",
-		description: "配置事件钩子，在特定时机自动触发操作",
-		postToolUse: {
-			title: "PostToolUse",
-			description: "工具使用后触发",
-			noConfig: "暂无配置",
-		},
-		preToolUse: {
-			title: "PreToolUse",
-			description: "工具使用前触发",
-			noConfig: "暂无配置",
-		},
-		addHook: "+ 添加钩子",
-		hint: "提示：Hooks 配置存储在",
-		hintPath: "~/.claude/settings.json",
-		hintSuffix: "中。SDK 会自动加载并执行配置的钩子。",
-	},
-
 	permissions: {
 		title: "权限",
 		description: "配置工具权限规则，控制 AI 可以执行的操作",
@@ -367,27 +276,6 @@ export default {
 		subtitle: "配置 AI 输出样式和格式",
 		description: "配置输出格式、代码高亮、主题等选项。",
 		comingSoon: "更多功能即将推出：自定义主题、更多渲染器选项等。",
-	},
-
-	recovery: {
-		title: "会话恢复",
-		subtitle: "查看历史会话并恢复",
-		description: "恢复之前的会话继续对话",
-		loading: "加载中...",
-		refresh: "刷新列表",
-		example1: {
-			title: "创建新的 Web 应用",
-			sessionId: "会话 ID: abc123def456",
-			updated: "更新于: 2 小时前",
-		},
-		example2: {
-			title: "修复 API 集成问题",
-			sessionId: "会话 ID: ghi789jkl012",
-			updated: "更新于: 1 天前",
-		},
-		recover: "恢复",
-		hint: "会话数据存储在本地数据库中。恢复会话将加载完整的对话历史。",
-		hintWithCommand: "也可以使用命令行：",
 	},
 
 	rules: {
@@ -519,6 +407,7 @@ export default {
 		placeholder: "描述您希望代理处理的内容...",
 		stopSession: "停止会话",
 		sendPrompt: "发送提示词",
+		selectWorkingDir: "选择工作目录",
 	},
 
 	// Common

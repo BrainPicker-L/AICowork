@@ -118,7 +118,8 @@ export function handleSessionContinue(
   runnerHandles: Map<string, RunnerHandle>,
   emit: (event: ServerEvent) => void,
   sessionId: string,
-  prompt: string
+  prompt: string,
+  cwd?: string
 ): void {
   const session = sessions.getSession(sessionId);
   if (!session) {
@@ -128,6 +129,19 @@ export function handleSessionContinue(
       payload: { sessionId, message: "Session no longer exists." }
     });
     return;
+  }
+
+  // 如果提供了新的工作目录，更新会话的 cwd
+  if (cwd !== undefined && cwd.trim() && cwd.trim() !== session.cwd) {
+    const oldCwd = session.cwd;
+    sessions.updateSession(sessionId, { cwd: cwd.trim() });
+    log.session(sessionId, "Working directory changed", { oldCwd, newCwd: cwd.trim() });
+    
+    // 重新获取更新后的会话对象
+    const updatedSession = sessions.getSession(sessionId);
+    if (updatedSession) {
+      Object.assign(session, updatedSession);
+    }
   }
 
   // If session has no claudeSessionId, treat this as the first prompt

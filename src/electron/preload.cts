@@ -79,6 +79,8 @@ electron.contextBridge.exposeInMainWorld("electron", {
         invoke("validate-mcp-server", config),
     testMcpServer: (config: any) =>
         invoke("test-mcp-server", config),
+    getMcpServerTools: (config: any) =>
+        invoke("get-mcp-server-tools", config),
     getMcpTemplates: () =>
         invoke("get-mcp-templates"),
     // Skills 操作

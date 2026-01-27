@@ -41,20 +41,13 @@ export default {
 			system: "Système",
 		},
 		navigation: {
-			help: "Aide",
 			feedback: "Commentaires",
 			about: "À propos",
 			language: "Langue",
 			api: "Paramètres API",
 			mcp: "Paramètres MCP",
-			skills: "Compétences",
-			plugins: "Plugins",
-			memory: "Mémoire",
-			agents: "Agents",
-			hooks: "Hooks",
 			permissions: "Permissions",
 			output: "Styles de Sortie",
-			recovery: "Récupération de Session",
 			rules: "Règles",
 			claudeMd: "Claude.md",
 		},
@@ -92,11 +85,6 @@ export default {
 			description: "Soumettre des rapports de problmes sur GitHub",
 			link: "Aller sur GitHub",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "Demande de Fonctionnalit",
-			description: "Suggrer de nouvelles fonctionnalits que vous souhaitez voir",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "Merci pour vos commentaires! Nous examinerons attentivement chaque commentaire.",
 	},
@@ -296,26 +284,7 @@ export default {
 			installed: "Installé",
 		},
 		hint: "Le format de commande de plugin est /plugin-name:command-name.",
-	},
-
-	memory: {
-		title: "Mmoire",
-		description: "Configurer la fonctionnalit de mmoire, permettant  l'IA de se souvenir d'informations importantes",
-		underDevelopment: "La fonctionnalit Mmoire est en dveloppement...",
-		reservedArea: "Zone rserve pour les fonctionnalits du projet memvid",
-		comingSoon: "Bientt disponible",
-		comingSoonDescription: "La fonctionnalit Mmoire permettra  l'IA de partager des informations entre les sessions pour une mmoire contextuelle persistante.",
-	},
-
-	agents: {
-		title: "Agents",
-		description: "Configurer les agents IA pour le traitement parallle des tches",
-		underDevelopment: "La fonctionnalit de configuration des Agents est en dveloppement...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "Peut lancer jusqu' 10 sous-agents en parallle pour amliorer l'efficacit sur les tches complexes (N cot).",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "Hooks",
 		description: "Configurer les hooks d'vnements pour dclencher automatiquement des actions  des moments spcifiques",
 		postToolUse: {
@@ -505,6 +474,7 @@ export default {
 		placeholder: "Décrivez ce que vous souhaitez que l'agent traite...",
 		stopSession: "Arrêter la session",
 		sendPrompt: "Envoyer l'invite",
+		selectWorkingDir: "Sélectionner le répertoire de travail",
 	},
 
 	// Common

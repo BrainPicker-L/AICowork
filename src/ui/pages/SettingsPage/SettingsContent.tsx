@@ -4,20 +4,13 @@
 
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../store/useAppStore';
-import { HelpSection } from './sections/HelpSection';
 import { FeedbackSection } from './sections/FeedbackSection';
 import { AboutSection } from './sections/AboutSection';
 import { LanguageSection } from './sections/LanguageSection';
 import { ApiSection } from './sections/ApiSection';
 import { McpSection } from './sections/McpSection';
-import { SkillsSection } from './sections/SkillsSection';
-import { PluginsSection } from './sections/PluginsSection';
-import { MemorySection } from './sections/MemorySection';
-import { AgentsSection } from './sections/AgentsSection';
-import { HooksSection } from './sections/HooksSection';
 import { PermissionsSection } from './sections/PermissionsSection';
 import { OutputSection } from './sections/OutputSection';
-import { RecoverySection } from './sections/RecoverySection';
 import { RulesSection } from './sections/RulesSection';
 import { ClaudeMdSection } from './sections/ClaudeMdSection';
 
@@ -47,8 +40,6 @@ export function SettingsContent({ className }: SettingsContentProps) {
 
   const renderContent = () => {
     switch (settingsSection) {
-      case 'help':
-        return <HelpSection />;
       case 'feedback':
         return <FeedbackSection />;
       case 'about':
@@ -59,22 +50,10 @@ export function SettingsContent({ className }: SettingsContentProps) {
         return <ApiSection />;
       case 'mcp':
         return <McpSection />;
-      case 'skills':
-        return <SkillsSection />;
-      case 'plugins':
-        return <PluginsSection />;
-      case 'memory':
-        return <MemorySection />;
-      case 'agents':
-        return <AgentsSection />;
-      case 'hooks':
-        return <HooksSection />;
       case 'permissions':
         return <PermissionsSection />;
       case 'output':
         return <OutputSection />;
-      case 'recovery':
-        return <RecoverySection />;
       case 'rules':
         return <RulesSection />;
       case 'claudeMd':

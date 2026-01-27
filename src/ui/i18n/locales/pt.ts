@@ -41,20 +41,13 @@ export default {
 			system: "Sistema",
 		},
 		navigation: {
-			help: "Ajuda",
 			feedback: "Feedback",
 			about: "Sobre",
 			language: "Idioma",
 			api: "Configuraes de API",
 			mcp: "Configuraes MCP",
-			skills: "Skills",
-			plugins: "Plugins",
-			memory: "Memria",
-			agents: "Agents",
-			hooks: "Ganchos",
 			permissions: "Permisses",
 			output: "Estilos de Sada",
-			recovery: "Recuperao de Sesso",
 			rules: "Regras",
 			claudeMd: "Claude.md",
 		},
@@ -92,11 +85,6 @@ export default {
 			description: "Envie relatrios de problemas no GitHub",
 			link: "Ir para GitHub",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "Solicitao de Recurso",
-			description: "Sugira novos recursos que gostaria de ver",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "Obrigado pelo seu feedback! Revisaremos cuidadosamente cada feedback.",
 	},
@@ -300,26 +288,7 @@ export default {
 			installed: "Instalado",
 		},
 		hint: "O formato do comando de plugin  /plugin-name:command-name.",
-	},
-
-	memory: {
-		title: "Memria",
-		description: "Configure o recurso de memria, permitindo que a IA lembre informaes importantes",
-		underDevelopment: "O recurso Memria est em desenvolvimento...",
-		reservedArea: "rea reservada para funcionalidade do projeto memvid",
-		comingSoon: "Em breve",
-		comingSoonDescription: "O recurso Memria permitir que a IA compartilhe informaes entre sesses para memria contextual persistente.",
-	},
-
-	agents: {
-		title: "Agents",
-		description: "Configure agentes de IA para processamento paralelo de tarefas",
-		underDevelopment: "O recurso de configurao de Agents est em desenvolvimento...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "Pode iniciar at 10 sub-agentes em paralelo para maior eficincia em tarefas complexas (N custo).",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "Ganchos",
 		description: "Configure ganchos de eventos para acionar automaticamente aes em momentos especficos",
 		postToolUse: {
@@ -509,6 +478,7 @@ export default {
 		placeholder: "Descreva o que deseja que o agente processe...",
 		stopSession: "Parar sesso",
 		sendPrompt: "Enviar prompt",
+		selectWorkingDir: "Selecionar diretório de trabalho",
 	},
 
 	// Common

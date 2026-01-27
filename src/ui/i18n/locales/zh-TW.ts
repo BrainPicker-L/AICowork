@@ -41,20 +41,13 @@ export default {
 			system: "系統",
 		},
 		navigation: {
-			help: "幫助",
 			feedback: "反饋",
 			about: "關於",
 			language: "語言",
 			api: "API 設定",
 			mcp: "MCP 設定",
-			skills: "技能",
-			plugins: "插件",
-			memory: "記憶",
-			agents: "代理",
-			hooks: "鉤子",
 			permissions: "權限",
 			output: "輸出樣式",
-			recovery: "會話恢復",
 			rules: "規則",
 			claudeMd: "Claude.md",
 		},
@@ -65,16 +58,6 @@ export default {
 	},
 
 	// Settings Sections
-	help: {
-		title: "幫助",
-		subtitle: "獲取使用幫助和文檔",
-		quickStart: { title: "快速開始", description: "了解如何使用 AICowork 開始第一個任務" },
-		faq: { title: "常見問題", description: "查看常見問題和解決方案" },
-		docs: { title: "文檔鏈接", description: "訪問官方文檔獲取更多信息" },
-		tip: "提示：遇到問題可以先查看常見問題，或者通過反饋渠道聯繫我們。",
-		helpUrl: "https://ima.qq.com/note/share/_AwZPbuK9wucK5gWaVdjNQ?channel=4",
-	},
-
 	feedback: {
 		title: "反饋",
 		subtitle: "提交問題和建議，幫助我們改進",
@@ -83,11 +66,6 @@ export default {
 			description: "在 GitHub 上提交問題報告",
 			link: "前往 GitHub",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "功能建議",
-			description: "提出您希望看到的新功能",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "感謝您的反饋！我們會認真閱讀每一條反饋意見。",
 	},
@@ -221,26 +199,7 @@ export default {
 		noPlugins: "暫無已安裝的插件",
 		status: { installed: "已安裝" },
 		hint: "插件命令格式為 /plugin-name:command-name。",
-	},
-
-	memory: {
-		title: "記憶",
-		description: "配置記憶功能，讓 AI 記住重要信息",
-		underDevelopment: "Memory 功能正在開發中...",
-		reservedArea: "此區域預留給 memvid 項目功能",
-		comingSoon: "即將推出",
-		comingSoonDescription: "Memory 功能將允許 AI 在多個會話之間共享信息，實現持久化的上下文記憶。",
-	},
-
-	agents: {
-		title: "代理",
-		description: "配置 AI 代理，實現並行任務處理",
-		underDevelopment: "Agents 配置功能正在開發中...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "最多可以同時啟動 10 個子代理並行處理任務，但請注意成本會相應增加（N×）。",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "鉤子",
 		description: "配置事件鉤子，在特定時機自動觸發操作",
 		postToolUse: {
@@ -405,6 +364,7 @@ export default {
 		placeholder: "描述您希望代理處理的內容...",
 		stopSession: "停止會話",
 		sendPrompt: "傳送提示詞",
+		selectWorkingDir: "選擇工作目錄",
 	},
 
 	// Common

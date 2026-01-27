@@ -213,6 +213,7 @@ export interface ElectronAPI {
   deleteMcpServer: (name: string) => Promise<{ success: boolean; error?: string }>;
   validateMcpServer: (config: McpServerConfig) => Promise<ValidationResult>;
   testMcpServer: (config: McpServerConfig) => Promise<TestApiResult>;
+  getMcpServerTools: (config: McpServerConfig) => Promise<Array<{ name: string; description?: string; inputSchema?: Record<string, unknown>; outputSchema?: Record<string, unknown> }>>;
   getMcpTemplates: () => Promise<Record<string, McpServerConfig>>;
   /** Skills 操作 */
   getSkillsList: () => Promise<SkillConfig[]>;

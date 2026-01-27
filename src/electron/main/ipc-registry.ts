@@ -118,6 +118,7 @@ import {
   saveMcpServer,
   deleteMcpServer,
   testMcpServer,
+  getMcpServerTools,
   validateMcpServer,
   MCP_TEMPLATES,
 } from "../storage/mcp-store.js";
@@ -626,6 +627,10 @@ function registerMcpHandlers(): void {
 
     ipcMain.handle("test-mcp-server", wrapIpcHandler("test-mcp-server", async (_: unknown, config: any) => {
         return await testMcpServer(config);
+    }));
+
+    ipcMain.handle("get-mcp-server-tools", wrapIpcHandler("get-mcp-server-tools", async (_: unknown, config: any) => {
+        return await getMcpServerTools(config);
     }));
 
     ipcMain.handle("validate-mcp-server", (_: unknown, config: any) => {

@@ -41,20 +41,13 @@ export default {
 			system: "Система",
 		},
 		navigation: {
-			help: "Справка",
 			feedback: "Обратная связь",
 			about: "О программе",
 			language: "Язык",
 			api: "Настройки API",
 			mcp: "Настройки MCP",
-			skills: "Навыки",
-			plugins: "Плагины",
-			memory: "Память",
-			agents: "Агенты",
-			hooks: "Хуки",
 			permissions: "Разрешения",
 			output: "Стили вывода",
-			recovery: "Восстановление сессии",
 			rules: "Правила",
 			claudeMd: "Claude.md",
 		},
@@ -92,11 +85,6 @@ export default {
 			description: "Отправьте отчёты о проблемах на GitHub",
 			link: "Перейти на GitHub",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "Запрос функции",
-			description: "Предложите новые функции, которые вы хотите видеть",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "Спасибо за вашу обратную связь! Мы внимательно рассмотрим каждый отзыв.",
 	},
@@ -300,26 +288,7 @@ export default {
 			installed: "Установлено",
 		},
 		hint: "Формат команды плагина: /plugin-name:command-name.",
-	},
-
-	memory: {
-		title: "Память",
-		description: "Настройте функцию памяти, позволяющую ИИ запоминать важную информацию",
-		underDevelopment: "Функция памяти находится в разработке...",
-		reservedArea: "Зарезервировано для функциональности проекта memvid",
-		comingSoon: "Скоро будет",
-		comingSoonDescription: "Функция памяти позволит ИИ делиться информацией между сессиями для постоянного контекста.",
-	},
-
-	agents: {
-		title: "Агенты",
-		description: "Настройте агентов ИИ для параллельной обработки задач",
-		underDevelopment: "Функция конфигурации агентов находится в разработке...",
-		subAgents: "Субагенты",
-		subAgentsDescription: "Может запускать до 10 субагентов параллельно для повышения эффективности на сложных задачах (N× стоимость).",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "Хуки",
 		description: "Настройте хуки событий для автоматического запуска действий в определённое время",
 		postToolUse: {
@@ -509,6 +478,7 @@ export default {
 		placeholder: "Опишите, что агент должен выполнить...",
 		stopSession: "Остановить сессию",
 		sendPrompt: "Отправить запрос",
+		selectWorkingDir: "Выбрать рабочий каталог",
 	},
 
 	// Common

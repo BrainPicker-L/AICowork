@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { APP_CONFIG } from "../../../config/constants";
 import { log } from "../../../utils/logger";
+import { useAppStore } from "../../../store/useAppStore";
 import type { ServerEvent } from "../../../../electron/types";
 import {
   Tooltip,
@@ -525,6 +526,10 @@ export function ApiSection() {
           setConfigId(config.id);
           setConfigName(config.name);
         }
+        
+        // 同步更新对话框中的模型选择
+        useAppStore.getState().setSelectedModelConfigId(activeId);
+        log.info("Synced selectedModelConfigId to:", activeId);
       }
     } catch (err) {
       log.error("Failed to set active config", err);

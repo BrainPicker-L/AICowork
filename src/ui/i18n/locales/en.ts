@@ -46,20 +46,13 @@ export default {
 			system: "System",
 		},
 		navigation: {
-			help: "Help",
 			feedback: "Feedback",
 			about: "About",
 			language: "Language",
 			api: "API Settings",
 			mcp: "MCP Settings",
-			skills: "Skills",
-			plugins: "Plugins",
-			memory: "Memory",
-			agents: "Agents",
-			hooks: "Hooks",
 			permissions: "Permissions",
 			output: "Output Styles",
-			recovery: "Session Recovery",
 			rules: "Rules",
 			claudeMd: "Claude.md",
 		},
@@ -70,25 +63,6 @@ export default {
 	},
 
 	// Settings Sections
-	help: {
-		title: "Help",
-		subtitle: "Get help and documentation",
-		quickStart: {
-			title: "Quick Start",
-			description: "Learn how to use AICowork to start your first task",
-		},
-		faq: {
-			title: "FAQ",
-			description: "View frequently asked questions and solutions",
-		},
-		docs: {
-			title: "Documentation",
-			description: "Visit official documentation for more information",
-		},
-		tip: "Tip: Check FAQ first if you encounter issues, or contact us through feedback channels.",
-		helpUrl: "https://ima.qq.com/note/share/_AwZPbuK9wucK5gWaVdjNQ?channel=4",
-	},
-
 	feedback: {
 		title: "Feedback",
 		subtitle: "Submit issues and suggestions to help us improve",
@@ -97,11 +71,6 @@ export default {
 			description: "Submit issue reports on GitHub",
 			link: "Go to GitHub",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "Feature Request",
-			description: "Suggest new features you'd like to see",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "Thank you for your feedback! We will carefully review every feedback.",
 	},
@@ -287,66 +256,6 @@ export default {
 		hintPath: "~/.qwen/settings.json",
 	},
 
-	skills: {
-		title: "Skills",
-		description: "Manage custom skills, AI will automatically execute based on SKILL.md instructions",
-		loading: "Loading...",
-		noSkills: "No installed Skills",
-		noSkillsHint: "Place Skills in ~/.claude/skills/ directory for auto-detection",
-		openDirectory: "Open Skills Directory",
-		source: {
-			skill: "Skill",
-			plugin: "Plugin",
-		},
-		hint: "Skills are stored in ~/.claude/skills/ directory. Each skill folder contains a SKILL.md file, AI will execute automatically based on content.",
-	},
-
-	plugins: {
-		title: "Plugins",
-		description: "Manage installed plugins",
-		noPlugins: "No installed plugins",
-		status: {
-			installed: "Installed",
-		},
-		hint: "Plugin command format is /plugin-name:command-name.",
-	},
-
-	memory: {
-		title: "Memory",
-		description: "Configure memory feature, allowing AI to remember important information",
-		underDevelopment: "Memory feature is under development...",
-		reservedArea: "Reserved for memvid project functionality",
-		comingSoon: "Coming Soon",
-		comingSoonDescription: "Memory feature will allow AI to share information across sessions for persistent context memory.",
-	},
-
-	agents: {
-		title: "Agents",
-		description: "Configure AI agents for parallel task processing",
-		underDevelopment: "Agents configuration feature is under development...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "Can launch up to 10 sub-agents in parallel for improved efficiency on complex tasks (N× cost).",
-	},
-
-	hooks: {
-		title: "Hooks",
-		description: "Configure event hooks to automatically trigger actions at specific times",
-		postToolUse: {
-			title: "PostToolUse",
-			description: "Triggered after tool use",
-			noConfig: "No configuration",
-		},
-		preToolUse: {
-			title: "PreToolUse",
-			description: "Triggered before tool use",
-			noConfig: "No configuration",
-		},
-		addHook: "+ Add Hook",
-		hint: "Tip: Hooks configuration is stored in",
-		hintPath: "~/.claude/settings.json",
-		hintSuffix: ". SDK will automatically load and execute configured hooks.",
-	},
-
 	permissions: {
 		title: "Permissions",
 		allowedTools: {
@@ -367,27 +276,6 @@ export default {
 		subtitle: "Configure AI output styles and formats",
 		description: "Output style configuration feature is under development...",
 		comingSoon: "Coming Soon: Configurable output format, code highlighting theme, Markdown rendering options, etc.",
-	},
-
-	recovery: {
-		title: "Session Recovery",
-		subtitle: "View and resume previous sessions",
-		description: "Resume previous sessions to continue conversations",
-		loading: "Loading...",
-		refresh: "Refresh List",
-		example1: {
-			title: "Create New Web App",
-			sessionId: "Session ID: abc123def456",
-			updated: "Updated: 2 hours ago",
-		},
-		example2: {
-			title: "Fix API Integration Issue",
-			sessionId: "Session ID: ghi789jkl012",
-			updated: "Updated: 1 day ago",
-		},
-		recover: "Resume",
-		hint: "Session data is stored in local database. Resuming a session will load the complete conversation history.",
-		hintWithCommand: "You can also use command line:",
 	},
 
 	rules: {
@@ -519,6 +407,7 @@ export default {
 		placeholder: "Describe what you want agent to handle...",
 		stopSession: "Stop session",
 		sendPrompt: "Send prompt",
+		selectWorkingDir: "Select working directory",
 	},
 
 	// Common

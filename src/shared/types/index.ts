@@ -63,7 +63,7 @@ export type ServerEvent =
  */
 export type ClientEvent =
   | { type: "session.start"; payload: { title: string; prompt: string; cwd?: string; allowedTools?: string } }
-  | { type: "session.continue"; payload: { sessionId: string; prompt: string } }
+  | { type: "session.continue"; payload: { sessionId: string; prompt: string; cwd?: string } }
   | { type: "session.stop"; payload: { sessionId: string } }
   | { type: "session.delete"; payload: { sessionId: string } }
   | { type: "session.list" }

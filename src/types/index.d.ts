@@ -85,6 +85,7 @@ type EventPayloadMapping = {
     "session.rename": { success: boolean; error?: string };
     // MCP 操作
     "test-mcp-server": { success: boolean; message: string; details?: string };
+    "get-mcp-server-tools": Array<{ name: string; description?: string; inputSchema?: Record<string, unknown>; outputSchema?: Record<string, unknown> }>;
     // Skills 操作
     "get-skills-list": Array<{ name: string; description: string; prompt: string; createdAt: number; updatedAt: number }>;
     "create-skill": { success: boolean; error?: string };

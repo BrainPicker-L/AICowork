@@ -4,19 +4,12 @@
 
 import { useTranslation } from 'react-i18next';
 import {
-  HelpCircle,
   MessageSquare,
   Info,
   Key,
   Plug,
-  Zap,
-  Puzzle,
-  Database,
-  Bot,
-  GitBranch,
   Shield,
   Palette,
-  History,
   Languages,
   FileText,
   FileCode
@@ -38,7 +31,6 @@ interface SectionDef {
 
 const SETTINGS_SECTIONS: SectionDef[] = [
   // 常规
-  { id: 'help', icon: HelpCircle, group: 'general' },
   { id: 'feedback', icon: MessageSquare, group: 'general' },
   { id: 'about', icon: Info, group: 'general' },
   { id: 'language', icon: Languages, group: 'general' },
@@ -48,18 +40,12 @@ const SETTINGS_SECTIONS: SectionDef[] = [
   { id: 'mcp', icon: Plug, group: 'api' },
 
   // 功能扩展
-  { id: 'skills', icon: Zap, group: 'features' },
-  { id: 'plugins', icon: Puzzle, group: 'features' },
-  { id: 'memory', icon: Database, group: 'features' },
-  { id: 'agents', icon: Bot, group: 'features' },
-  { id: 'hooks', icon: GitBranch, group: 'features' },
   { id: 'rules', icon: FileText, group: 'features' },
   { id: 'claudeMd', icon: FileCode, group: 'features' },
 
   // 系统
   { id: 'permissions', icon: Shield, group: 'system' },
   { id: 'output', icon: Palette, group: 'system' },
-  { id: 'recovery', icon: History, group: 'system' },
 ];
 
 const GROUP_ORDER: Array<SectionDef['group']> = ['general', 'api', 'features', 'system'];

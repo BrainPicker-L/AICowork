@@ -47,20 +47,13 @@ export default {
 			system: "System",
 		},
 		navigation: {
-			help: "Hilfe",
 			feedback: "Feedback",
 			about: "Über",
 			language: "Sprache",
 			api: "API-Einstellungen",
 			mcp: "MCP-Einstellungen",
-			skills: "Skills",
-			plugins: "Plugins",
-			memory: "Memory",
-			agents: "Agents",
-			hooks: "Hooks",
 			permissions: "Berechtigungen",
 			output: "Ausgabeformate",
-			recovery: "Sitzungswiederherstellung",
 			rules: "Regeln",
 			claudeMd: "Claude.md",
 		},
@@ -98,11 +91,6 @@ export default {
 			description: "Fehler auf GitHub melden",
 			link: "Zu GitHub gehen",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "Funktionswunsch",
-			description: "Schlagen Sie neue Funktionen vor, die Sie sehen möchten",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "Vielen Dank für Ihr Feedback! Wir werden jedes Feedback sorgfältig prüfen.",
 	},
@@ -306,26 +294,7 @@ export default {
 			installed: "Installiert",
 		},
 		hint: "Plugin-Befehlsformat ist /plugin-name:befehls-name.",
-	},
-
-	memory: {
-		title: "Memory",
-		description: "Memory-Funktion konfigurieren, damit KI wichtige Informationen merken kann",
-		underDevelopment: "Memory-Funktion ist in Entwicklung...",
-		reservedArea: "Bereich reserviert für memvid-Projektfunktionalität",
-		comingSoon: "Demnächst verfügbar",
-		comingSoonDescription: "Memory-Funktion ermöglicht der KI, Informationen über Sitzungen hinweg zu teilen für persistente Kontext-Erinnerung.",
-	},
-
-	agents: {
-		title: "Agents",
-		description: "KI-Agents für parallele Aufgabenverarbeitung konfigurieren",
-		underDevelopment: "Agents-Konfigurationsfunktion ist in Entwicklung...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "Kann bis zu 10 Sub-Agents parallel für verbesserte Effizienz bei komplexen Aufgaben starten (N Kosten).",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "Hooks",
 		description: "Event-Hooks konfigurieren, um automatisch Aktionen zu bestimmten Zeitpunkten auszulösen",
 		postToolUse: {
@@ -515,6 +484,7 @@ export default {
 		placeholder: "Beschreiben Sie, was der Agent tun soll...",
 		stopSession: "Sitzung stoppen",
 		sendPrompt: "Eingabe senden",
+		selectWorkingDir: "Arbeitsverzeichnis auswählen",
 	},
 
 	// Common

@@ -92,7 +92,7 @@ export function handleClientEvent(event: ClientEvent) {
     },
     "session.continue": () => {
       const payload = (event as Extract<ClientEvent, { type: "session.continue" }>).payload;
-      handleSessionContinue(sessions, runnerHandles, emit, payload.sessionId, payload.prompt);
+      handleSessionContinue(sessions, runnerHandles, emit, payload.sessionId, payload.prompt, payload.cwd);
     },
     "session.stop": () => {
       const payload = (event as Extract<ClientEvent, { type: "session.stop" }>).payload;

@@ -41,20 +41,13 @@ export default {
 			system: "Sistema",
 		},
 		navigation: {
-			help: "Ayuda",
 			feedback: "Comentarios",
 			about: "Acerca de",
 			language: "Idioma",
 			api: "Configuracin API",
 			mcp: "Configuracin MCP",
-			skills: "Habilidades",
-			plugins: "Plugins",
-			memory: "Memoria",
-			agents: "Agentes",
-			hooks: "Ganchos",
 			permissions: "Permisos",
 			output: "Estilos de Salida",
-			recovery: "Recuperacin de Sesin",
 			rules: "Reglas",
 			claudeMd: "Claude.md",
 		},
@@ -92,11 +85,6 @@ export default {
 			description: "Enve reportes de problemas en GitHub",
 			link: "Ir a GitHub",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "Solicitud de Caracterstica",
-			description: "Sugiera nuevas caractersticas que le gustara ver",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "Gracias por sus comentarios! Revisaremos cuidadosamente cada comentario.",
 	},
@@ -300,26 +288,7 @@ export default {
 			installed: "Instalado",
 		},
 		hint: "El formato del comando de plugin es /nombre-plugin:nombre-comando.",
-	},
-
-	memory: {
-		title: "Memoria",
-		description: "Configure la funcin de memoria, permitiendo que la IA recuerde informacin importante",
-		underDevelopment: "La funcin de Memoria est en desarrollo...",
-		reservedArea: "rea reservada para la funcionalidad del proyecto memvid",
-		comingSoon: "Prximamente",
-		comingSoonDescription: "La funcin de Memoria permitir que la IA comparta informacin entre sesiones para memoria contextual persistente.",
-	},
-
-	agents: {
-		title: "Agentes",
-		description: "Configure agentes de IA para procesamiento paralelo de tareas",
-		underDevelopment: "La funcin de configuracin de Agents est en desarrollo...",
-		subAgents: "SubAgentes",
-		subAgentsDescription: "Puede iniciar hasta 10 sub-agentes en paralelo para mejorar la eficiencia en tareas complejas (N costo).",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "Ganchos",
 		description: "Configure ganchos de eventos para activar automticamente acciones en momentos especficos",
 		postToolUse: {
@@ -509,6 +478,7 @@ export default {
 		placeholder: "Describa lo que desea que el agente maneje...",
 		stopSession: "Detener sesin",
 		sendPrompt: "Enviar prompt",
+		selectWorkingDir: "Seleccionar directorio de trabajo",
 	},
 
 	// Common

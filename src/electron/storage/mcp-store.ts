@@ -8,6 +8,10 @@ import { promises as fs } from "fs";
 import { join, dirname } from "path";
 import { homedir } from "os";
 import { log } from "../logger.js";
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 
 /**
  * MCP 服务器配置接口
@@ -296,7 +300,18 @@ export interface McpTestResult {
 }
 
 /**
+ * MCP 工具信息接口
+ */
+export interface McpToolInfo {
+  name: string;
+  description?: string;
+  inputSchema?: Record<string, unknown>;
+  outputSchema?: Record<string, unknown>;
+}
+
+/**
  * 测试 MCP 服务器连接
+ * 真正连接到 MCP 服务器并测试通信
  */
 export async function testMcpServer(config: McpServerConfig): Promise<McpTestResult> {
   // 首先验证配置
@@ -309,147 +324,169 @@ export async function testMcpServer(config: McpServerConfig): Promise<McpTestRes
     };
   }
 
-  const type = config.type || 'stdio';
+  try {
+    const client = new Client({
+      name: 'mcp-connection-tester',
+      version: '1.0.0',
+    });
 
-  if (type === 'stdio') {
-    // 测试 stdio 类型：检查命令是否存在
-    return await testStdioServer(config);
-  } else if (type === 'sse' || type === 'streamableHttp') {
-    // 测试 HTTP 类型：检查 URL 是否可达
-    return await testHttpServer(config);
-  }
+    let transport: any;
+    const type = config.type || 'stdio';
 
-  return {
-    success: false,
-    message: '未知的服务器类型',
-  };
-}
-
-/**
- * 测试 stdio 类型的 MCP 服务器
- */
-async function testStdioServer(config: McpServerConfig): Promise<McpTestResult> {
-  const { spawn } = await import('child_process');
-
-  return new Promise((resolve) => {
-    const args = config.args || [];
-    const command = config.command!;
-
-    // 设置超时
-    const timeout = setTimeout(() => {
-      resolve({
-        success: false,
-        message: '连接超时',
-        details: `命令 ${command} 在 5 秒内无响应`,
+    // 创建传输层
+    if (type === 'stdio') {
+      if (!config.command) {
+        return {
+          success: false,
+          message: '配置错误',
+          details: 'stdio 类型需要 command 参数',
+        };
+      }
+      transport = new StdioClientTransport({
+        command: config.command,
+        args: config.args || [],
+        env: {
+          ...process.env,
+          ...(config.env || {}),
+        } as Record<string, string>,
       });
-    }, 5000);
+    } else if (type === 'sse') {
+      if (!config.url) {
+        return {
+          success: false,
+          message: '配置错误',
+          details: 'sse 类型需要 url 参数',
+        };
+      }
+      transport = new SSEClientTransport(new URL(config.url));
+    } else if (type === 'streamableHttp') {
+      if (!config.url) {
+        return {
+          success: false,
+          message: '配置错误',
+          details: 'streamableHttp 类型需要 url 参数',
+        };
+      }
+      transport = new StreamableHTTPClientTransport(new URL(config.url));
+    } else {
+      return {
+        success: false,
+        message: '未知的服务器类型',
+        details: `不支持的类型: ${type}`,
+      };
+    }
+
+    // 尝试连接到服务器
+    const startTime = Date.now();
+    await client.connect(transport, { timeout: 10000 });
 
     try {
-      // 尝试启动进程（使用 --version 或类似参数测试）
-      const testArgs = ['--version', '--help', '-v'].filter(arg =>
-        args.length === 0 || !args.includes(arg)
-      );
+      // 测试基本通信：获取服务器信息
+      const serverInfo = await client.getServerVersion();
+      const responseTime = Date.now() - startTime;
 
-      const child = spawn(command, testArgs.length > 0 ? testArgs : args, {
-        shell: false,  // 移除 shell 以防止命令注入风险
-        env: { ...process.env, ...config.env },
-      });
-
-      let stdout = '';
-      let stderr = '';
-
-      child.stdout?.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      child.stderr?.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      child.on('error', (error) => {
-        clearTimeout(timeout);
-        resolve({
-          success: false,
-          message: '命令执行失败',
-          details: error.message,
-        });
-      });
-
-      child.on('close', (code) => {
-        clearTimeout(timeout);
-        if (code === 0 || code === 1) {
-          // 退出码 0 或 1 都可能表示命令存在（某些工具用 1 表示帮助信息）
-          resolve({
-            success: true,
-            message: '连接成功',
-            details: `命令 ${command} 可用`,
-          });
-        } else {
-          resolve({
-            success: false,
-            message: '命令不可用',
-            details: `退出码: ${code}`,
-          });
-        }
-      });
-    } catch (error: any) {
-      clearTimeout(timeout);
-      resolve({
-        success: false,
-        message: '启动失败',
-        details: error.message,
-      });
-    }
-  });
-}
-
-/**
- * 测试 HTTP 类型的 MCP 服务器
- */
-async function testHttpServer(config: McpServerConfig): Promise<McpTestResult> {
-  const url = config.url!;
-
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-    // 使用原生 fetch (Node.js 18+)
-    const response = await fetch(url, {
-      method: 'GET',
-      signal: controller.signal as any,
-      headers: {
-        'Accept': 'application/json',
-      },
-    }).catch(() => null);
-
-    clearTimeout(timeoutId);
-
-    if (response && (response.ok || response.status === 404 || response.status === 405)) {
-      // 200, 404, 405 都表示服务器存在（只是端点可能不同）
       return {
         success: true,
         message: '连接成功',
-        details: `URL ${url} 可访问`,
+        details: `服务器: ${serverInfo.name || 'unknown'}, 版本: ${serverInfo.version || 'unknown'}, 响应时间: ${responseTime}ms`,
       };
+    } finally {
+      // 关闭连接
+      await client.close();
+    }
+  } catch (error: any) {
+    log.error('[mcp-store] MCP server test failed:', error);
+    
+    // 解析错误信息
+    let message = '连接失败';
+    let details = error.message;
+
+    if (error.message?.includes('timeout') || error.message?.includes('ETIMEDOUT')) {
+      message = '连接超时';
+      details = '服务器在 10 秒内无响应';
+    } else if (error.message?.includes('ENOENT') || error.message?.includes('command not found')) {
+      message = '命令不存在';
+      details = `找不到命令: ${config.command}`;
+    } else if (error.message?.includes('ECONNREFUSED')) {
+      message = '连接被拒绝';
+      details = '无法连接到服务器';
+    } else if (error.code === 'ENOENT') {
+      message = '命令不存在';
+      details = `找不到命令: ${config.command}`;
     }
 
     return {
       success: false,
-      message: '连接失败',
-      details: `URL ${url} 无响应`,
-    };
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
-      return {
-        success: false,
-        message: '连接超时',
-        details: `URL ${url} 在 5 秒内无响应`,
-      };
-    }
-    return {
-      success: false,
-      message: '连接失败',
-      details: error.message,
+      message,
+      details,
     };
   }
 }
+
+/**
+ * 获取 MCP 服务器的工具列表
+ */
+export async function getMcpServerTools(config: McpServerConfig): Promise<McpToolInfo[]> {
+  try {
+    const client = new Client({
+      name: 'mcp-tools-inspector',
+      version: '1.0.0',
+    });
+
+    let transport: any;
+    const type = config.type || 'stdio';
+
+    // 创建传输层
+    if (type === 'stdio') {
+      if (!config.command) {
+        throw new Error('stdio 类型需要 command 参数');
+      }
+      transport = new StdioClientTransport({
+        command: config.command,
+        args: config.args || [],
+        env: {
+          ...process.env,
+          ...(config.env || {}),
+        } as Record<string, string>,
+      });
+    } else if (type === 'sse') {
+      if (!config.url) {
+        throw new Error('sse 类型需要 url 参数');
+      }
+      transport = new SSEClientTransport(new URL(config.url));
+    } else if (type === 'streamableHttp') {
+      if (!config.url) {
+        throw new Error('streamableHttp 类型需要 url 参数');
+      }
+      transport = new StreamableHTTPClientTransport(new URL(config.url));
+    } else {
+      throw new Error(`不支持的服务器类型: ${type}`);
+    }
+
+    // 连接到服务器
+    await client.connect(transport, { timeout: 10000 });
+
+    try {
+      // 获取工具列表
+      const result = await client.listTools();
+      
+      // 转换为简化格式
+      const tools: McpToolInfo[] = result.tools.map((tool: any) => ({
+        name: tool.name,
+        description: tool.description,
+        inputSchema: tool.inputSchema,
+        outputSchema: tool.outputSchema,
+      }));
+
+      return tools;
+    } finally {
+      // 关闭连接
+      await client.close();
+    }
+  } catch (error: any) {
+    log.error('[mcp-store] Failed to get MCP server tools:', error);
+    throw new Error(`获取工具列表失败: ${error.message}`);
+  }
+}
+
+

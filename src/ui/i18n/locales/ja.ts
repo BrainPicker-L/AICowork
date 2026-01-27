@@ -41,20 +41,13 @@ export default {
 			system: "システム",
 		},
 		navigation: {
-			help: "ヘルプ",
 			feedback: "フィードバック",
 			about: "について",
 			language: "言語",
 			api: "API 設定",
 			mcp: "MCP 設定",
-			skills: "スキル",
-			plugins: "プラグイン",
-			memory: "メモリ",
-			agents: "エージェント",
-			hooks: "フック",
 			permissions: "権限",
 			output: "出力スタイル",
-			recovery: "セッション復元",
 			rules: "ルール",
 			claudeMd: "Claude.md",
 		},
@@ -92,11 +85,6 @@ export default {
 			description: "GitHub で問題を報告する",
 			link: "GitHub へ移動",
 			url: "https://github.com/BrainPicker-L/AICowork",
-		},
-		featureRequest: {
-			title: "機能リクエスト",
-			description: "ご希望の新機能を提案する",
-			url: "https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv",
 		},
 		thankYou: "フィードバックありがとうございます！すべてのフィードバックを真摯に確認いたします。",
 	},
@@ -300,26 +288,7 @@ export default {
 			installed: "インストール済み",
 		},
 		hint: "プラグインコマンドの形式は /plugin-name:command-name です。",
-	},
-
-	memory: {
-		title: "メモリ",
-		description: "メモリ機能を設定して、AI に重要情報を記憶させます",
-		underDevelopment: "メモリ機能は開発中です...",
-		reservedArea: "この領域は memvid プロジェクト機能用に予約されています",
-		comingSoon: "近日公開",
-		comingSoonDescription: "メモリ機能により、AI は複数のセッション間で情報を共有し、永続的なコンテキストメモリを実現できます。",
-	},
-
-	agents: {
-		title: "エージェント",
-		description: "AI エージェントを設定して、並列タスク処理を実現",
-		underDevelopment: "エージェント設定機能は開発中です...",
-		subAgents: "SubAgents",
-		subAgentsDescription: "複雑なタスクの効率を向上させるため、最大 10 個のサブエージェントを並行して起動できますが、コストもそれに応じて増加します（N×）。",
-	},
-
-	hooks: {
+	},	hooks: {
 		title: "フック",
 		description: "イベントフックを設定して、特定のタイミングでアクションを自動的にトリガー",
 		postToolUse: {
@@ -510,6 +479,7 @@ export default {
 		placeholder: "エージェントに処理してほしい内容を説明してください...",
 		stopSession: "セッション停止",
 		sendPrompt: "プロンプトを送信",
+		selectWorkingDir: "作業ディレクトリを選択",
 	},
 
 	// Common

@@ -10,7 +10,6 @@ export function FeedbackSection() {
   // 反馈链接配置
   const feedbackLinks = {
     bugReport: 'https://github.com/BrainPicker-L/AICowork',
-    featureRequest: 'https://docs.qq.com/form/page/DRm5uV1pSZFB3VHNv',
   };
 
   // 统一使用浏览器打开链接
@@ -44,21 +43,6 @@ export function FeedbackSection() {
               </p>
             </div>
             <svg viewBox="0 0 24 24" className="w-5 h-5 text-muted ml-3" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M7 17L17 7M7 7h10v10" />
-            </svg>
-          </div>
-        </div>
-
-        <div
-          className="p-4 rounded-xl border border-ink-900/10 bg-surface hover:border-accent/30 transition-colors cursor-pointer"
-          onClick={() => openLink(feedbackLinks.featureRequest)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-accent">{t('feedback.featureRequest.title')}</h3>
-              <p className="mt-2 text-sm text-muted">{t('feedback.featureRequest.description')}</p>
-            </div>
-            <svg viewBox="0 0 24 24" className="w-5 h-5 text-muted" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M7 17L17 7M7 7h10v10" />
             </svg>
           </div>

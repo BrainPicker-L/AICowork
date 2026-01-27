@@ -32,20 +32,13 @@ export type SessionView = {
  * 设置页面区域类型
  */
 export type SettingsSection =
-  | 'help'
   | 'feedback'
   | 'about'
   | 'language'
   | 'api'
   | 'mcp'
-  | 'skills'
-  | 'plugins'
-  | 'memory'
-  | 'agents'
-  | 'hooks'
   | 'permissions'
   | 'output'
-  | 'recovery'
   | 'rules'
   | 'claudeMd';
 
@@ -61,6 +54,7 @@ interface AppState {
   showSettingsModal: boolean;
   historyRequested: Set<string>;
   apiConfigChecked: boolean;
+  selectedModelConfigId: string | null; // 新增：当前选中的模型配置ID
 
   // 新增：页面状态
   currentPage: 'main' | 'settings';
@@ -74,6 +68,7 @@ interface AppState {
   setShowSettingsModal: (show: boolean) => void;
   setActiveSessionId: (id: string | null) => void;
   setApiConfigChecked: (checked: boolean) => void;
+  setSelectedModelConfigId: (configId: string | null) => void; // 新增：设置选中的模型配置
   markHistoryRequested: (sessionId: string) => void;
   resolvePermissionRequest: (sessionId: string, toolUseId: string) => void;
   renameSession: (sessionId: string, newTitle: string) => void;
@@ -100,6 +95,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   showSettingsModal: false,
   historyRequested: new Set(),
   apiConfigChecked: false,
+  selectedModelConfigId: null, // 新增：初始化为 null
 
   // 新增：页面状态
   currentPage: 'main',
@@ -113,6 +109,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setShowSettingsModal: (showSettingsModal) => set({ showSettingsModal }),
   setActiveSessionId: (id) => set({ activeSessionId: id }),
   setApiConfigChecked: (apiConfigChecked) => set({ apiConfigChecked }),
+  setSelectedModelConfigId: (configId) => set({ selectedModelConfigId: configId }), // 新增：设置方法
 
   // 新增：页面切换方法
   setCurrentPage: (currentPage) => set({ currentPage }),

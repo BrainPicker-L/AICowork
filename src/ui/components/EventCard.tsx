@@ -305,6 +305,10 @@ const SystemInfoCard = ({ message, showIndicator = false }: { message: SDKMessag
     </div>
   );
 
+  // ✅ 优先使用实际配置的模型名称（如果有），否则使用 SDK 返回的模型名称
+  // configuredModel 是在 Runner 中附加的实际配置的模型名称
+  const displayModel = systemMsg.configuredModel || systemMsg.model || "-";
+
   return (
     <div className="flex flex-col gap-2 mt-2">
       <div className="header text-accent flex items-center gap-2">
@@ -313,7 +317,7 @@ const SystemInfoCard = ({ message, showIndicator = false }: { message: SDKMessag
       </div>
       <div className="flex flex-col rounded-xl px-4 py-2 border border-ink-900/10 bg-surface-secondary space-y-1">
         <InfoItem name={t('events.sessionId')} value={systemMsg.session_id || "-"} />
-        <InfoItem name={t('events.modelName')} value={systemMsg.model || "-"} />
+        <InfoItem name={t('events.modelName')} value={displayModel} />
         <InfoItem name={t('events.permissionMode')} value={systemMsg.permissionMode || "-"} />
         <InfoItem name={t('events.workingDirectory')} value={systemMsg.cwd || "-"} />
       </div>

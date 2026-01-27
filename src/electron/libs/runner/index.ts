@@ -197,6 +197,26 @@ export async function runClaude(options: RunnerOptions): Promise<RunnerHandle> {
         log.warn('[Runner] CLI path not found, falling back to HTTP API mode');
       }
 
+      // ========== 记录详细的 API 请求信息 ==========
+      try {
+        const apiEndpoint = buildApiEndpoint(config);
+        const requestHeaders = buildApiHeaders(config);
+        const requestBody = buildApiRequestBody(config, enhancedPrompt);
+
+        // 打印详细的请求信息（类似 api-tester.ts 的格式）
+        log.info('========================================');
+        log.info('=== API Request Details ===');
+        log.info(`Session ID: ${session.id}`);
+        log.info(`URL: ${apiEndpoint}`);
+        log.info('Method: POST');
+        log.info(`Headers: ${JSON.stringify(requestHeaders, null, 2)}`);
+        log.info(`Body: ${JSON.stringify(requestBody, null, 2)}`);
+        log.info('========================================');
+      } catch (logError) {
+        log.warn('[Runner] Failed to log API request details:', logError);
+      }
+      // ========== 结束：API 请求信息记录 ==========
+
       const q = query({
         // ✅ 使用增强后的 prompt（包含用户设置的语言偏好）
         prompt: enhancedPrompt,
@@ -231,13 +251,18 @@ export async function runClaude(options: RunnerOptions): Promise<RunnerHandle> {
         if (messageCount === 1 || messageCount % 10 === 0) {
           log.debug(`[Runner] Received message ${messageCount} of type: ${message.type}`);
         }
-        // 提取 session_id
+        // 提取 session_id 并附加实际配置的模型名称
         if (message.type === "system" && "subtype" in message && message.subtype === "init") {
           const sdkSessionId = message.session_id;
           if (sdkSessionId) {
             session.claudeSessionId = sdkSessionId;
             onSessionUpdate?.({ claudeSessionId: sdkSessionId });
           }
+          
+          // ✅ 附加实际配置的模型名称（覆盖 SDK 返回的 coder-model）
+          // 这样前端可以显示用户实际配置的模型名称
+          (message as any).configuredModel = config.model;
+          log.debug(`[Runner] System init message enhanced with configured model: ${config.model}`);
         }
 
         // 处理工具使用事件
@@ -307,4 +332,126 @@ export async function runClaude(options: RunnerOptions): Promise<RunnerHandle> {
   return {
     abort: () => abortController.abort()
   };
+}
+
+// ========== 辅助函数：构建 API 请求信息（用于日志记录） ==========
+
+/**
+ * 检测厂商类型（基于 Base URL）
+ */
+function detectProviderType(baseURL: string): 'anthropic' | 'openai' {
+  const url = baseURL.toLowerCase();
+  
+  // OpenAI 兼容的厂商列表
+  const openaiProviders = [
+    'api.deepseek.com',
+    'api.openai.com',
+    'api.moonshot.cn',
+    'dashscope.aliyuncs.com/compatible-mode', // 阿里云百炼
+    'antchat.alipay.com', // 矽塔（蚂蚁聊天）
+  ];
+  
+  for (const provider of openaiProviders) {
+    if (url.includes(provider)) {
+      return 'openai';
+    }
+  }
+  
+  // 默认使用 Anthropic 格式
+  return 'anthropic';
+}
+
+/**
+ * 构建 API 端点 URL
+ * 根据厂商类型使用不同的 API 格式
+ */
+function buildApiEndpoint(config: { baseURL: string }): string {
+  const baseUrl = config.baseURL.replace(/\/+$/, ''); // 移除尾部斜杠
+  const providerType = detectProviderType(config.baseURL);
+
+  // 使用正则检查 URL 是否以特定路径结尾（完整端点）
+  const endsWithPath = (pattern: string) => new RegExp(`${pattern}/?$`).test(baseUrl);
+
+  // 如果 URL 已包含完整的 API 端点路径，直接使用
+  if (endsWithPath('/messages') || endsWithPath('/chat/completions')) {
+    return baseUrl;
+  }
+
+  // 阿里云百炼特殊处理：compatible-mode/v1 使用 OpenAI 格式
+  if (baseUrl.includes('dashscope.aliyuncs.com/compatible-mode/v1')) {
+    return `${baseUrl}/chat/completions`;
+  }
+
+  // 根据厂商类型构建端点
+  if (providerType === 'openai') {
+    // OpenAI 格式：/v1/chat/completions
+    if (endsWithPath('/v1')) return `${baseUrl}/chat/completions`;
+    return `${baseUrl}/v1/chat/completions`;
+  } else {
+    // Anthropic 格式：/v1/messages
+    if (endsWithPath('/v1')) return `${baseUrl}/messages`;
+    return `${baseUrl}/v1/messages`;
+  }
+}
+
+/**
+ * 构造 API 请求头（脱敏显示）
+ * 根据厂商类型使用不同的格式
+ */
+function buildApiHeaders(config: { baseURL: string; apiKey: string }): Record<string, string> {
+  const providerType = detectProviderType(config.baseURL);
+  
+  // 脱敏处理：只显示前 10 个字符
+  const maskedApiKey = config.apiKey.length > 10 
+    ? `${config.apiKey.substring(0, 10)}...` 
+    : '***';
+  
+  if (providerType === 'openai') {
+    // OpenAI 格式：使用 Authorization Bearer
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${maskedApiKey}`
+    };
+  } else {
+    // Anthropic 格式：使用 x-api-key
+    return {
+      'Content-Type': 'application/json',
+      'x-api-key': maskedApiKey,
+      'anthropic-version': '2023-06-01'
+    };
+  }
+}
+
+/**
+ * 构造 API 请求体（用于日志显示）
+ * 根据厂商类型使用不同的格式
+ */
+function buildApiRequestBody(
+  config: { baseURL: string; model: string; maxTokens?: number; temperature?: number }, 
+  prompt: string
+): any {
+  const providerType = detectProviderType(config.baseURL);
+  
+  // 截断过长的 prompt 用于日志显示
+  const truncatedPrompt = prompt.length > 200 
+    ? `${prompt.substring(0, 200)}... (total ${prompt.length} chars)` 
+    : prompt;
+  
+  if (providerType === 'openai') {
+    // OpenAI 格式
+    return {
+      model: config.model,
+      max_tokens: config.maxTokens || 8192,
+      temperature: config.temperature || 1.0,
+      messages: [{ role: 'user', content: truncatedPrompt }]
+    };
+  } else {
+    // Anthropic 格式
+    return {
+      model: config.model,
+      max_tokens: config.maxTokens || 8192,
+      temperature: config.temperature || 1.0,
+      messages: [{ role: 'user', content: truncatedPrompt }]
+    };
+  }
 }
