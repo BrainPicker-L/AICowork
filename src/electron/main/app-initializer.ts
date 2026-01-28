@@ -23,11 +23,12 @@ export async function initializeAppServices(): Promise<void> {
     initializeSdkConfigCache(),
     prewarmMcpServers(),
     initializeLanguagePreference(),
+    fixApiConfigs(), // ✅ 自动修复 API 配置
   ]);
 
   // 记录初始化结果
   results.forEach((result, index) => {
-    const serviceName = ['SDK Config Cache', 'MCP Servers', 'Language Preference'][index];
+    const serviceName = ['SDK Config Cache', 'MCP Servers', 'Language Preference', 'API Config Fix'][index];
     if (result.status === 'fulfilled') {
       log.info(`[AppInit] ✓ ${serviceName} initialized`);
     } else {
@@ -79,5 +80,28 @@ async function initializeLanguagePreference(): Promise<void> {
     log.info('[AppInit] Language preference initialized (default: zh)');
   } catch (error) {
     log.warn('[AppInit] Language preference initialization failed (non-critical):', error);
+  }
+}
+
+/**
+ * 修复 API 配置
+ * 为旧配置补充 apiSpec 字段并重新同步到 ~/.qwen/settings.json
+ */
+async function fixApiConfigs(): Promise<void> {
+  try {
+    const { fixApiConfigs } = await import('../utils/fix-api-config.js');
+    const result = fixApiConfigs();
+    
+    if (result.success) {
+      if (result.fixed > 0) {
+        log.info(`[AppInit] ✓ Fixed ${result.fixed} API config(s) and re-synced to ~/.qwen/settings.json`);
+      } else {
+        log.info('[AppInit] ✓ All API configs are up-to-date');
+      }
+    } else {
+      log.warn('[AppInit] API config fix failed:', result.error);
+    }
+  } catch (error) {
+    log.warn('[AppInit] API config fix failed (non-critical):', error);
   }
 }

@@ -117,11 +117,11 @@ export function getCurrentApiConfig(): ApiConfig | null {
   }
 
   // 2. 检查 process.env（从 .env 文件加载的环境变量）
-  // Qwen SDK 使用 OpenAI 兼容的环境变量
-  const envAuthToken = process.env.OPENAI_API_KEY || process.env.QWEN_API_KEY;
-  const envBaseURL = process.env.OPENAI_BASE_URL || process.env.QWEN_BASE_URL;
-  const envModel = process.env.OPENAI_MODEL || process.env.QWEN_MODEL;
-  const envApiType = process.env.QWEN_API_TYPE;
+  // 支持多种环境变量格式：ANTHROPIC_* / OPENAI_* / QWEN_*
+  const envAuthToken = process.env.ANTHROPIC_AUTH_TOKEN || process.env.OPENAI_API_KEY || process.env.QWEN_API_KEY;
+  const envBaseURL = process.env.ANTHROPIC_BASE_URL || process.env.OPENAI_BASE_URL || process.env.QWEN_BASE_URL;
+  const envModel = process.env.ANTHROPIC_MODEL || process.env.OPENAI_MODEL || process.env.QWEN_MODEL;
+  const envApiType = process.env.ANTHROPIC_API_TYPE || process.env.QWEN_API_TYPE;
 
   if (envAuthToken && envBaseURL && envModel) {
     log.debug("[qwen-settings] Using config from process.env (.env file):", {
@@ -209,6 +209,14 @@ export function buildEnvForConfig(config: ApiConfig): Record<string, string> {
   baseEnv.OPENAI_API_KEY = config.apiKey;
   baseEnv.OPENAI_BASE_URL = config.baseURL;
   baseEnv.OPENAI_MODEL = config.model;
+  
+  // 同时保留 ANTHROPIC_* 格式（用于 .env 文件兼容）
+  baseEnv.ANTHROPIC_AUTH_TOKEN = config.apiKey;
+  baseEnv.ANTHROPIC_BASE_URL = config.baseURL;
+  baseEnv.ANTHROPIC_MODEL = config.model;
+  if (config.apiType) {
+    baseEnv.ANTHROPIC_API_TYPE = config.apiType;
+  }
 
   // 设置 Qwen 配置目录路径，确保 SDK 能找到 MCP 配置
   const qwenConfigDir = join(homedir(), '.qwen');

@@ -5,6 +5,8 @@ export interface ApiConfig {
   baseURL: string;
   model: string;
   apiType?: string;
+  /** API 规范类型：openai、anthropic、gemini、vertex-ai */
+  apiSpec?: 'openai' | 'anthropic' | 'gemini' | 'vertex-ai';
   /** Azure 特定：资源名称 */
   resourceName?: string;
   /** Azure 特定：部署名称 */

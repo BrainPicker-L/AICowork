@@ -19,6 +19,16 @@ export function setupGlobalErrorHandlers(): void {
 
   // 未捕获的异常
   process.on('uncaughtException', (error: Error) => {
+    // ✅ 特殊处理：EPIPE 错误（流式输出时客户端断开连接）
+    // 这是正常的网络行为，不应该导致应用崩溃
+    if (error.message.includes('EPIPE') || error.message.includes('write EPIPE')) {
+      log.warn('[GlobalError] EPIPE error (client disconnected during streaming)', {
+        message: error.message,
+        // 不打印完整堆栈，避免日志污染
+      });
+      return; // 忽略此错误，继续运行
+    }
+
     log.error('[GlobalError] Uncaught Exception', {
       message: error.message,
       stack: error.stack,

@@ -76,28 +76,28 @@ export function writeEnvFile(envVars: Record<string, string>): void {
       '',
     ];
 
-    // API 配置
-    if (envVars.ANTHROPIC_AUTH_TOKEN) {
-      lines.push(`# Anthropic API Key`);
-      lines.push(`ANTHROPIC_AUTH_TOKEN=${envVars.ANTHROPIC_AUTH_TOKEN}`);
+    // API 配置 - 使用 OpenAI 兼容格式
+    if (envVars.OPENAI_API_KEY) {
+      lines.push(`# OpenAI API Key`);
+      lines.push(`OPENAI_API_KEY=${envVars.OPENAI_API_KEY}`);
       lines.push('');
     }
 
-    if (envVars.ANTHROPIC_BASE_URL) {
+    if (envVars.OPENAI_BASE_URL) {
       lines.push(`# API Base URL`);
-      lines.push(`ANTHROPIC_BASE_URL=${envVars.ANTHROPIC_BASE_URL}`);
+      lines.push(`OPENAI_BASE_URL=${envVars.OPENAI_BASE_URL}`);
       lines.push('');
     }
 
-    if (envVars.ANTHROPIC_MODEL) {
+    if (envVars.OPENAI_MODEL) {
       lines.push(`# 默认模型`);
-      lines.push(`ANTHROPIC_MODEL=${envVars.ANTHROPIC_MODEL}`);
+      lines.push(`OPENAI_MODEL=${envVars.OPENAI_MODEL}`);
       lines.push('');
     }
 
-    if (envVars.ANTHROPIC_API_TYPE) {
+    if (envVars.QWEN_API_TYPE) {
       lines.push(`# API 厂商类型`);
-      lines.push(`ANTHROPIC_API_TYPE=${envVars.ANTHROPIC_API_TYPE}`);
+      lines.push(`QWEN_API_TYPE=${envVars.QWEN_API_TYPE}`);
       lines.push('');
     }
 
@@ -121,21 +121,28 @@ export function loadApiConfigFromEnv(): {
 } | null {
   const envVars = readEnvFile();
 
-  if (!envVars.ANTHROPIC_AUTH_TOKEN || !envVars.ANTHROPIC_BASE_URL || !envVars.ANTHROPIC_MODEL) {
+  // 支持多种格式：优先 OPENAI_*，然后 ANTHROPIC_*
+  const apiKey = envVars.OPENAI_API_KEY || envVars.ANTHROPIC_AUTH_TOKEN;
+  const baseURL = envVars.OPENAI_BASE_URL || envVars.ANTHROPIC_BASE_URL;
+  const model = envVars.OPENAI_MODEL || envVars.ANTHROPIC_MODEL;
+  const apiType = envVars.QWEN_API_TYPE || envVars.ANTHROPIC_API_TYPE;
+
+  if (!apiKey || !baseURL || !model) {
     log.debug('[env-file] Incomplete configuration in .env file');
     return null;
   }
 
   return {
-    apiKey: envVars.ANTHROPIC_AUTH_TOKEN,
-    baseURL: envVars.ANTHROPIC_BASE_URL,
-    model: envVars.ANTHROPIC_MODEL,
-    apiType: envVars.ANTHROPIC_API_TYPE || 'anthropic',
+    apiKey,
+    baseURL,
+    model,
+    apiType: apiType || 'anthropic',
   };
 }
 
 /**
  * 将 API 配置保存到环境变量文件
+ * 使用 OpenAI 兼容格式
  */
 export function saveApiConfigToEnv(config: {
   apiKey: string;
@@ -144,13 +151,13 @@ export function saveApiConfigToEnv(config: {
   apiType?: string;
 }): void {
   const envVars: Record<string, string> = {
-    ANTHROPIC_AUTH_TOKEN: config.apiKey,
-    ANTHROPIC_BASE_URL: config.baseURL,
-    ANTHROPIC_MODEL: config.model,
+    OPENAI_API_KEY: config.apiKey,
+    OPENAI_BASE_URL: config.baseURL,
+    OPENAI_MODEL: config.model,
   };
 
   if (config.apiType) {
-    envVars.ANTHROPIC_API_TYPE = config.apiType;
+    envVars.QWEN_API_TYPE = config.apiType;
   }
 
   writeEnvFile(envVars);

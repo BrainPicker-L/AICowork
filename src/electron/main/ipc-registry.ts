@@ -267,12 +267,12 @@ function registerConfigHandlers(): void {
     }));
 
     ipcMain.handle("delete-api-config", wrapIpcHandler("delete-api-config", async (_: unknown, configId: string) => {
-        deleteApiConfig(configId);
+        await deleteApiConfig(configId);
         return { success: true };
     }));
 
     ipcMain.handle("set-active-api-config", wrapIpcHandler("set-active-api-config", async (_: unknown, configId: string) => {
-        setActiveApiConfig(configId);
+        await setActiveApiConfig(configId);
         return { success: true };
     }));
 

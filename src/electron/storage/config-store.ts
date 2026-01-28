@@ -27,6 +27,8 @@ export type ApiConfig = {
   model: string;
   /** API 厂商类型 */
   apiType?: ApiType;
+  /** API 规范类型：openai、anthropic、gemini、vertex-ai */
+  apiSpec?: 'openai' | 'anthropic' | 'gemini' | 'vertex-ai';
   /** 是否为当前激活的配置 */
   isActive?: boolean;
   /** Azure 特定：资源名称 */
@@ -528,7 +530,7 @@ export function loadAllApiConfigs(): ApiConfigsStore | null {
   }
 }
 
-export function saveApiConfig(config: ApiConfig): void {
+export async function saveApiConfig(config: ApiConfig): Promise<void> {
   const configPath = getConfigPath();
   const userDataPath = app.getPath("userData");
 
@@ -558,6 +560,13 @@ export function saveApiConfig(config: ApiConfig): void {
     // 设置默认 apiType
     if (!config.apiType) {
       config.apiType = "anthropic";
+    }
+
+    // ✅ 自动设置 API 规范
+    if (config.apiType && !config.apiSpec) {
+      const syncModule = await import('../utils/qwen-settings-sync.js');
+      config.apiSpec = syncModule.getApiSpec(config.apiType);
+      log.debug(`[config-store] Auto-set apiSpec: ${config.apiType} -> ${config.apiSpec}`);
     }
 
     // 加载现有配置存储
@@ -606,6 +615,15 @@ export function saveApiConfig(config: ApiConfig): void {
     writeFileSync(configPath, JSON.stringify(store, null, 2), "utf8");
     log.info("[config-store] API config saved successfully");
 
+    // ✅ 同步到 ~/.qwen/settings.json
+    try {
+      const syncModule = await import('../utils/qwen-settings-sync.js');
+      syncModule.syncToQwenSettings(store);
+      log.info("[config-store] ✓ Synced to ~/.qwen/settings.json");
+    } catch (syncError) {
+      log.warn("[config-store] ✗ Failed to sync to ~/.qwen/settings.json:", syncError);
+    }
+
     // 保存到 .env 文件（使用激活的配置）
     const activeConfig = store.configs.find(c => c.id === store.activeConfigId) || config;
     try {
@@ -645,7 +663,7 @@ export function saveApiConfig(config: ApiConfig): void {
  */
 export async function saveApiConfigAsync(config: ApiConfig): Promise<{ success: boolean; error?: string }> {
   try {
-    saveApiConfig(config);
+    await saveApiConfig(config);
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -657,7 +675,7 @@ export async function saveApiConfigAsync(config: ApiConfig): Promise<{ success: 
  * 删除指定的 API 配置
  * @param configId 配置 ID
  */
-export function deleteApiConfig(configId: string): void {
+export async function deleteApiConfig(configId: string): Promise<void> {
   try {
     const configPath = getConfigPath();
     if (!existsSync(configPath)) {
@@ -682,6 +700,15 @@ export function deleteApiConfig(configId: string): void {
     // 保存更新后的配置
     writeFileSync(configPath, JSON.stringify(store, null, 2), "utf8");
     log.info(`[config-store] API config deleted: ${configId}`);
+
+    // ✅ 同步到 ~/.qwen/settings.json
+    try {
+      const syncModule = await import('../utils/qwen-settings-sync.js');
+      syncModule.syncToQwenSettings(store);
+      log.info("[config-store] ✓ Synced deletion to ~/.qwen/settings.json");
+    } catch (syncError) {
+      log.warn("[config-store] ✗ Failed to sync deletion:", syncError);
+    }
   } catch (error) {
     log.error("[config-store] Failed to delete API config:", error);
     throw error;
@@ -692,7 +719,7 @@ export function deleteApiConfig(configId: string): void {
  * 设置激活的 API 配置
  * @param configId 配置 ID
  */
-export function setActiveApiConfig(configId: string): void {
+export async function setActiveApiConfig(configId: string): Promise<void> {
   try {
     const configPath = getConfigPath();
     if (!existsSync(configPath)) {
@@ -714,6 +741,15 @@ export function setActiveApiConfig(configId: string): void {
     // 保存更新后的配置
     writeFileSync(configPath, JSON.stringify(store, null, 2), "utf8");
     log.info(`[config-store] Active API config set to: ${configId}`);
+
+    // ✅ 同步到 ~/.qwen/settings.json
+    try {
+      const syncModule = await import('../utils/qwen-settings-sync.js');
+      syncModule.syncToQwenSettings(store);
+      log.info("[config-store] ✓ Synced active config to ~/.qwen/settings.json");
+    } catch (syncError) {
+      log.warn("[config-store] ✗ Failed to sync active config:", syncError);
+    }
 
     // 清除 API 配置缓存，确保下次获取最新配置
     try {
@@ -848,7 +884,7 @@ export async function updateModelLimits(config: ApiConfig): Promise<ApiConfig> {
     };
 
     // 保存更新后的配置
-    saveApiConfig(updatedConfig);
+    await saveApiConfig(updatedConfig);
     log.info('[config-store] 模型限制已更新并保存:', limits);
     return updatedConfig;
   }

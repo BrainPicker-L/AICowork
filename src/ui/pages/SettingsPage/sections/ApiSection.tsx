@@ -267,6 +267,35 @@ export function ApiSection() {
     };
   }, []);
 
+  // ✅ 辅助函数：根据 apiType 获取 apiSpec
+  const getApiSpec = (apiType: string): 'openai' | 'anthropic' | 'gemini' | 'vertex-ai' => {
+    const specMap: Record<string, 'openai' | 'anthropic' | 'gemini' | 'vertex-ai'> = {
+      // OpenAI 规范
+      'xita': 'openai',
+      'deepseek': 'openai',
+      'moonshot': 'openai',
+      'alibaba': 'openai',
+      
+      // Anthropic 规范
+      'anthropic': 'anthropic',
+      'zhipu': 'anthropic',
+      'qiniu': 'anthropic',
+      'n1n': 'anthropic',
+      'minimax': 'anthropic',
+      
+      // Gemini 规范
+      'gemini': 'gemini',
+      
+      // Vertex AI 规范
+      'vertex-ai': 'vertex-ai',
+      
+      // 自定义（默认 anthropic）
+      'custom': 'anthropic',
+    };
+    
+    return specMap[apiType] || 'anthropic';
+  };
+
   const handleSave = async () => {
     // 验证输入
     if (!apiKey.trim()) {
@@ -306,11 +335,15 @@ export function ApiSection() {
     setSaving(true);
 
     try {
+      // ✅ 自动设置 API 规范
+      const apiSpec = getApiSpec(apiType);
+      
       const configToSave: any = {
         apiKey: apiKey.trim(),
         baseURL: baseURL.trim(),
         model: model.trim(),
         apiType: apiType,
+        apiSpec: apiSpec, // ✅ 添加 apiSpec 字段
         resourceName: apiType === "azure" ? resourceName.trim() : undefined,
         deploymentName: apiType === "azure" ? deploymentName.trim() : undefined,
       };

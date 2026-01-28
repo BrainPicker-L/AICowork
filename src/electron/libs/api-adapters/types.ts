@@ -11,6 +11,8 @@ import type { ApiProvider } from '../../config/constants.js';
 export interface ApiConfig {
   /** API 厂商类型 */
   apiType?: ApiProvider;
+  /** API 规范类型：openai、anthropic、gemini、vertex-ai */
+  apiSpec?: 'openai' | 'anthropic' | 'gemini' | 'vertex-ai';
   /** API 密钥 */
   apiKey: string;
   /** API 基础 URL */
