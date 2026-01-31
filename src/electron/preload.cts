@@ -75,6 +75,8 @@ electron.contextBridge.exposeInMainWorld("electron", {
         invoke("save-mcp-server", name, config),
     deleteMcpServer: (name: string) =>
         invoke("delete-mcp-server", name),
+    toggleMcpServerEnabled: (name: string, enabled: boolean) =>
+        invoke("toggle-mcp-server-enabled", name, enabled),
     validateMcpServer: (config: any) =>
         invoke("validate-mcp-server", config),
     testMcpServer: (config: any) =>

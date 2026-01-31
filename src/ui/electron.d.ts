@@ -48,19 +48,36 @@ export interface TestApiResult {
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
+  warnings?: string[];
 }
 
 /** MCP 服务器配置 */
 export interface McpServerConfig {
-  name: string;
-  displayName?: string;
-  type?: 'stdio' | 'sse' | 'streamableHttp';
+  // 传输类型（可选，SDK 会自动识别）
+  type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
+  
+  // stdio 类型
   command?: string;
   args?: string[];
+  cwd?: string;
   env?: Record<string, string>;
+  
+  // sse/http 类型
   url?: string;
-  disabled?: boolean;
+  headers?: Record<string, string>;
+  
+  // 通用字段
+  displayName?: string;
   description?: string;
+  enabled?: boolean;
+  timeout?: number;
+  trust?: boolean;
+  includeTools?: string[];
+  excludeTools?: string[];
+  
+  // 已废弃（兼容）
+  disabled?: boolean;
+  name?: string;
 }
 
 /** Skills 配置 */
@@ -213,6 +230,7 @@ export interface ElectronAPI {
   getMcpServerList: () => Promise<Array<{ name: string; config: McpServerConfig }>>;
   saveMcpServer: (name: string, config: McpServerConfig) => Promise<{ success: boolean; error?: string }>;
   deleteMcpServer: (name: string) => Promise<{ success: boolean; error?: string }>;
+  toggleMcpServerEnabled: (name: string, enabled: boolean) => Promise<{ success: boolean; error?: string }>;
   validateMcpServer: (config: McpServerConfig) => Promise<ValidationResult>;
   testMcpServer: (config: McpServerConfig) => Promise<TestApiResult>;
   getMcpServerTools: (config: McpServerConfig) => Promise<Array<{ name: string; description?: string; inputSchema?: Record<string, unknown>; outputSchema?: Record<string, unknown> }>>;

@@ -117,6 +117,7 @@ import {
   getMcpServerList,
   saveMcpServer,
   deleteMcpServer,
+  toggleMcpServerEnabled,
   testMcpServer,
   getMcpServerTools,
   validateMcpServer,
@@ -622,6 +623,11 @@ function registerMcpHandlers(): void {
 
     ipcMain.handle("delete-mcp-server", wrapIpcHandler("delete-mcp-server", async (_: unknown, name: string) => {
         await deleteMcpServer(name);
+        return { success: true };
+    }));
+
+    ipcMain.handle("toggle-mcp-server-enabled", wrapIpcHandler("toggle-mcp-server-enabled", async (_: unknown, name: string, enabled: boolean) => {
+        await toggleMcpServerEnabled(name, enabled);
         return { success: true };
     }));
 

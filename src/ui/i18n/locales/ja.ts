@@ -200,6 +200,10 @@ export default {
 		description: "Model Context Protocol サーバーを設定します。SDK は自動的に起動してツールを登録します",
 		noServers: "MCP サーバー設定がありません",
 		addServer: "+ サーバーを追加",
+		status: {
+			enabled: "有効",
+			disabled: "無効",
+		},
 		templates: {
 			title: "テンプレートから追加",
 		},
@@ -255,6 +259,7 @@ export default {
 			deleteFailed: "削除失敗",
 			nameRequired: "サーバー名は必須です",
 			saveFailed: "保存失敗",
+			toggleFailed: "状態切り替え失敗",
 			invalidNameFormat: "サーバー名には英字、数字、アンダースコア、ハイフンのみ使用できます",
 			commandRequired: "stdio タイプのサーバーにはコマンドを指定する必要があります",
 			urlRequired: "このタイプのサーバーには URL を指定する必要があります",

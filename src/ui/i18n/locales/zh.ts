@@ -187,6 +187,10 @@ export default {
 		description: "配置 Model Context Protocol 服务器，SDK 会自动启动并注册工具",
 		noServers: "暂无 MCP 服务器配置",
 		addServer: "+ 添加服务器",
+		status: {
+			enabled: "已启用",
+			disabled: "已禁用",
+		},
 		templates: {
 			title: "从模板添加",
 		},
@@ -242,6 +246,7 @@ export default {
 			deleteFailed: "删除失败",
 			nameRequired: "服务器名称不能为空",
 			saveFailed: "保存失败",
+			toggleFailed: "切换状态失败",
 			invalidNameFormat: "服务器名称只能包含字母、数字、下划线和连字符",
 			commandRequired: "stdio 类型服务器必须指定命令",
 			urlRequired: "该类型服务器必须指定 URL",

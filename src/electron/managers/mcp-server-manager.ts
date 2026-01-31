@@ -14,8 +14,7 @@ import { loadMcpServers, type McpServerConfig } from "../storage/mcp-store.js";
 
 /**
  * 获取 MCP 服务器配置
- * 只返回配置数据，不创建服务器实例
- * 实例管理由 SDK 完成
+ * 在传递给 SDK 前，移除 type 字段让 SDK 自动识别
  */
 export async function getMcpServers(): Promise<Record<string, McpServerConfig>> {
   const servers: Record<string, McpServerConfig> = {};
@@ -28,19 +27,16 @@ export async function getMcpServers(): Promise<Record<string, McpServerConfig>> 
 
     for (const [name, config] of Object.entries(configs)) {
       // 跳过禁用的服务器
-      if (config.disabled) {
+      if (config.disabled || ('enabled' in config && !config.enabled)) {
         skippedCount++;
         continue;
       }
 
-      // 检查是否有 enabled 字段（显式启用）
-      if ('enabled' in config && !config.enabled) {
-        skippedCount++;
-        continue;
-      }
-
-      // 添加启用的服务器配置
-      servers[name] = config;
+      // 移除 type 字段，让 Qwen SDK 自动识别
+      // 同时移除其他不需要的字段
+      const { type, name: _, disabled, ...cleanConfig } = config as any;
+      
+      servers[name] = cleanConfig;
       enabledCount++;
     }
 

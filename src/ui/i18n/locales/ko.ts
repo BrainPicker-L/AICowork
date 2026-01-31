@@ -200,6 +200,10 @@ export default {
 		description: "Model Context Protocol 서버를 구성합니다. SDK는 자동으로 시작되어 도구를 등록합니다",
 		noServers: "MCP 서버 구성이 없습니다",
 		addServer: "+ 서버 추가",
+		status: {
+			enabled: "활성화됨",
+			disabled: "비활성화됨",
+		},
 		templates: {
 			title: "템플릿에서 추가",
 		},
@@ -255,6 +259,7 @@ export default {
 			deleteFailed: "삭제 실패",
 			nameRequired: "서버 이름은 비워둘 수 없습니다",
 			saveFailed: "저장 실패",
+			toggleFailed: "상태 전환 실패",
 			invalidNameFormat: "서버 이름에는 영문, 숫자, 밑줄, 하이픈만 사용할 수 있습니다",
 			commandRequired: "stdio 유형 서버는 명령을 지정해야 합니다",
 			urlRequired: "이 유형의 서버는 URL을 지정해야 합니다",

@@ -152,10 +152,11 @@ export function syncToQwenSettings(apiConfigStore: ApiConfigsStore): void {
     log.debug(`[qwen-settings-sync] Added model to ${apiSpec}: ${config.model} -> ${baseUrl}`);
   }
   
-  // 5. 写回文件（只包含 $version 和 modelProviders）
+  // 5. 写回文件（保留 mcpServers 和其他字段）
   try {
-    // 只保留 $version 和 modelProviders
+    // 保留原有的所有字段，只更新 $version 和 modelProviders
     const outputSettings = {
+      ...qwenSettings,  // 保留所有现有字段（包括 mcpServers）
       $version: qwenSettings.$version,
       modelProviders: qwenSettings.modelProviders,
     };

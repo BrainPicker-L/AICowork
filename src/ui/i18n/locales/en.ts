@@ -185,9 +185,13 @@ export default {
 
 	mcp: {
 		title: "MCP Settings",
-		description: "Configure Model Context Protocol servers, SDK will auto-start and register tools",
+		description: "Configure Model Context Protocol servers, SDK will automatically start and register tools",
 		noServers: "No MCP server configurations",
 		addServer: "+ Add Server",
+		status: {
+			enabled: "Enabled",
+			disabled: "Disabled",
+		},
 		templates: {
 			title: "Add from Template",
 		},
@@ -240,16 +244,15 @@ export default {
 			cancel: "Cancel",
 		},
 		errors: {
-			deleteFailed: "Delete Failed",
+			deleteFailed: "Delete failed",
 			nameRequired: "Server name cannot be empty",
-			saveFailed: "Save Failed",
-			invalidNameFormat: "Server name can only contain letters, numbers, underscores, and hyphens",
-			commandRequired: "stdio type servers must specify a command",
-			urlRequired: "This server type must specify a URL",
+			saveFailed: "Save failed",
+			toggleFailed: "Toggle status failed",
+			invalidNameFormat: "Server name can only contain letters, numbers, underscores and hyphens",
+			commandRequired: "stdio type server must specify command",
+			urlRequired: "This type of server must specify URL",
 			invalidUrl: "Invalid URL format",
-			invalidJson: "Invalid JSON configuration format, please check syntax",
-			configMustBeObject: "Configuration must be a JSON object",
-			saveSuccess: "Saved successfully",
+			saveSuccess: "Save successful",
 		},
 		confirmDelete: "Are you sure you want to delete MCP server \"{{name}}\"?",
 		hint: "Hint: MCP server configurations are stored in ~/.qwen/settings.json. SDK will automatically start configured MCP servers and register tools to the session.",

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Trash2, Edit2, X, ChevronDown, ChevronUp, Copy, Check, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, Wifi, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -28,23 +28,21 @@ export function McpSection() {
   const [loading, setLoading] = useState(false);
 
   // 表单状态
-  const [serverName, setServerName] = useState<string>('');
+  const [displayName, setDisplayName] = useState<string>('');
   const [jsonConfig, setJsonConfig] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [editingServer, setEditingServer] = useState<ServerListItem | null>(null);
 
   // 展开/折叠状态
   const [expandedServers, setExpandedServers] = useState<Set<string>>(new Set());
   
   // 测试连接状态
   const [testingServers, setTestingServers] = useState<Set<string>>(new Set());
-  const [testResults, setTestResults] = useState<Map<string, { success: boolean; message: string; details?: string }>>(new Map());
   
   // 工具列表状态
   const [serverTools, setServerTools] = useState<Map<string, Array<{ name: string; description?: string }>>>(new Map());
-  const [loadingTools, setLoadingTools] = useState<Set<string>>(new Set());
   
   // 弹框状态
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -87,7 +85,7 @@ export function McpSection() {
 
   // 重置表单
   const resetForm = () => {
-    setServerName('');
+    setDisplayName('');
     setJsonConfig('');
     setError(null);
     setSuccess(false);
@@ -96,59 +94,46 @@ export function McpSection() {
   // 新建服务器
   const handleAdd = () => {
     setViewMode('add');
+    setEditingServer(null);
     resetForm();
-    // 提供示例配置
+    // 提供示例配置（完整的 mcpServers 格式）
     setJsonConfig(JSON.stringify({
-      command: "npx",
-      args: ["@modelcontextprotocol/server-github"],
-      env: {
-        GITHUB_TOKEN: "your-token-here"
+      mcpServers: {
+        "github-mcp-server": {
+          type: "stdio",
+          command: "npx",
+          args: ["@modelcontextprotocol/server-github"],
+          env: {
+            GITHUB_TOKEN: "your-token-here"
+          }
+        }
       }
     }, null, 2));
   };
 
   // 编辑服务器
   const handleEdit = (server: ServerListItem) => {
-    setServerName(server.name);
-    // 移除 name 字段，因为它会单独输入
-    const { name, ...configWithoutName } = server.config;
-    setJsonConfig(JSON.stringify(configWithoutName, null, 2));
+    setEditingServer(server);
+    
+    // 提取 displayName
+    const { name, displayName: existingDisplayName, ...configWithoutNameAndDisplayName } = server.config;
+    setDisplayName(existingDisplayName || '');
+    
+    // 构造完整的 mcpServers 格式（不包含 displayName，因为它会单独输入）
+    const fullConfig = {
+      mcpServers: {
+        [server.name]: configWithoutNameAndDisplayName
+      }
+    };
+    setJsonConfig(JSON.stringify(fullConfig, null, 2));
     setError(null);
     setViewMode('edit');
   };
 
-  // 删除服务器
-  const handleDelete = async (name: string) => {
-    if (!confirm(t('mcp.confirmDelete', { name }))) {
-      return;
-    }
-
-    try {
-      const result = await window.electron.deleteMcpServer(name);
-      if (result.success) {
-        await loadServers();
-      } else {
-        setError(result.error || t('mcp.errors.deleteFailed'));
-      }
-    } catch (err) {
-      setError(t('mcp.errors.deleteFailed'));
-    }
-  };
 
   // 保存服务器
   const handleSave = async () => {
     setError(null);
-
-    // 验证服务器名称
-    if (!serverName.trim()) {
-      setError(t('mcp.errors.nameRequired'));
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9_-]+$/.test(serverName)) {
-      setError(t('mcp.errors.invalidNameFormat'));
-      return;
-    }
 
     // 验证 JSON 配置
     let parsedConfig: any;
@@ -161,26 +146,75 @@ export function McpSection() {
 
     // 确保配置是对象
     if (typeof parsedConfig !== 'object' || parsedConfig === null || Array.isArray(parsedConfig)) {
-      setError(t('mcp.errors.configMustBeObject'));
+      setError('配置必须是对象格式');
+      return;
+    }
+
+    // 检查是否包含 mcpServers 字段
+    if (!parsedConfig.mcpServers || typeof parsedConfig.mcpServers !== 'object') {
+      setError('配置必须包含 mcpServers 字段，格式：{ "mcpServers": { "server-name": {...} } }');
+      return;
+    }
+
+    // 提取第一个服务器配置
+    const serverEntries = Object.entries(parsedConfig.mcpServers);
+    if (serverEntries.length === 0) {
+      setError('mcpServers 对象不能为空');
+      return;
+    }
+
+    if (serverEntries.length > 1) {
+      setError('一次只能添加一个服务器，请确保 mcpServers 对象中只有一个服务器配置');
+      return;
+    }
+
+    const [serverName, serverConfig] = serverEntries[0];
+
+    // 确保服务器配置是对象
+    if (typeof serverConfig !== 'object' || serverConfig === null || Array.isArray(serverConfig)) {
+      setError('服务器配置必须是对象');
       return;
     }
 
     setSaving(true);
 
     try {
-      // 合并 name 到配置中
-      const config: McpServerConfig = {
-        name: serverName.trim(),
-        ...parsedConfig
-      };
+      // 构建最终配置
+      const finalConfig = { ...serverConfig } as any;
+      
+      // 如果用户填写了别名，添加到配置中
+      if (displayName.trim()) {
+        finalConfig.displayName = displayName.trim();
+      }
+      
+      // 新增服务器时，默认 enabled 为 true（如果配置中没有指定）
+      if (viewMode === 'add' && !('enabled' in finalConfig)) {
+        finalConfig.enabled = true;
+      }
+      
+      // 调用验证
+      const validation = await window.electron.validateMcpServer(finalConfig);
+      
+      // 显示警告（如果有）
+      if (validation.warnings && validation.warnings.length > 0) {
+        console.warn('MCP 配置警告:', validation.warnings);
+      }
+      
+      // 如果有错误，阻止保存
+      if (!validation.valid) {
+        setError(validation.errors.join('; '));
+        setSaving(false);
+        return;
+      }
 
-      const result = await window.electron.saveMcpServer(serverName.trim(), config);
+      const result = await window.electron.saveMcpServer(serverName, finalConfig);
 
       if (result.success) {
         setSuccess(true);
         setTimeout(() => {
           setSuccess(false);
           setViewMode('list');
+          setEditingServer(null);
           loadServers();
         }, 1000);
       } else {
@@ -196,16 +230,10 @@ export function McpSection() {
   // 取消操作
   const handleCancel = () => {
     setViewMode('list');
+    setEditingServer(null);
     resetForm();
   };
 
-  // 复制配置
-  const handleCopyConfig = (config: McpServerConfig) => {
-    const { name, ...configWithoutName } = config;
-    navigator.clipboard.writeText(JSON.stringify(configWithoutName, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   // 测试 MCP 服务器连接
   const handleTestConnection = async (server: ServerListItem) => {
@@ -234,42 +262,14 @@ export function McpSection() {
           return next;
         });
       } else {
-        // 测试失败，显示临时提示
-        setTestResults(prev => {
-          const next = new Map(prev);
-          next.set(serverName, result);
-          return next;
-        });
-        
-        // 3秒后清除测试结果
-        setTimeout(() => {
-          setTestResults(prev => {
-            const next = new Map(prev);
-            next.delete(serverName);
-            return next;
-          });
-        }, 3000);
+        // 测试失败，显示错误信息
+        setError(result.message || '连接测试失败');
+        setTimeout(() => setError(null), 3000);
       }
     } catch (err) {
       console.error("Failed to test MCP server:", err);
-      setTestResults(prev => {
-        const next = new Map(prev);
-        next.set(serverName, {
-          success: false,
-          message: '测试失败',
-          details: String(err)
-        });
-        return next;
-      });
-      
-      // 3秒后清除测试结果
-      setTimeout(() => {
-        setTestResults(prev => {
-          const next = new Map(prev);
-          next.delete(serverName);
-          return next;
-        });
-      }, 3000);
+      setError('测试失败: ' + String(err));
+      setTimeout(() => setError(null), 3000);
     } finally {
       setTestingServers(prev => {
         const next = new Set(prev);
@@ -279,26 +279,47 @@ export function McpSection() {
     }
   };
 
-  // 加载 MCP 服务器的工具列表
-  const loadServerTools = async (server: ServerListItem) => {
-    const serverName = server.name;
-    setLoadingTools(prev => new Set(prev).add(serverName));
-    
+
+  // 切换 MCP 服务器的启用状态
+  const handleToggleEnabled = async (serverName: string, currentEnabled: boolean) => {
     try {
-      const tools = await window.electron.getMcpServerTools(server.config);
-      setServerTools(prev => {
-        const next = new Map(prev);
-        next.set(serverName, tools);
-        return next;
-      });
+      const newEnabled = !currentEnabled;
+      const result = await window.electron.toggleMcpServerEnabled(serverName, newEnabled);
+      if (result.success) {
+        // 重新加载服务器列表以更新 UI
+        await loadServers();
+      } else {
+        setError(result.error || t('mcp.errors.toggleFailed'));
+        // 3秒后清除错误
+        setTimeout(() => setError(null), 3000);
+      }
     } catch (err) {
-      console.error("Failed to load MCP server tools:", err);
-    } finally {
-      setLoadingTools(prev => {
-        const next = new Set(prev);
-        next.delete(serverName);
-        return next;
-      });
+      console.error("Failed to toggle MCP server:", err);
+      setError(t('mcp.errors.toggleFailed'));
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  // 删除 MCP 服务器
+  const handleDelete = async (serverName: string) => {
+    // 确认删除
+    if (!confirm(`确定要删除 MCP 服务器 "${serverName}" 吗？`)) {
+      return;
+    }
+
+    try {
+      const result = await window.electron.deleteMcpServer(serverName);
+      if (result.success) {
+        // 重新加载服务器列表
+        await loadServers();
+      } else {
+        setError(result.error || '删除失败');
+        setTimeout(() => setError(null), 3000);
+      }
+    } catch (err) {
+      console.error("Failed to delete MCP server:", err);
+      setError('删除失败: ' + String(err));
+      setTimeout(() => setError(null), 3000);
     }
   };
 
@@ -419,107 +440,99 @@ export function McpSection() {
                     key={server.name}
                     className="rounded-xl border border-ink-900/10 bg-surface overflow-hidden transition-all"
                   >
-                    {/* 服务器头部 */}
-                    <div
-                      className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-surface-secondary transition-colors"
-                      onClick={() => toggleExpand(server.name)}
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <button className="text-muted hover:text-ink-700 transition-colors">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <button
+                          onClick={() => toggleExpand(server.name)}
+                          className="flex-shrink-0 p-1 rounded-lg text-muted hover:text-ink-700 hover:bg-surface-tertiary transition-colors cursor-pointer"
+                        >
                           {isExpanded ? (
                             <ChevronUp className="w-4 h-4" strokeWidth={2} />
                           ) : (
                             <ChevronDown className="w-4 h-4" strokeWidth={2} />
                           )}
                         </button>
-                        <div className="flex-1">
-                          <h3 className="text-sm font-medium text-ink-900">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-medium text-ink-900 truncate">
                             {server.config.displayName || server.name}
                           </h3>
                           {server.config.description && (
-                            <p className="text-xs text-muted mt-0.5">{server.config.description}</p>
+                            <p className="text-xs text-muted truncate mt-0.5">
+                              {server.config.description}
+                            </p>
                           )}
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        {/* 测试连接按钮 */}
+                      <div className="flex items-center gap-1">
+                        {/* Toggle Switch - 启用/禁用开关 */}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                testingServers.has(server.name)
-                                  ? 'text-muted cursor-wait'
-                                  : testResults.get(server.name)?.success
-                                  ? 'text-success hover:bg-surface-tertiary'
-                                  : testResults.get(server.name)
-                                  ? 'text-error hover:bg-surface-tertiary'
-                                  : 'text-muted hover:text-ink-700 hover:bg-surface-tertiary'
+                              onClick={() => handleToggleEnabled(server.name, server.config.enabled !== false)}
+                              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                server.config.enabled !== false ? 'bg-accent' : 'bg-ink-900/20'
                               }`}
-                              onClick={() => handleTestConnection(server)}
-                              disabled={testingServers.has(server.name)}
+                              aria-label={server.config.enabled !== false ? t('mcp.status.enabled') : t('mcp.status.disabled')}
                             >
-                              {testingServers.has(server.name) ? (
-                                <Loader2 className="w-4 h-4 animate-spin" strokeWidth={2} />
-                              ) : testResults.get(server.name)?.success ? (
-                                <Wifi className="w-4 h-4" strokeWidth={2} />
-                              ) : testResults.get(server.name) ? (
-                                <WifiOff className="w-4 h-4" strokeWidth={2} />
-                              ) : (
-                                <Wifi className="w-4 h-4" strokeWidth={2} />
-                              )}
+                              <span
+                                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm ${
+                                  server.config.enabled !== false ? 'translate-x-5' : 'translate-x-0.5'
+                                }`}
+                              />
                             </button>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md max-w-xs">
-                            {testingServers.has(server.name) 
-                              ? '测试中...' 
-                              : testResults.get(server.name)
-                              ? `${testResults.get(server.name)!.message}${testResults.get(server.name)!.details ? ': ' + testResults.get(server.name)!.details : ''}`
-                              : '测试连接'}
+                          <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                            {server.config.enabled !== false ? t('mcp.status.enabled') : t('mcp.status.disabled')}
                           </TooltipContent>
                         </Tooltip>
                         
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              className="p-1.5 rounded-lg text-muted hover:text-ink-700 hover:bg-surface-tertiary transition-colors cursor-pointer"
-                              onClick={() => handleCopyConfig(server.config)}
-                            >
-                              {copied ? (
-                                <Check className="w-4 h-4 text-success" strokeWidth={2} />
-                              ) : (
-                                <Copy className="w-4 h-4" strokeWidth={2} />
-                              )}
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
-                            {copied ? '已复制' : '复制配置'}
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-surface-tertiary transition-colors cursor-pointer"
                               onClick={() => handleEdit(server)}
+                              className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-surface-tertiary transition-colors"
                             >
-                              <Edit2 className="w-4 h-4" strokeWidth={2} />
+                              <svg className="w-4 h-4" strokeWidth={2} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
                             </button>
                           </TooltipTrigger>
                           <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
                             {t('mcp.actions.edit')}
                           </TooltipContent>
                         </Tooltip>
+                        
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              className="p-1.5 rounded-lg text-muted hover:text-error hover:bg-surface transition-colors cursor-pointer"
-                              onClick={() => handleDelete(server.name)}
+                              onClick={() => handleTestConnection(server)}
+                              disabled={testingServers.has(server.name)}
+                              className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-surface-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <Trash2 className="w-4 h-4" strokeWidth={2} />
+                              {testingServers.has(server.name) ? (
+                                <Loader2 className="w-4 h-4 animate-spin" strokeWidth={2} />
+                              ) : (
+                                <Wifi className="w-4 h-4" strokeWidth={2} />
+                              )}
                             </button>
                           </TooltipTrigger>
                           <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
-                            {t('mcp.actions.delete')}
+                            测试连接
+                          </TooltipContent>
+                        </Tooltip>
+                        
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() => handleDelete(server.name)}
+                              className="p-1.5 rounded-lg text-muted hover:text-error hover:bg-error-light transition-colors"
+                            >
+                              <X className="w-4 h-4" strokeWidth={2} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-ink-900 text-white text-xs px-2 py-1 rounded-md">
+                            删除服务器
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -556,14 +569,6 @@ export function McpSection() {
                                 </div>
                               ))}
                             </div>
-                          </div>
-                        )}
-                        
-                        {/* 加载工具中 */}
-                        {loadingTools.has(server.name) && (
-                          <div className="flex items-center gap-2 text-xs text-muted">
-                            <Loader2 className="w-3 h-3 animate-spin" strokeWidth={2} />
-                            <span>加载工具列表中...</span>
                           </div>
                         )}
                         
@@ -612,38 +617,34 @@ export function McpSection() {
               </Tooltip>
             </div>
 
-            {/* 服务器名称 */}
+            {/* 别名输入框 */}
             <label className="grid gap-1.5">
-              <span className="text-xs font-medium text-muted">{t('mcp.form.name.label')}</span>
+              <span className="text-xs font-medium text-muted">显示别名（可选）</span>
               <input
                 type="text"
-                className={`rounded-xl border px-3 py-2 text-sm text-ink-800 placeholder:text-muted-light focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20 transition-colors ${
-                  viewMode === 'edit' ? 'bg-surface border-ink-900/10' : 'bg-surface-secondary border-ink-900/10'
-                }`}
-                placeholder={t('mcp.form.name.placeholder')}
-                value={serverName}
-                onChange={(e) => setServerName(e.target.value)}
-                disabled={viewMode === 'edit'}
-                required
+                className="rounded-xl border border-ink-900/10 bg-surface px-3 py-2 text-sm text-ink-800 placeholder:text-muted-light focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20 transition-colors"
+                placeholder="例如：必应搜索、GitHub 助手"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
               />
               <p className="text-[10px] text-muted-light">
-                服务器的唯一标识符，只能包含字母、数字、下划线和连字符
+                为服务器设置一个友好的显示名称，用于前端展示。如果不填写，将使用配置中的服务器名称
               </p>
             </label>
 
             {/* JSON 配置 */}
             <label className="grid gap-1.5">
-              <span className="text-xs font-medium text-muted">JSON 配置</span>
+              <span className="text-xs font-medium text-muted">MCP 服务器配置</span>
               <textarea
                 className="rounded-xl border border-ink-900/10 bg-surface-secondary px-3 py-2 text-sm text-ink-800 placeholder:text-muted-light focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20 transition-colors font-mono resize-none"
-                placeholder={`{\n  "command": "npx",\n  "args": ["@modelcontextprotocol/server-github"],\n  "env": {\n    "GITHUB_TOKEN": "your-token"\n  }\n}`}
+                placeholder={`{\n  "mcpServers": {\n    "server-name": {\n      "type": "stdio",\n      "command": "npx",\n      "args": ["@modelcontextprotocol/server-github"]\n    }\n  }\n}`}
                 value={jsonConfig}
                 onChange={(e) => setJsonConfig(e.target.value)}
-                rows={12}
+                rows={16}
                 required
               />
               <p className="text-[10px] text-muted-light">
-                直接粘贴 MCP 服务器的 JSON 配置，支持所有 Qwen Code SDK 的配置选项
+                粘贴完整的 mcpServers 配置，格式：{`{ "mcpServers": { "服务器名称": {...配置...} } }`}
               </p>
             </label>
 
@@ -655,21 +656,44 @@ export function McpSection() {
                   <strong className="text-ink-900">stdio 类型（本地命令）：</strong>
                   <pre className="mt-1 text-[10px] bg-surface rounded-lg p-2 overflow-x-auto font-mono leading-relaxed">
 {`{
-  "command": "npx",
-  "args": ["@modelcontextprotocol/server-github"],
-  "env": {
-    "GITHUB_TOKEN": "your-token"
+  "mcpServers": {
+    "github-mcp-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "your-token"
+      }
+    }
   }
 }`}
                   </pre>
                 </div>
                 <div>
-                  <strong className="text-ink-900">HTTP 类型（远程服务）：</strong>
+                  <strong className="text-ink-900">streamable_http 类型（远程服务）：</strong>
                   <pre className="mt-1 text-[10px] bg-surface rounded-lg p-2 overflow-x-auto font-mono leading-relaxed">
 {`{
-  "url": "https://api.example.com/mcp",
-  "headers": {
-    "Authorization": "Bearer your-token"
+  "mcpServers": {
+    "必应搜索": {
+      "type": "streamable_http",
+      "url": "https://mcp.api-inference.modelscope.net/127876a63bfd49/mcp"
+    }
+  }
+}`}
+                  </pre>
+                </div>
+                <div>
+                  <strong className="text-ink-900">sse 类型（SSE 服务）：</strong>
+                  <pre className="mt-1 text-[10px] bg-surface rounded-lg p-2 overflow-x-auto font-mono leading-relaxed">
+{`{
+  "mcpServers": {
+    "custom-sse-server": {
+      "type": "sse",
+      "url": "https://api.example.com/mcp/sse",
+      "headers": {
+        "Authorization": "Bearer your-token"
+      }
+    }
   }
 }`}
                   </pre>

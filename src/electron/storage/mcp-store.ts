@@ -15,26 +15,54 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 
 /**
  * MCP 服务器配置接口
+ * 支持从 MCP 市场直接复制粘贴的格式
  */
 export interface McpServerConfig {
-  /** 服务器名称（唯一标识） */
-  name: string;
-  /** 显示名称（可选） */
-  displayName?: string;
-  /** 服务器类型 */
-  type?: 'stdio' | 'sse' | 'streamableHttp';
-  /** 命令（stdio 类型） */
+  // ===== 传输类型字段（可选，Qwen SDK 会自动识别） =====
+  /** 
+   * 传输类型（可选）
+   * 注意：Qwen Code SDK 会自动识别传输类型，此字段仅用于兼容性
+   * 如果提供，应为：stdio、sse、http 或 streamable_http
+   */
+  type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
+  
+  // ===== stdio 类型字段 =====
+  /** 命令（stdio 类型必需） */
   command?: string;
-  /** 命令参数（stdio 类型） */
+  /** 命令参数（stdio 类型可选） */
   args?: string[];
-  /** 环境变量（可选） */
+  /** 工作目录（stdio 类型可选） */
+  cwd?: string;
+  /** 环境变量（stdio 类型可选） */
   env?: Record<string, string>;
-  /** URL（sse/streamableHttp 类型） */
+  
+  // ===== sse/http 类型字段 =====
+  /** URL（sse/http 类型必需） */
   url?: string;
-  /** 是否禁用 */
-  disabled?: boolean;
-  /** 描述（可选） */
+  /** HTTP 请求头（sse/http 类型可选） */
+  headers?: Record<string, string>;
+  
+  // ===== 通用可选字段 =====
+  /** 显示名称 */
+  displayName?: string;
+  /** 描述 */
   description?: string;
+  /** 是否启用 */
+  enabled?: boolean;
+  /** 连接超时（毫秒） */
+  timeout?: number;
+  /** 是否信任（跳过确认） */
+  trust?: boolean;
+  /** 包含的工具列表（白名单） */
+  includeTools?: string[];
+  /** 排除的工具列表（黑名单） */
+  excludeTools?: string[];
+  
+  // ===== 已废弃字段（仅用于兼容） =====
+  /** @deprecated 使用 enabled 代替 */
+  disabled?: boolean;
+  /** @deprecated 服务器名称已经是 key，不需要重复 */
+  name?: string;
 }
 
 /**
@@ -131,6 +159,7 @@ export async function loadMcpServer(name: string): Promise<McpServerConfig | nul
 
 /**
  * 保存 MCP 服务器配置（异步）
+ * 用户输入的配置原样保存到 settings.json
  */
 export async function saveMcpServer(name: string, config: McpServerConfig): Promise<void> {
   const settings = await readSettings();
@@ -139,13 +168,11 @@ export async function saveMcpServer(name: string, config: McpServerConfig): Prom
     settings.mcpServers = {};
   }
 
-  // 确保 name 和 config.name 一致
-  config.name = name;
-
-  // 添加时间戳
-  (config as any).updatedAt = Date.now();
-
-  settings.mcpServers[name] = config;
+  // 移除 name 字段（name 是 key，不应在 value 中重复）
+  const { name: _, ...configToSave } = config as any;
+  
+  // 原样保存用户配置，包括 type 字段（如果有）
+  settings.mcpServers[name] = configToSave;
   await writeSettings(settings);
   log.info(`[mcp-store] MCP server saved: ${name}`);
 }
@@ -161,6 +188,25 @@ export async function deleteMcpServer(name: string): Promise<void> {
     await writeSettings(settings);
     log.info(`[mcp-store] MCP server deleted: ${name}`);
   }
+}
+
+/**
+ * 切换 MCP 服务器的启用状态
+ * @param name 服务器名称
+ * @param enabled 新的启用状态
+ */
+export async function toggleMcpServerEnabled(name: string, enabled: boolean): Promise<void> {
+  const config = await loadMcpServer(name);
+  if (!config) {
+    throw new Error(`MCP server not found: ${name}`);
+  }
+  
+  // 更新 enabled 状态
+  config.enabled = enabled;
+  
+  // 保存配置
+  await saveMcpServer(name, config);
+  log.info(`[mcp-store] MCP server "${name}" ${enabled ? 'enabled' : 'disabled'}`);
 }
 
 /**
@@ -244,49 +290,68 @@ export function createMcpServerFromTemplate(templateName: string, customName?: s
 
 /**
  * 验证 MCP 服务器配置
+ * 检查是否符合 Qwen Code 规范，并给出修改建议
  */
-export function validateMcpServer(config: McpServerConfig): { valid: boolean; errors: string[] } {
+export function validateMcpServer(config: McpServerConfig): { 
+  valid: boolean; 
+  errors: string[];
+  warnings: string[];
+} {
   const errors: string[] = [];
+  const warnings: string[] = [];
 
-  // 检查名称
-  if (!config.name || typeof config.name !== 'string') {
-    errors.push('服务器名称不能为空');
-  } else if (!/^[a-zA-Z0-9_-]+$/.test(config.name)) {
-    errors.push('服务器名称只能包含字母、数字、下划线和连字符');
-  }
-
-  // 检查类型
-  if (config.type && !['stdio', 'sse', 'streamableHttp'].includes(config.type)) {
-    errors.push('无效的服务器类型');
-  }
-
-  // stdio 类型需要 command
-  if (!config.type || config.type === 'stdio') {
-    if (!config.command) {
-      errors.push('stdio 类型服务器必须指定命令');
+  // 检查 type 字段（如果提供）
+  if (config.type) {
+    const validTypes = ['stdio', 'sse', 'http', 'streamable_http'];
+    if (!validTypes.includes(config.type)) {
+      errors.push(`type 必须是 ${validTypes.join('、')} 之一`);
+    }
+    
+    // 如果是 streamable_http，给出建议
+    if (config.type === 'streamable_http') {
+      warnings.push('建议：type 值 "streamable_http" 可以改为 "http"，或直接移除 type 字段让 Qwen SDK 自动识别');
     }
   }
 
-  // sse/streamableHttp 类型需要 url
-  if (config.type === 'sse' || config.type === 'streamableHttp') {
-    if (!config.url) {
-      errors.push(`${config.type} 类型服务器必须指定 URL`);
-    } else {
-      try {
-        new URL(config.url);
-      } catch (urlError) {
-        if (urlError instanceof TypeError) {
-          errors.push('URL 格式无效');
-        } else {
-          throw urlError;
-        }
-      }
+  // 检查必需字段
+  const hasCommand = !!config.command;
+  const hasUrl = !!config.url;
+
+  if (!hasCommand && !hasUrl) {
+    errors.push('必须提供 command（stdio 类型）或 url（sse/http 类型）');
+  }
+
+  // stdio 类型验证
+  if (hasCommand) {
+    if (typeof config.command !== 'string' || config.command.trim() === '') {
+      errors.push('command 不能为空');
     }
+    if (config.args && !Array.isArray(config.args)) {
+      errors.push('args 必须是数组');
+    }
+    if (config.env && typeof config.env !== 'object') {
+      errors.push('env 必须是对象');
+    }
+  }
+
+  // sse/http 类型验证
+  if (hasUrl) {
+    try {
+      new URL(config.url!);
+    } catch {
+      errors.push('url 格式无效');
+    }
+  }
+
+  // headers 验证
+  if (config.headers && typeof config.headers !== 'object') {
+    errors.push('headers 必须是对象');
   }
 
   return {
     valid: errors.length === 0,
     errors,
+    warnings,
   };
 }
 
@@ -310,8 +375,35 @@ export interface McpToolInfo {
 }
 
 /**
+ * 根据配置自动识别传输类型并创建 Transport
+ */
+function createTransport(config: McpServerConfig): any {
+  // 优先根据字段判断，而不是 type
+  if (config.command) {
+    // stdio 类型
+    return new StdioClientTransport({
+      command: config.command,
+      args: config.args || [],
+      env: {
+        ...process.env,
+        ...(config.env || {}),
+      } as Record<string, string>,
+    });
+  } else if (config.url) {
+    // 根据 type 或 URL 特征判断是 SSE 还是 HTTP
+    // 如果 type 是 http 或 streamable_http，使用 HTTP
+    if (config.type === 'http' || config.type === 'streamable_http') {
+      return new StreamableHTTPClientTransport(new URL(config.url));
+    }
+    // 如果 type 是 sse，或者没有 type，默认使用 SSE
+    return new SSEClientTransport(new URL(config.url));
+  }
+  
+  throw new Error('无法识别传输类型：缺少 command 或 url');
+}
+
+/**
  * 测试 MCP 服务器连接
- * 真正连接到 MCP 服务器并测试通信
  */
 export async function testMcpServer(config: McpServerConfig): Promise<McpTestResult> {
   // 首先验证配置
@@ -330,55 +422,9 @@ export async function testMcpServer(config: McpServerConfig): Promise<McpTestRes
       version: '1.0.0',
     });
 
-    let transport: any;
-    const type = config.type || 'stdio';
-
-    // 创建传输层
-    if (type === 'stdio') {
-      if (!config.command) {
-        return {
-          success: false,
-          message: '配置错误',
-          details: 'stdio 类型需要 command 参数',
-        };
-      }
-      transport = new StdioClientTransport({
-        command: config.command,
-        args: config.args || [],
-        env: {
-          ...process.env,
-          ...(config.env || {}),
-        } as Record<string, string>,
-      });
-    } else if (type === 'sse') {
-      if (!config.url) {
-        return {
-          success: false,
-          message: '配置错误',
-          details: 'sse 类型需要 url 参数',
-        };
-      }
-      transport = new SSEClientTransport(new URL(config.url));
-    } else if (type === 'streamableHttp') {
-      if (!config.url) {
-        return {
-          success: false,
-          message: '配置错误',
-          details: 'streamableHttp 类型需要 url 参数',
-        };
-      }
-      transport = new StreamableHTTPClientTransport(new URL(config.url));
-    } else {
-      return {
-        success: false,
-        message: '未知的服务器类型',
-        details: `不支持的类型: ${type}`,
-      };
-    }
-
-    // 尝试连接到服务器
+    const transport = createTransport(config);
     const startTime = Date.now();
-    await client.connect(transport, { timeout: 10000 });
+    await client.connect(transport, { timeout: config.timeout || 10000 });
 
     try {
       // 测试基本通信：获取服务器信息
@@ -403,7 +449,7 @@ export async function testMcpServer(config: McpServerConfig): Promise<McpTestRes
 
     if (error.message?.includes('timeout') || error.message?.includes('ETIMEDOUT')) {
       message = '连接超时';
-      details = '服务器在 10 秒内无响应';
+      details = `服务器在 ${config.timeout || 10000}ms 内无响应`;
     } else if (error.message?.includes('ENOENT') || error.message?.includes('command not found')) {
       message = '命令不存在';
       details = `找不到命令: ${config.command}`;
@@ -433,38 +479,8 @@ export async function getMcpServerTools(config: McpServerConfig): Promise<McpToo
       version: '1.0.0',
     });
 
-    let transport: any;
-    const type = config.type || 'stdio';
-
-    // 创建传输层
-    if (type === 'stdio') {
-      if (!config.command) {
-        throw new Error('stdio 类型需要 command 参数');
-      }
-      transport = new StdioClientTransport({
-        command: config.command,
-        args: config.args || [],
-        env: {
-          ...process.env,
-          ...(config.env || {}),
-        } as Record<string, string>,
-      });
-    } else if (type === 'sse') {
-      if (!config.url) {
-        throw new Error('sse 类型需要 url 参数');
-      }
-      transport = new SSEClientTransport(new URL(config.url));
-    } else if (type === 'streamableHttp') {
-      if (!config.url) {
-        throw new Error('streamableHttp 类型需要 url 参数');
-      }
-      transport = new StreamableHTTPClientTransport(new URL(config.url));
-    } else {
-      throw new Error(`不支持的服务器类型: ${type}`);
-    }
-
-    // 连接到服务器
-    await client.connect(transport, { timeout: 10000 });
+    const transport = createTransport(config);
+    await client.connect(transport, { timeout: config.timeout || 10000 });
 
     try {
       // 获取工具列表
