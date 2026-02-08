@@ -394,7 +394,7 @@ function App() {
 
       <main className="flex flex-1 flex-col ml-[280px] bg-surface-cream">
         <div
-          className="flex items-center justify-center gap-2 h-12 border-b border-ink-900/10 bg-surface-cream select-none"
+          className="flex items-center justify-center gap-2 h-12 border-b border-ink-900/10 bg-surface-cream select-none relative z-10"
           style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
         >
           <span className="text-sm font-medium text-ink-700">{activeSession?.title || "AICowork"}</span>

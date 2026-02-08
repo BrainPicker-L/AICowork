@@ -13,11 +13,22 @@ export function SettingsPage() {
 
   return (
     <div className="h-screen bg-surface">
-      {/* 顶部标题栏 */}
-      <header className="fixed top-0 left-0 right-0 z-10 h-12 bg-surface border-b border-ink-900/10 flex items-center px-4">
+      {/* 顶部标题栏 - 支持 Electron 窗口拖拽 */}
+      <header
+        className="fixed top-0 left-0 right-0 z-10 h-12 bg-surface border-b border-ink-900/10 flex items-center px-4 select-none"
+        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+      >
+        {IS_MAC && (
+          <div
+            className="absolute top-0 left-0 w-[70px] h-12 z-20"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            aria-hidden
+          />
+        )}
         <button
           onClick={() => setCurrentPage('main')}
           className={`p-2 rounded-lg hover:bg-surface-tertiary transition-colors duration-200 cursor-pointer ${IS_MAC ? 'ml-20' : ''}`}
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
           aria-label="返回"
         >
           <ArrowLeft className="w-5 h-5" strokeWidth={2} />

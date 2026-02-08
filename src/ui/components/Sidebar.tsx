@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import { useAppStore } from "../store/useAppStore";
+import { IS_MAC } from "../utils/device";
 
 interface SidebarProps {
   connected: boolean;
@@ -102,10 +103,18 @@ export function Sidebar({
 
   return (
     <aside className="fixed inset-y-0 left-0 flex h-full w-[280px] flex-col gap-4 border-r border-ink-900/5 bg-[#FAF9F6] px-4 pb-4 pt-12">
+      {/* Electron 窗口拖拽区域 - 顶层 z-index 确保可点击，macOS 需为交通灯留出 no-drag 区域 */}
       <div
-        className="absolute top-0 left-0 right-0 h-12"
+        className="absolute top-0 left-0 right-0 h-12 z-20"
         style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
       />
+      {IS_MAC && (
+        <div
+          className="absolute top-0 left-0 w-[70px] h-12 z-30"
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+          aria-hidden
+        />
+      )}
       <TooltipProvider>
         <div className="flex gap-2">
           <Tooltip>
