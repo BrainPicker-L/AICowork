@@ -97,30 +97,8 @@ const StatusDot = ({ variant = "accent", isActive = false, isVisible = true }: {
 };
 
 const SessionResult = ({ message }: { message: SDKResultMessage }) => {
-  const { t } = useTranslation();
-  const formatMinutes = (ms: number | undefined) => typeof ms !== "number" ? "-" : `${(ms / 60000).toFixed(2)} min`;
-  const formatUsd = (usd: number | undefined) => typeof usd !== "number" ? "-" : usd.toFixed(2);
-  const formatMillions = (tokens: number | undefined) => typeof tokens !== "number" ? "-" : `${(tokens / 1_000_000).toFixed(4)} M`;
-
-  return (
-    <div className="flex flex-col gap-2 mt-4">
-      <div className="header text-accent">{t('events.sessionResult')}</div>
-      <div className="flex flex-col rounded-xl px-4 py-3 border border-ink-900/10 bg-surface-secondary space-y-2">
-        <div className="flex flex-wrap items-center gap-2 text-[14px]">
-          <span className="font-normal">{t('events.duration')}</span>
-          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{formatMinutes(message.duration_ms)}</span>
-          <span className="font-normal">API</span>
-          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{formatMinutes(message.duration_api_ms)}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-[14px]">
-          <span className="font-normal">{t('events.usage')}</span>
-          <span className="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-0.5 text-accent text-[13px]">{t('events.cost')} ${formatUsd((message as any).total_cost_usd)}</span>
-          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{t('events.input')} {formatMillions(message.usage?.input_tokens)}</span>
-          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{t('events.output')} {formatMillions(message.usage?.output_tokens)}</span>
-        </div>
-      </div>
-    </div>
-  );
+  // 不显示会话结果区块
+  return null;
 };
 
 export function isMarkdown(text: string): boolean {
@@ -206,10 +184,6 @@ const ToolResult = ({ messageContent }: { messageContent: ToolResultContent }) =
 
 const AssistantBlockCard = ({ title, text, showIndicator = false }: { title: string; text: string; showIndicator?: boolean }) => (
   <div className="flex flex-col mt-4">
-    <div className="header text-accent flex items-center gap-2">
-      <StatusDot variant="success" isActive={showIndicator} isVisible={showIndicator} />
-      {title}
-    </div>
     <MDRenderer text={text} />
   </div>
 );
@@ -292,49 +266,14 @@ const AskUserQuestionCard = ({
   );
 };
 
-const SystemInfoCard = ({ message, showIndicator = false }: { message: SDKMessage; showIndicator?: boolean }) => {
-  const { t } = useTranslation();
-  if (message.type !== "system" || !("subtype" in message) || message.subtype !== "init") return null;
-
-  const systemMsg = message as any;
-
-  const InfoItem = ({ name, value }: { name: string; value: string }) => (
-    <div className="text-[14px]">
-      <span className="mr-4 font-normal">{name}</span>
-      <span className="font-light">{value}</span>
-    </div>
-  );
-
-  // ✅ 优先使用实际配置的模型名称（如果有），否则使用 SDK 返回的模型名称
-  // configuredModel 是在 Runner 中附加的实际配置的模型名称
-  const displayModel = systemMsg.configuredModel || systemMsg.model || "-";
-
+const UserMessageCard = ({ message }: { message: { type: "user_prompt"; prompt: string } }) => {
   return (
-    <div className="flex flex-col gap-2 mt-2">
-      <div className="header text-accent flex items-center gap-2">
-        <StatusDot variant="success" isActive={showIndicator} isVisible={showIndicator} />
-        {t('events.systemInit')}
+    <div className="flex justify-end mt-4">
+      <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-accent px-4 py-3 text-white">
+        <div className="prose prose-invert max-w-none">
+          <MDContent text={message.prompt} />
+        </div>
       </div>
-      <div className="flex flex-col rounded-xl px-4 py-2 border border-ink-900/10 bg-surface-secondary space-y-1">
-        <InfoItem name={t('events.sessionId')} value={systemMsg.session_id || "-"} />
-        <InfoItem name={t('events.modelName')} value={displayModel} />
-        <InfoItem name={t('events.permissionMode')} value={systemMsg.permissionMode || "-"} />
-        <InfoItem name={t('events.workingDirectory')} value={systemMsg.cwd || "-"} />
-      </div>
-    </div>
-  );
-};
-
-const UserMessageCard = ({ message, showIndicator = false }: { message: { type: "user_prompt"; prompt: string }; showIndicator?: boolean }) => {
-  const { t } = useTranslation();
-
-  return (
-    <div className="flex flex-col mt-4">
-      <div className="header text-accent flex items-center gap-2">
-        <StatusDot variant="success" isActive={showIndicator} isVisible={showIndicator} />
-        {t('events.user')}
-      </div>
-      <MDContent text={message.prompt} />
     </div>
   );
 };
@@ -368,13 +307,14 @@ export function MessageCard({
   }
 
   if (message.type === "user_prompt") {
-    return <UserMessageCard message={message} showIndicator={showIndicator} />;
+    return <UserMessageCard message={message} />;
   }
 
   const sdkMessage = message as SDKMessage;
 
+  // 不显示系统消息
   if (sdkMessage.type === "system") {
-    return <SystemInfoCard message={sdkMessage} showIndicator={showIndicator} />;
+    return null;
   }
 
   if (sdkMessage.type === "result") {
