@@ -102,11 +102,20 @@ export const useAppStore = create<AppState>()(
       setShowStartModal: (showStartModal) => set({ showStartModal }),
       setShowSettingsModal: (showSettingsModal) => set({ showSettingsModal }),
       setActiveSessionId: (id) => {
+        const state = get();
         console.log('=== [useAppStore] setActiveSessionId called ===');
-        console.log('[useAppStore] Old activeSessionId:', get().activeSessionId);
+        console.log('[useAppStore] Old activeSessionId:', state.activeSessionId);
         console.log('[useAppStore] New activeSessionId:', id);
         console.trace('[useAppStore] Stack trace:');
-        set({ activeSessionId: id });
+
+        // 切换任务时同步工作目录
+        if (id && state.sessions[id]?.cwd) {
+          const sessionCwd = state.sessions[id].cwd;
+          console.log('[useAppStore] Syncing cwd to session:', sessionCwd);
+          set({ activeSessionId: id, cwd: sessionCwd });
+        } else {
+          set({ activeSessionId: id });
+        }
       },
       setApiConfigChecked: (apiConfigChecked) => set({ apiConfigChecked }),
       setSelectedModelConfigId: (configId) => set({ selectedModelConfigId: configId }), // 新增：设置方法
