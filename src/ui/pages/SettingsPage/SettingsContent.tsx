@@ -7,6 +7,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { FeedbackSection } from './sections/FeedbackSection';
 import { AboutSection } from './sections/AboutSection';
 import { LanguageSection } from './sections/LanguageSection';
+import { DisplaySection } from './sections/DisplaySection';
 import { ApiSection } from './sections/ApiSection';
 import { McpSection } from './sections/McpSection';
 import { MemorySection } from './sections/MemorySection';
@@ -45,6 +46,8 @@ export function SettingsContent({ className }: SettingsContentProps) {
         return <AboutSection />;
       case 'language':
         return <LanguageSection />;
+      case 'display':
+        return <DisplaySection />;
       case 'api':
         return <ApiSection />;
       case 'mcp':

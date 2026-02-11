@@ -28,6 +28,7 @@ export type SettingsSection =
   | 'feedback'
   | 'about'
   | 'language'
+  | 'display'
   | 'api'
   | 'mcp'
   | 'skills'
@@ -52,6 +53,10 @@ interface AppState {
   currentPage: 'main' | 'settings';
   settingsSection: SettingsSection;
 
+  // 显示设置
+  showTokenUsage: boolean;
+  showSystemMessage: boolean;
+
   setPrompt: (prompt: string) => void;
   setCwd: (cwd: string) => void;
   setPendingStart: (pending: boolean) => void;
@@ -69,6 +74,10 @@ interface AppState {
   // 新增：页面切换方法
   setCurrentPage: (page: 'main' | 'settings') => void;
   setSettingsSection: (section: SettingsSection) => void;
+
+  // 显示设置方法
+  setShowTokenUsage: (show: boolean) => void;
+  setShowSystemMessage: (show: boolean) => void;
 }
 
 function createSession(id: string): SessionView {
@@ -94,6 +103,10 @@ export const useAppStore = create<AppState>()(
       // 新增：页面状态
       currentPage: 'main',
       settingsSection: 'api' as SettingsSection,
+
+      // 显示设置（默认开启）
+      showTokenUsage: true,
+      showSystemMessage: true,
 
       setPrompt: (prompt) => set({ prompt }),
       setCwd: (cwd) => set({ cwd }),
@@ -123,6 +136,10 @@ export const useAppStore = create<AppState>()(
       // 新增：页面切换方法
       setCurrentPage: (currentPage) => set({ currentPage }),
       setSettingsSection: (settingsSection) => set({ settingsSection }),
+
+      // 显示设置方法
+      setShowTokenUsage: (showTokenUsage) => set({ showTokenUsage }),
+      setShowSystemMessage: (showSystemMessage) => set({ showSystemMessage }),
 
       renameSession: (sessionId, newTitle) => {
     set((state) => {
@@ -351,6 +368,8 @@ export const useAppStore = create<AppState>()(
         selectedModelConfigId: state.selectedModelConfigId,
         currentPage: state.currentPage,
         settingsSection: state.settingsSection,
+        showTokenUsage: state.showTokenUsage,
+        showSystemMessage: state.showSystemMessage,
       }),
     }
   )

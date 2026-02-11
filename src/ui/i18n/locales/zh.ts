@@ -51,6 +51,7 @@ export default {
 			feedback: "反馈",
 			about: "关于",
 			language: "语言",
+			display: "显示设置",
 			api: "API 设置",
 			mcp: "MCP 设置",
 			memory: "记忆",
@@ -100,6 +101,23 @@ export default {
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
 		tagline: "AICowork 让 AI 成为你的工作协作伙伴。",
+	},
+
+	display: {
+		title: "显示设置",
+		description: "配置会话消息的显示选项",
+		tokenUsage: {
+			title: "显示 Token 耗时信息",
+			description: "在会话结束时显示 Token 使用量、耗时和费用信息",
+		},
+		systemMessage: {
+			title: "显示系统环境消息",
+			description: "在会话开始时显示系统初始化信息（会话ID、模型、工作目录等）",
+		},
+		hint: {
+			label: "提示",
+			text: "这些设置会保存在本地，下次启动应用时自动应用。",
+		},
 	},
 
 	language: {

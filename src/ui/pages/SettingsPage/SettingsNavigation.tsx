@@ -11,7 +11,8 @@ import {
   Languages,
   Zap,
   Package,
-  Brain
+  Brain,
+  Monitor
 } from 'lucide-react';
 import type { SettingsSection } from '../../store/useAppStore';
 
@@ -33,6 +34,7 @@ const SETTINGS_SECTIONS: SectionDef[] = [
   { id: 'feedback', icon: MessageSquare, group: 'general' },
   { id: 'about', icon: Info, group: 'general' },
   { id: 'language', icon: Languages, group: 'general' },
+  { id: 'display', icon: Monitor, group: 'general' },
 
   // 连接与模型
   { id: 'api', icon: Key, group: 'connection' },

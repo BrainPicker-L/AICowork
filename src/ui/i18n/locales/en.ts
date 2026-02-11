@@ -52,6 +52,7 @@ export default {
 			feedback: "Feedback",
 			about: "About",
 			language: "Language",
+			display: "Display",
 			api: "API Settings",
 			mcp: "MCP Settings",
 			memory: "Memory",
@@ -101,6 +102,23 @@ export default {
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
 		tagline: "AICowork makes AI your collaborative work partner.",
+	},
+
+	display: {
+		title: "Display Settings",
+		description: "Configure session message display options",
+		tokenUsage: {
+			title: "Show Token Usage Info",
+			description: "Display token usage, duration and cost information at the end of session",
+		},
+		systemMessage: {
+			title: "Show System Message",
+			description: "Display system initialization info at the start of session (session ID, model, working directory, etc.)",
+		},
+		hint: {
+			label: "Tip",
+			text: "These settings are saved locally and will be applied automatically when you start the app next time.",
+		},
 	},
 
 	language: {

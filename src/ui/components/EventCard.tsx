@@ -9,6 +9,7 @@ import type {
 } from "@qwen-code/sdk";
 import type { StreamMessage } from "../types";
 import type { PermissionRequest } from "../store/useAppStore";
+import { useAppStore } from "../store/useAppStore";
 import MDContent from "../render/markdown";
 import MDContentEnhanced from "../render/markdown-enhanced";
 import { DecisionPanel } from "./DecisionPanel";
@@ -97,8 +98,37 @@ const StatusDot = ({ variant = "accent", isActive = false, isVisible = true }: {
 };
 
 const SessionResult = ({ message }: { message: SDKResultMessage }) => {
-  // 不显示会话结果区块
-  return null;
+  const { t } = useTranslation();
+  const showTokenUsage = useAppStore((state) => state.showTokenUsage);
+  
+  // 如果设置为不显示，返回 null
+  if (!showTokenUsage) {
+    return null;
+  }
+
+  const formatMinutes = (ms: number | undefined) => typeof ms !== "number" ? "-" : `${(ms / 60000).toFixed(2)} min`;
+  const formatUsd = (usd: number | undefined) => typeof usd !== "number" ? "-" : usd.toFixed(2);
+  const formatMillions = (tokens: number | undefined) => typeof tokens !== "number" ? "-" : `${(tokens / 1_000_000).toFixed(4)} M`;
+
+  return (
+    <div className="flex flex-col gap-2 mt-4">
+      <div className="header text-accent">{t('events.sessionResult')}</div>
+      <div className="flex flex-col rounded-xl px-4 py-3 border border-ink-900/10 bg-surface-secondary space-y-2">
+        <div className="flex flex-wrap items-center gap-2 text-[14px]">
+          <span className="font-normal">{t('events.duration')}</span>
+          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{formatMinutes(message.duration_ms)}</span>
+          <span className="font-normal">API</span>
+          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{formatMinutes(message.duration_api_ms)}</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-[14px]">
+          <span className="font-normal">{t('events.usage')}</span>
+          <span className="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-0.5 text-accent text-[13px]">{t('events.cost')} ${formatUsd((message as any).total_cost_usd)}</span>
+          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{t('events.input')} {formatMillions(message.usage?.input_tokens)}</span>
+          <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2.5 py-0.5 text-ink-700 text-[13px]">{t('events.output')} {formatMillions(message.usage?.output_tokens)}</span>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export function isMarkdown(text: string): boolean {
@@ -266,6 +296,44 @@ const AskUserQuestionCard = ({
   );
 };
 
+const SystemInfoCard = ({ message, showIndicator = false }: { message: SDKMessage; showIndicator?: boolean }) => {
+  const { t } = useTranslation();
+  const showSystemMessage = useAppStore((state) => state.showSystemMessage);
+  
+  // 如果设置为不显示，返回 null
+  if (!showSystemMessage) {
+    return null;
+  }
+  
+  if (message.type !== "system" || !("subtype" in message) || message.subtype !== "init") return null;
+
+  const systemMsg = message as any;
+
+  const InfoItem = ({ name, value }: { name: string; value: string }) => (
+    <div className="text-[14px]">
+      <span className="mr-4 font-normal">{name}</span>
+      <span className="font-light">{value}</span>
+    </div>
+  );
+
+  const displayModel = systemMsg.configuredModel || systemMsg.model || "-";
+
+  return (
+    <div className="flex flex-col gap-2 mt-2">
+      <div className="header text-accent flex items-center gap-2">
+        <StatusDot variant="success" isActive={showIndicator} isVisible={showIndicator} />
+        {t('events.systemInit')}
+      </div>
+      <div className="flex flex-col rounded-xl px-4 py-2 border border-ink-900/10 bg-surface-secondary space-y-1">
+        <InfoItem name={t('events.sessionId')} value={systemMsg.session_id || "-"} />
+        <InfoItem name={t('events.modelName')} value={displayModel} />
+        <InfoItem name={t('events.permissionMode')} value={systemMsg.permissionMode || "-"} />
+        <InfoItem name={t('events.workingDirectory')} value={systemMsg.cwd || "-"} />
+      </div>
+    </div>
+  );
+};
+
 const UserMessageCard = ({ message }: { message: { type: "user_prompt"; prompt: string } }) => {
   return (
     <div className="flex justify-end mt-4">
@@ -312,9 +380,9 @@ export function MessageCard({
 
   const sdkMessage = message as SDKMessage;
 
-  // 不显示系统消息
+  // 使用 SystemInfoCard 组件（内部会根据设置决定是否显示）
   if (sdkMessage.type === "system") {
-    return null;
+    return <SystemInfoCard message={sdkMessage} showIndicator={showIndicator} />;
   }
 
   if (sdkMessage.type === "result") {
