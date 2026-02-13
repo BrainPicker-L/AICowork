@@ -79,6 +79,10 @@ function getEnhancedPath(): string {
 /**
  * MCP 服务器配置接口
  * 支持从 MCP 市场直接复制粘贴的格式
+ * 按照 Qwen Code SDK 规范：
+ * - stdio 类型使用 command + args
+ * - sse 类型使用 url
+ * - http/streamable_http 类型使用 httpUrl
  */
 export interface McpServerConfig {
   // ===== 传输类型字段（可选，Qwen SDK 会自动识别） =====
@@ -99,9 +103,14 @@ export interface McpServerConfig {
   /** 环境变量（stdio 类型可选） */
   env?: Record<string, string>;
   
-  // ===== sse/http 类型字段 =====
-  /** URL（sse/http 类型必需） */
+  // ===== sse 类型字段 =====
+  /** URL（sse 类型必需） */
   url?: string;
+  
+  // ===== http/streamable_http 类型字段 =====
+  /** HTTP URL（http/streamable_http 类型必需） */
+  httpUrl?: string;
+  
   /** HTTP 请求头（sse/http 类型可选） */
   headers?: Record<string, string>;
   
@@ -354,6 +363,10 @@ export function createMcpServerFromTemplate(templateName: string, customName?: s
 /**
  * 验证 MCP 服务器配置
  * 检查是否符合 Qwen Code 规范，并给出修改建议
+ * 按照 Qwen Code SDK 规范：
+ * - stdio 类型使用 command + args
+ * - sse 类型使用 url
+ * - http/streamable_http 类型使用 httpUrl
  */
 export function validateMcpServer(config: McpServerConfig): { 
   valid: boolean; 
@@ -379,9 +392,23 @@ export function validateMcpServer(config: McpServerConfig): {
   // 检查必需字段
   const hasCommand = !!config.command;
   const hasUrl = !!config.url;
+  const hasHttpUrl = !!config.httpUrl;
 
-  if (!hasCommand && !hasUrl) {
-    errors.push('必须提供 command（stdio 类型）或 url（sse/http 类型）');
+  if (!hasCommand && !hasUrl && !hasHttpUrl) {
+    errors.push('必须提供 command（stdio 类型）、url（sse 类型）或 httpUrl（http/streamable_http 类型）');
+  }
+
+  // 检查 url 和 httpUrl 不能同时存在
+  if (hasUrl && hasHttpUrl) {
+    errors.push('url 和 httpUrl 不能同时存在，SSE 类型使用 url，HTTP 类型使用 httpUrl');
+  }
+
+  // 类型与字段匹配校验
+  if (config.type === 'sse' && hasHttpUrl && !hasUrl) {
+    errors.push('SSE 类型应使用 url 字段而不是 httpUrl');
+  }
+  if ((config.type === 'http' || config.type === 'streamable_http') && hasUrl && !hasHttpUrl) {
+    warnings.push('HTTP/Streamable HTTP 类型建议使用 httpUrl 字段而不是 url（当前配置仍可工作，但建议调整）');
   }
 
   // stdio 类型验证
@@ -397,12 +424,21 @@ export function validateMcpServer(config: McpServerConfig): {
     }
   }
 
-  // sse/http 类型验证
+  // sse 类型验证（url 字段）
   if (hasUrl) {
     try {
       new URL(config.url!);
     } catch {
       errors.push('url 格式无效');
+    }
+  }
+
+  // http/streamable_http 类型验证（httpUrl 字段）
+  if (hasHttpUrl) {
+    try {
+      new URL(config.httpUrl!);
+    } catch {
+      errors.push('httpUrl 格式无效');
     }
   }
 
@@ -439,6 +475,10 @@ export interface McpToolInfo {
 
 /**
  * 根据配置自动识别传输类型并创建 Transport
+ * 按照 Qwen Code SDK 规范：
+ * - stdio 类型使用 command + args
+ * - sse 类型使用 url
+ * - http/streamable_http 类型使用 httpUrl
  */
 function createTransport(config: McpServerConfig): any {
   // 优先根据字段判断，而不是 type
@@ -453,17 +493,20 @@ function createTransport(config: McpServerConfig): any {
         ...(config.env || {}),
       } as Record<string, string>,
     });
+  } else if (config.httpUrl) {
+    // HTTP/Streamable HTTP 类型 - 优先使用 httpUrl 字段
+    return new StreamableHTTPClientTransport(new URL(config.httpUrl));
   } else if (config.url) {
-    // 根据 type 或 URL 特征判断是 SSE 还是 HTTP
-    // 如果 type 是 http 或 streamable_http，使用 HTTP
+    // 根据 type 判断是 SSE 还是 HTTP
+    // 如果 type 是 http 或 streamable_http，使用 HTTP（兼容旧配置）
     if (config.type === 'http' || config.type === 'streamable_http') {
       return new StreamableHTTPClientTransport(new URL(config.url));
     }
-    // 如果 type 是 sse，或者没有 type，默认使用 SSE
+    // 默认使用 SSE
     return new SSEClientTransport(new URL(config.url));
   }
   
-  throw new Error('无法识别传输类型：缺少 command 或 url');
+  throw new Error('无法识别传输类型：缺少 command、url 或 httpUrl');
 }
 
 /**

@@ -245,7 +245,14 @@ export function McpSection() {
       
       // 如果测试成功，加载工具列表并显示弹框
       if (result.success) {
-        const tools = await window.electron.getMcpServerTools(server.config);
+        let tools: Array<{ name: string; description?: string }> = [];
+        try {
+          const toolsResult = await window.electron.getMcpServerTools(server.config);
+          tools = Array.isArray(toolsResult) ? toolsResult : [];
+        } catch (toolsErr) {
+          console.error("Failed to get MCP server tools:", toolsErr);
+          tools = [];
+        }
         
         // 显示弹框
         setDialogData({
@@ -366,15 +373,15 @@ export function McpSection() {
                   {/* 工具列表 */}
                   <div>
                     <h3 className="text-sm font-semibold text-ink-900 mb-3">
-                      可用工具 ({dialogData.tools.length})
+                      可用工具 ({(dialogData.tools ?? []).length})
                     </h3>
-                    {dialogData.tools.length === 0 ? (
+                    {(dialogData.tools ?? []).length === 0 ? (
                       <div className="text-center py-8 text-muted text-sm">
                         该服务器未提供任何工具
                       </div>
                     ) : (
                       <div className="space-y-2 max-h-96 overflow-y-auto">
-                        {dialogData.tools.map((tool, idx) => (
+                        {(dialogData.tools ?? []).map((tool, idx) => (
                           <div
                             key={idx}
                             className="rounded-lg border border-ink-900/10 bg-surface p-3 hover:bg-surface-secondary transition-colors"
@@ -658,7 +665,6 @@ export function McpSection() {
 {`{
   "mcpServers": {
     "github-mcp-server": {
-      "type": "stdio",
       "command": "npx",
       "args": ["@modelcontextprotocol/server-github"],
       "env": {
@@ -670,25 +676,23 @@ export function McpSection() {
                   </pre>
                 </div>
                 <div>
-                  <strong className="text-ink-900">streamable_http 类型（远程服务）：</strong>
+                  <strong className="text-ink-900">http 类型（远程 HTTP 服务，推荐）：</strong>
                   <pre className="mt-1 text-[10px] bg-surface rounded-lg p-2 overflow-x-auto font-mono leading-relaxed">
 {`{
   "mcpServers": {
     "必应搜索": {
-      "type": "streamable_http",
-      "url": "https://mcp.api-inference.modelscope.net/127876a63bfd49/mcp"
+      "httpUrl": "https://mcp.api-inference.modelscope.net/127876a63bfd49/mcp"
     }
   }
 }`}
                   </pre>
                 </div>
                 <div>
-                  <strong className="text-ink-900">sse 类型（SSE 服务）：</strong>
+                  <strong className="text-ink-900">sse 类型（SSE 服务，旧版）：</strong>
                   <pre className="mt-1 text-[10px] bg-surface rounded-lg p-2 overflow-x-auto font-mono leading-relaxed">
 {`{
   "mcpServers": {
     "custom-sse-server": {
-      "type": "sse",
       "url": "https://api.example.com/mcp/sse",
       "headers": {
         "Authorization": "Bearer your-token"

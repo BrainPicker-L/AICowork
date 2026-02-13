@@ -205,33 +205,39 @@ interface Window {
         getMcpServers: () => Promise<Record<string, {
             name: string;
             displayName?: string;
-            type?: 'stdio' | 'sse' | 'streamableHttp';
+            type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             url?: string;
+            httpUrl?: string;
+            headers?: Record<string, string>;
             disabled?: boolean;
             description?: string;
         }>>;
         getMcpServerList: () => Promise<Array<{ name: string; config: {
             name: string;
             displayName?: string;
-            type?: 'stdio' | 'sse' | 'streamableHttp';
+            type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             url?: string;
+            httpUrl?: string;
+            headers?: Record<string, string>;
             disabled?: boolean;
             description?: string;
         } }>>;
         saveMcpServer: (name: string, config: {
             name: string;
             displayName?: string;
-            type?: 'stdio' | 'sse' | 'streamableHttp';
+            type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             url?: string;
+            httpUrl?: string;
+            headers?: Record<string, string>;
             disabled?: boolean;
             description?: string;
         }) => Promise<{ success: boolean; error?: string }>;
@@ -239,33 +245,39 @@ interface Window {
         validateMcpServer: (config: {
             name: string;
             displayName?: string;
-            type?: 'stdio' | 'sse' | 'streamableHttp';
+            type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             url?: string;
+            httpUrl?: string;
+            headers?: Record<string, string>;
             disabled?: boolean;
             description?: string;
         }) => Promise<{ valid: boolean; errors: string[]; warnings?: string[] }>;
         testMcpServer: (config: {
             name: string;
             displayName?: string;
-            type?: 'stdio' | 'sse' | 'streamableHttp';
+            type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             url?: string;
+            httpUrl?: string;
+            headers?: Record<string, string>;
             disabled?: boolean;
             description?: string;
         }) => Promise<{ success: boolean; message: string; details?: string }>;
         getMcpTemplates: () => Promise<Record<string, {
             name: string;
             displayName?: string;
-            type?: 'stdio' | 'sse' | 'streamableHttp';
+            type?: 'stdio' | 'sse' | 'http' | 'streamable_http';
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             url?: string;
+            httpUrl?: string;
+            headers?: Record<string, string>;
             disabled?: boolean;
             description?: string;
         }>>;

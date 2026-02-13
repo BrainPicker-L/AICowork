@@ -62,8 +62,12 @@ export interface McpServerConfig {
   cwd?: string;
   env?: Record<string, string>;
   
-  // sse/http 类型
+  // sse 类型
   url?: string;
+  
+  // http/streamable_http 类型
+  httpUrl?: string;
+  
   headers?: Record<string, string>;
   
   // 通用字段
