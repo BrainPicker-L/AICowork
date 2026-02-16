@@ -13,6 +13,7 @@ export type SessionView = {
   title: string;
   status: SessionStatus;
   cwd?: string;
+  source?: string;
   messages: StreamMessage[];
   permissionRequests: PermissionRequest[];
   lastPrompt?: string;
@@ -33,7 +34,8 @@ export type SettingsSection =
   | 'mcp'
   | 'skills'
   | 'jarvis'
-  | 'memory';
+  | 'memory'
+  | 'dingtalk';
 
 interface AppState {
   sessions: Record<string, SessionView>;
@@ -116,16 +118,10 @@ export const useAppStore = create<AppState>()(
       setShowSettingsModal: (showSettingsModal) => set({ showSettingsModal }),
       setActiveSessionId: (id) => {
         const state = get();
-        console.log('=== [useAppStore] setActiveSessionId called ===');
-        console.log('[useAppStore] Old activeSessionId:', state.activeSessionId);
-        console.log('[useAppStore] New activeSessionId:', id);
-        console.trace('[useAppStore] Stack trace:');
 
         // 切换任务时同步工作目录
         if (id && state.sessions[id]?.cwd) {
-          const sessionCwd = state.sessions[id].cwd;
-          console.log('[useAppStore] Syncing cwd to session:', sessionCwd);
-          set({ activeSessionId: id, cwd: sessionCwd });
+          set({ activeSessionId: id, cwd: state.sessions[id].cwd });
         } else {
           set({ activeSessionId: id });
         }
@@ -195,6 +191,7 @@ export const useAppStore = create<AppState>()(
             status: session.status,
             title: session.title,
             cwd: session.cwd,
+            source: session.source,
             createdAt: session.createdAt,
             updatedAt: session.updatedAt
           };
@@ -237,13 +234,7 @@ export const useAppStore = create<AppState>()(
           }
 
           case "session.status": {
-        const { sessionId, status, title, cwd } = event.payload;
-        
-        console.log('=== [useAppStore] session.status event ===');
-        console.log('[useAppStore] sessionId:', sessionId);
-        console.log('[useAppStore] status:', status);
-        console.log('[useAppStore] current activeSessionId:', state.activeSessionId);
-        console.log('[useAppStore] pendingStart:', state.pendingStart);
+        const { sessionId, status, title, cwd, source } = event.payload;
         
         set((state) => {
           const existing = state.sessions[sessionId] ?? createSession(sessionId);
@@ -255,25 +246,22 @@ export const useAppStore = create<AppState>()(
                 status,
                 title: title ?? existing.title,
                 cwd: cwd ?? existing.cwd,
+                source: source ?? existing.source,
                 updatedAt: Date.now()
               }
             }
           };
         });
 
-        // ✅ 修复：确保 activeSessionId 被正确设置
+        // 确保 activeSessionId 被正确设置
         if (state.pendingStart) {
-          console.log('[useAppStore] pendingStart is true, setting activeSessionId to:', sessionId);
           get().setActiveSessionId(sessionId);
           set({ pendingStart: false, showStartModal: false });
         }
-        // ✅ 新增：如果当前没有活跃会话，且这是一个新启动的会话，设置为活跃
-        else if (!state.activeSessionId && status === "running") {
-          console.log('[useAppStore] No activeSessionId and status is running, setting activeSessionId to:', sessionId);
+        // 仅自动激活本地会话；钉钉会话在后台运行，不抢占用户当前上下文
+        else if (!state.activeSessionId && status === "running" && source !== "dingtalk") {
           get().setActiveSessionId(sessionId);
-        } else {
-          console.log('[useAppStore] Not setting activeSessionId (pendingStart:', state.pendingStart, ', activeSessionId:', state.activeSessionId, ', status:', status, ')');
-          }
+        }
             break;
           }
 

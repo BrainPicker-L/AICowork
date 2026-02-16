@@ -4,6 +4,7 @@
  */
 
 import type { SDKMessage, PermissionResult } from "@qwen-code/sdk";
+import type { DingTalkConnectionStatus, DingTalkSessionMeta } from "./dingtalk.js";
 
 // ==================== 消息类型 ====================
 
@@ -28,6 +29,11 @@ export type StreamMessage = SDKMessage | UserPromptMessage;
 export type SessionStatus = "idle" | "running" | "completed" | "error";
 
 /**
+ * 会话来源
+ */
+export type SessionSource = 'local' | 'dingtalk';
+
+/**
  * 会话信息
  */
 export type SessionInfo = {
@@ -36,6 +42,8 @@ export type SessionInfo = {
   status: SessionStatus;
   claudeSessionId?: string;
   cwd?: string;
+  source?: SessionSource;
+  dingtalkMeta?: DingTalkSessionMeta;
   createdAt: number;
   updatedAt: number;
 };
@@ -48,14 +56,15 @@ export type SessionInfo = {
 export type ServerEvent =
   | { type: "stream.message"; payload: { sessionId: string; message: StreamMessage } }
   | { type: "stream.user_prompt"; payload: { sessionId: string; prompt: string } }
-  | { type: "session.status"; payload: { sessionId: string; status: SessionStatus; title?: string; cwd?: string; error?: string } }
+  | { type: "session.status"; payload: { sessionId: string; status: SessionStatus; title?: string; cwd?: string; error?: string; source?: SessionSource } }
   | { type: "session.list"; payload: { sessions: SessionInfo[] } }
   | { type: "session.history"; payload: { sessionId: string; status: SessionStatus; messages: StreamMessage[] } }
   | { type: "session.deleted"; payload: { sessionId: string } }
   | { type: "permission.request"; payload: { sessionId: string; toolUseId: string; toolName: string; input: unknown } }
   | { type: "runner.error"; payload: { sessionId?: string; message: string } }
   | { type: "api.modelList"; payload: { models: string[] | null; error?: string } }
-  | { type: "api.modelLimits"; payload: { limits: { max_tokens?: number; min_tokens?: number } | null; error?: string } };
+  | { type: "api.modelLimits"; payload: { limits: { max_tokens?: number; min_tokens?: number } | null; error?: string } }
+  | { type: "dingtalk.status"; payload: { botName: string; status: DingTalkConnectionStatus; error?: string } };
 
 /**
  * 客户端 -> 服务端事件
@@ -69,8 +78,12 @@ export type ClientEvent =
   | { type: "session.history"; payload: { sessionId: string } }
   | { type: "permission.response"; payload: { sessionId: string; toolUseId: string; result: PermissionResult } }
   | { type: "api.fetchModelList"; payload: { apiKey: string; baseURL: string; apiType?: string } }
-  | { type: "api.fetchModelLimits"; payload: { apiKey: string; baseURL: string; model: string; apiType?: string } };
+  | { type: "api.fetchModelLimits"; payload: { apiKey: string; baseURL: string; model: string; apiType?: string } }
+  | { type: "dingtalk.connect"; payload: { botName: string } }
+  | { type: "dingtalk.disconnect"; payload: { botName: string } };
 
 // ==================== 重新导出 SDK 类型 ====================
 
 export type { SDKMessage, PermissionResult };
+export type { DingTalkConfig, DingTalkConnectionStatus, DingTalkInboundMessage, DingTalkSessionMeta, DingTalkBotSummary, AICardInstance, AICardStatus } from "./dingtalk.js";
+export { DEFAULT_DINGTALK_CONFIG } from "./dingtalk.js";

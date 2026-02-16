@@ -212,7 +212,7 @@ const ToolResult = ({ messageContent }: { messageContent: ToolResultContent }) =
   );
 };
 
-const AssistantBlockCard = ({ title, text, showIndicator = false }: { title: string; text: string; showIndicator?: boolean }) => (
+const AssistantBlockCard = ({ text }: { title: string; text: string; showIndicator?: boolean }) => (
   <div className="flex flex-col mt-4">
     <MDRenderer text={text} />
   </div>

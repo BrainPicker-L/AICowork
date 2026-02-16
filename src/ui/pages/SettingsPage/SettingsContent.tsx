@@ -13,6 +13,7 @@ import { McpSection } from './sections/McpSection';
 import { MemorySection } from './sections/MemorySection';
 import { SkillsSection } from './sections/SkillsSection';
 import { JarvisSection } from './sections/JarvisSection';
+import { DingTalkSection } from './sections/DingTalkSection';
 
 interface SettingsContentProps {
   className?: string;
@@ -58,6 +59,8 @@ export function SettingsContent({ className }: SettingsContentProps) {
         return <SkillsSection />;
       case 'jarvis':
         return <JarvisSection />;
+      case 'dingtalk':
+        return <DingTalkSection />;
       default:
         return (
           <PlaceholderSection

@@ -4,6 +4,9 @@ import type { ServerEvent, ClientEvent } from "../types";
 export function useIPC(onEvent: (event: ServerEvent) => void) {
   const [connected, setConnected] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  // 使用 ref 保持最新的回调引用，避免 IPC 监听器随 onEvent 重建而反复取消/订阅
+  const onEventRef = useRef(onEvent);
+  onEventRef.current = onEvent;
 
   useEffect(() => {
     // 安全检查：确保 window.electron 已加载
@@ -15,9 +18,9 @@ export function useIPC(onEvent: (event: ServerEvent) => void) {
       return () => clearTimeout(timer);
     }
 
-    // Subscribe to server events
+    // 只订阅一次，通过 ref 间接调用始终拿到最新的 onEvent
     const unsubscribe = window.electron.onServerEvent((event: ServerEvent) => {
-      onEvent(event);
+      onEventRef.current(event);
     });
     
     unsubscribeRef.current = unsubscribe;
@@ -30,7 +33,7 @@ export function useIPC(onEvent: (event: ServerEvent) => void) {
       }
       setConnected(false);
     };
-  }, [onEvent]);
+  }, []); // 不再依赖 onEvent，只在挂载/卸载时订阅/取消
 
   const sendEvent = useCallback((event: ClientEvent) => {
     if (!window.electron) {
