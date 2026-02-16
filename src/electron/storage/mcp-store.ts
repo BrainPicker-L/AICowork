@@ -18,7 +18,7 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
  * 在打包后的 Electron 应用中，需要手动添加常见的用户工具路径
  * 解决 spawn ENOENT 问题
  */
-function getEnhancedPath(): string {
+export function getEnhancedPath(): string {
   const home = homedir();
   const existingPath = process.env.PATH || '';
   const additionalPaths: string[] = [];

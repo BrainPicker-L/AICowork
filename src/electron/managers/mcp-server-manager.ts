@@ -13,7 +13,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import { log } from "../logger.js";
-import { loadMcpServers, type McpServerConfig } from "../storage/mcp-store.js";
+import { loadMcpServers, getEnhancedPath, type McpServerConfig } from "../storage/mcp-store.js";
 import { getMemoryDirPath } from "../storage/memory-store.js";
 
 const _dir = path.dirname(fileURLToPath(import.meta.url));
@@ -43,6 +43,16 @@ export async function getMcpServers(): Promise<Record<string, McpServerConfig>> 
       // 同时移除其他不需要的字段
       const { type, name: _, disabled, ...cleanConfig } = config as any;
       
+      // 对 stdio 类型的 MCP 服务器（有 command 字段），注入增强的 PATH
+      // 解决打包后 Electron 应用 PATH 受限，找不到用户安装的命令（如 utoo-proxy）的问题
+      if (cleanConfig.command) {
+        cleanConfig.env = {
+          ...process.env,
+          PATH: getEnhancedPath(),
+          ...(cleanConfig.env || {}),
+        };
+      }
+
       servers[name] = cleanConfig;
       enabledCount++;
     }
@@ -59,7 +69,7 @@ export async function getMcpServers(): Promise<Record<string, McpServerConfig>> 
     servers["aicowork-memory"] = {
       command: "node",
       args: [memoryServerPath, "--db", memoryDir],
-      env: { ...process.env, MEMORY_DB_PATH: memoryDir },
+      env: { ...process.env, PATH: getEnhancedPath(), MEMORY_DB_PATH: memoryDir },
       enabled: true,
       displayName: "AICowork 记忆",
       description: "设置中管理的记忆，对话中可检索与存储",

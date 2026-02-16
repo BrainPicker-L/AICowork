@@ -142,6 +142,21 @@ import {
 } from "../storage/theme-store.js";
 import type { ThemePreference } from "../storage/theme-store.js";
 
+// 导入钉钉存储和服务函数
+import {
+  loadDingTalkBots,
+  loadDingTalkBot,
+  saveDingTalkBot,
+  deleteDingTalkBot,
+  getDingTalkBotList,
+  validateDingTalkConfig,
+} from "../storage/dingtalk-store.js";
+import {
+  getDingTalkStatus,
+  getAllDingTalkStatuses,
+  testDingTalkConnection,
+} from "../services/dingtalk-service.js";
+
 // 导入 API 适配器工具函数
 import {
   getAnthropicFormatUrl,
@@ -728,6 +743,46 @@ function registerThemeHandlers(): void {
     });
 }
 
+// ==================== 钉钉处理器 ====================
+
+/**
+ * 注册钉钉相关 IPC 处理器（多机器人）
+ */
+function registerDingTalkHandlers(): void {
+    ipcMain.handle("get-dingtalk-bot-list", async () => {
+        return await getDingTalkBotList();
+    });
+
+    ipcMain.handle("get-dingtalk-bot", async (_: unknown, name: string) => {
+        return await loadDingTalkBot(name);
+    });
+
+    ipcMain.handle("save-dingtalk-bot", wrapIpcHandler("save-dingtalk-bot", async (_: unknown, name: string, config: any) => {
+        await saveDingTalkBot(name, config);
+        return { success: true };
+    }));
+
+    ipcMain.handle("delete-dingtalk-bot", wrapIpcHandler("delete-dingtalk-bot", async (_: unknown, name: string) => {
+        await deleteDingTalkBot(name);
+        return { success: true };
+    }));
+
+    ipcMain.handle("validate-dingtalk-config", (_: unknown, config: any) => {
+        return validateDingTalkConfig(config);
+    });
+
+    ipcMain.handle("test-dingtalk-connection", wrapIpcHandler("test-dingtalk-connection", async (_: unknown, config: any) => {
+        return await testDingTalkConnection(config);
+    }));
+
+    ipcMain.handle("get-dingtalk-status", (_: unknown, name?: string) => {
+        if (name) {
+            return getDingTalkStatus(name);
+        }
+        return getAllDingTalkStatuses();
+    });
+}
+
 // ==================== 主注册函数 ====================
 
 /**
@@ -748,6 +803,7 @@ export function registerIpcHandlers(): void {
     registerMemoryHandlers();
     registerJarvisHandlers();
     registerThemeHandlers();
+    registerDingTalkHandlers();
 
     // 启动资源轮询
     const mainWindow = getMainWindow();
