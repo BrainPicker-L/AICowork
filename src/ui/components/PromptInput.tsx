@@ -43,6 +43,7 @@ export function usePromptActions(sendEvent: (event: ClientEvent) => void) {
 
   const activeSession = activeSessionId ? sessions[activeSessionId] : undefined;
   const isRunning = activeSession?.status === "running";
+  const isDingTalkSession = activeSession?.source === "dingtalk";
 
   /**
    * 发送消息
@@ -50,16 +51,12 @@ export function usePromptActions(sendEvent: (event: ClientEvent) => void) {
   const handleSend = useCallback(async () => {
     if (!prompt.trim()) return;
 
-    // ✅ 添加调试日志
-    console.log('=== [PromptInput] handleSend called ===');
-    console.log('[PromptInput] activeSessionId:', activeSessionId);
-    console.log('[PromptInput] activeSession:', activeSession);
-    console.log('[PromptInput] sessions:', sessions);
-    console.log('[PromptInput] prompt:', prompt);
+    // 钉钉会话由钉钉服务管理，禁止通过 UI 发送（避免创建重复 runner 导致串台）
+    if (isDingTalkSession) {
+      return;
+    }
 
     if (!activeSessionId) {
-      console.log('[PromptInput] ❌ No activeSessionId - Creating new session');
-      
       // 安全检查：确保 window.electron 已加载
       if (!window.electron) {
         log.error("window.electron is not available");
@@ -71,7 +68,6 @@ export function usePromptActions(sendEvent: (event: ClientEvent) => void) {
       try {
         setPendingStart(true);
         title = await window.electron.generateSessionTitle(prompt);
-        console.log('[PromptInput] Generated title:', title);
       } catch (error) {
         log.error("Failed to generate session title", error);
         setPendingStart(false);
@@ -79,21 +75,16 @@ export function usePromptActions(sendEvent: (event: ClientEvent) => void) {
         return;
       }
       
-      console.log('[PromptInput] Sending session.start event');
       sendEvent({
         type: "session.start",
         payload: { title, prompt, cwd: cwd.trim() || undefined, allowedTools: DEFAULT_ALLOWED_TOOLS }
       });
     } else {
-      console.log('[PromptInput] ✅ Has activeSessionId - Continuing session:', activeSessionId);
-      
       if (activeSession?.status === "running") {
-        console.log('[PromptInput] ⚠️ Session is still running');
         setGlobalError(t("errors.sessionStillRunning"));
         return;
       }
       
-      console.log('[PromptInput] Sending session.continue event');
       // 继续会话时，传递当前的工作目录（可能已经被用户修改）
       sendEvent({ 
         type: "session.continue", 
@@ -156,7 +147,7 @@ export function usePromptActions(sendEvent: (event: ClientEvent) => void) {
     setPrompt("");
   }, [cwd, prompt, sendEvent, setGlobalError, setPendingStart, setPrompt, t]);
 
-  return { prompt, setPrompt, isRunning, handleSend, handleStop, handleStartFromModal };
+  return { prompt, setPrompt, isRunning, isDingTalkSession, handleSend, handleStop, handleStartFromModal };
 }
 
 /**
@@ -165,7 +156,7 @@ export function usePromptActions(sendEvent: (event: ClientEvent) => void) {
    */
 export function PromptInput({ sendEvent, onSendMessage, disabled = false }: PromptInputProps) {
   const { t } = useTranslation();
-  const { prompt, setPrompt, isRunning, handleSend, handleStop } = usePromptActions(sendEvent);
+  const { prompt, setPrompt, isRunning, isDingTalkSession, handleSend, handleStop } = usePromptActions(sendEvent);
   const promptRef = useRef<HTMLTextAreaElement | null>(null);
 
   // 直接检查是否有活跃会话，更可靠的方式
@@ -299,7 +290,6 @@ export function PromptInput({ sendEvent, onSendMessage, disabled = false }: Prom
 
   // 处理输入框点击事件 - 当没有活跃会话时，打开启动会话模态框
   const handleEmptySessionClick = () => {
-    console.log("🚀 ~ handleEmptySessionClick ~ hasActiveSession:", hasActiveSession)
     if (!hasActiveSession) {
       useAppStore.getState().setShowStartModal(true);
     }
@@ -314,16 +304,22 @@ export function PromptInput({ sendEvent, onSendMessage, disabled = false }: Prom
         >
           {/* 第一行：文本输入框 */}
           <div className="w-full">
-            <textarea
-              rows={1}
-              className="w-full resize-none bg-transparent py-1.5 text-sm text-ink-800 placeholder:text-muted focus:outline-none disabled:opacity-60 cursor-pointer"
-              placeholder={disabled ? t("promptInput.placeholderDisabled") : t("promptInput.placeholder")}
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onInput={handleInput}
-              ref={promptRef}
-            />
+            {isDingTalkSession ? (
+              <div className="py-1.5 text-sm text-muted italic">
+                {t("promptInput.dingTalkReadOnly", "钉钉会话仅供查看，消息由钉钉端发送")}
+              </div>
+            ) : (
+              <textarea
+                rows={1}
+                className="w-full resize-none bg-transparent py-1.5 text-sm text-ink-800 placeholder:text-muted focus:outline-none disabled:opacity-60 cursor-pointer"
+                placeholder={disabled ? t("promptInput.placeholderDisabled") : t("promptInput.placeholder")}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onInput={handleInput}
+                ref={promptRef}
+              />
+            )}
           </div>
 
           {/* 第二行：工作目录（左）+ 模型选择和发送按钮（右） */}
@@ -389,8 +385,9 @@ export function PromptInput({ sendEvent, onSendMessage, disabled = false }: Prom
                     e.stopPropagation();
                     handleButtonClick();
                   }}
+                  disabled={isDingTalkSession && !isRunning}
                   aria-label={isRunning ? t("promptInput.stopSession") : t("promptInput.sendPrompt")}
-                  title={isRunning ? t("promptInput.stopSession") : "⌘ + Enter"}
+                  title={isDingTalkSession ? t("promptInput.dingTalkReadOnly", "钉钉会话仅供查看") : isRunning ? t("promptInput.stopSession") : "⌘ + Enter"}
                 >
                   {isRunning ? (
                     <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">

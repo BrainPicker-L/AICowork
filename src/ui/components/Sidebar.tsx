@@ -150,7 +150,12 @@ export function Sidebar({
             <div className="flex items-center justify-between gap-2">
               <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
                 <div className="flex items-center gap-1.5">
-                  <div className={`text-[12px] font-semibold ${session.status === "running" ? "text-info" : session.status === "completed" ? "text-success" : session.status === "error" ? "text-error" : "text-ink-800"}`}>
+                  {session.source === 'dingtalk' && (
+                    <span className="inline-flex items-center rounded-md bg-blue-50 px-1 py-0.5 text-[9px] font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-500/10 dark:text-blue-400 dark:ring-blue-400/20 flex-shrink-0">
+                      DingTalk
+                    </span>
+                  )}
+                  <div className={`text-[12px] font-semibold truncate ${session.status === "running" ? "text-info" : session.status === "completed" ? "text-success" : session.status === "error" ? "text-error" : "text-ink-800"}`}>
                     {session.title}
                   </div>
                 </div>

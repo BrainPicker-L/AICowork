@@ -43,3 +43,6 @@ out
 
 # opensrc - source code for packages
 opensrc/
+
+# Test scripts
+test-dingtalk.mjs

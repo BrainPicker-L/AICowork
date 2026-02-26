@@ -9,6 +9,8 @@ import { setupLifecycleEventHandlers } from "./main/lifecycle.js";
 import { createMainWindow } from "./main/window-manager.js";
 import { registerIpcHandlers } from "./main/ipc-registry.js";
 import "./services/claude-settings.js";
+import { autoConnectDingTalk } from "./services/dingtalk-service.js";
+import { getEmit } from "./ipc-handlers.js";
 
 // 导入应用服务初始化器
 import { initializeAppServices } from "./main/app-initializer.js";
@@ -93,6 +95,11 @@ app.on("ready", async () => {
 
     // 8. 注册所有 IPC 处理器
     registerIpcHandlers();
+
+    // 9. 钉钉机器人自动连接（如果已配置且启用）
+    autoConnectDingTalk(getEmit()).catch((error) => {
+        log.error('[App] DingTalk auto-connect failed:', error);
+    });
 });
 
 /**

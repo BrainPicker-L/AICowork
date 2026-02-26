@@ -16,6 +16,8 @@ import {
 } from "./handlers/session-handlers.js";
 import { fetchModelList, fetchModelLimits } from './storage/config-store.js';
 import type { ApiConfig } from './storage/config-store.js';
+import { connectDingTalk, disconnectDingTalk } from './services/dingtalk-service.js';
+import { loadDingTalkBot } from './storage/dingtalk-store.js';
 
 let sessions: SessionStore;
 const runnerHandles = new Map<string, RunnerHandle>();
@@ -147,6 +149,30 @@ export function handleClientEvent(event: ClientEvent) {
         emit({ type: "api.modelLimits", payload: { limits: null, error: error instanceof Error ? error.message : String(error) } });
       }
     },
+    "dingtalk.connect": async () => {
+      const payload = (event as Extract<ClientEvent, { type: "dingtalk.connect" }>).payload;
+      const botName = payload.botName;
+      try {
+        const config = await loadDingTalkBot(botName);
+        if (!config) {
+          emit({ type: "dingtalk.status", payload: { botName, status: "failed", error: `Bot '${botName}' not found` } });
+          return;
+        }
+        await connectDingTalk(botName, config, emit);
+      } catch (error) {
+        log.error(`[IPC] 钉钉连接失败 (${botName}):`, error);
+        emit({ type: "dingtalk.status", payload: { botName, status: "failed", error: error instanceof Error ? error.message : String(error) } });
+      }
+    },
+    "dingtalk.disconnect": async () => {
+      const payload = (event as Extract<ClientEvent, { type: "dingtalk.disconnect" }>).payload;
+      const botName = payload.botName;
+      try {
+        await disconnectDingTalk(botName, emit);
+      } catch (error) {
+        log.error(`[IPC] 钉钉断开失败 (${botName}):`, error);
+      }
+    },
   } as const;
 
   // 获取并执行对应的事件处理器
@@ -203,6 +229,15 @@ export function registerLanguageHandlers(): void {
   });
 
   log.info('[IPC] Language preference handlers registered');
+}
+
+/**
+ * 获取 emit 函数（供外部模块使用）
+ * 确保 sessions 已初始化
+ */
+export function getEmit(): (event: ServerEvent) => void {
+  initializeSessions();
+  return emit;
 }
 
 export { sessions };

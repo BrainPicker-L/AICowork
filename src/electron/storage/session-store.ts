@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import type { SessionStatus, StreamMessage } from "../types.js";
+import type { SessionStatus, SessionSource, StreamMessage, DingTalkSessionMeta } from "../types.js";
 
 export type PendingPermission = {
   toolUseId: string;
@@ -16,6 +16,8 @@ export type Session = {
   cwd?: string;
   allowedTools?: string;
   lastPrompt?: string;
+  source?: SessionSource;
+  dingtalkMeta?: DingTalkSessionMeta;
   pendingPermissions: Map<string, PendingPermission>;
   abortController?: AbortController;
 };
@@ -28,6 +30,8 @@ export type StoredSession = {
   allowedTools?: string;
   lastPrompt?: string;
   claudeSessionId?: string;
+  source?: SessionSource;
+  dingtalkMeta?: DingTalkSessionMeta;
   createdAt: number;
   updatedAt: number;
 };
@@ -47,7 +51,7 @@ export class SessionStore {
     this.loadSessions();
   }
 
-  createSession(options: { cwd?: string; allowedTools?: string; prompt?: string; title: string }): Session {
+  createSession(options: { cwd?: string; allowedTools?: string; prompt?: string; title: string; source?: SessionSource; dingtalkMeta?: DingTalkSessionMeta }): Session {
     const id = crypto.randomUUID();
     const now = Date.now();
     const session: Session = {
@@ -57,14 +61,16 @@ export class SessionStore {
       cwd: options.cwd,
       allowedTools: options.allowedTools,
       lastPrompt: options.prompt,
+      source: options.source,
+      dingtalkMeta: options.dingtalkMeta,
       pendingPermissions: new Map()
     };
     this.sessions.set(id, session);
     this.db
       .prepare(
         `insert into sessions
-          (id, title, claude_session_id, status, cwd, allowed_tools, last_prompt, created_at, updated_at)
-         values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          (id, title, claude_session_id, status, cwd, allowed_tools, last_prompt, source, dingtalk_meta, created_at, updated_at)
+         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         id,
@@ -74,6 +80,8 @@ export class SessionStore {
         session.cwd ?? null,
         session.allowedTools ?? null,
         session.lastPrompt ?? null,
+        session.source ?? null,
+        session.dingtalkMeta ? JSON.stringify(session.dingtalkMeta) : null,
         now,
         now
       );
@@ -87,7 +95,7 @@ export class SessionStore {
   listSessions(): StoredSession[] {
     const rows = this.db
       .prepare(
-        `select id, title, claude_session_id, status, cwd, allowed_tools, last_prompt, created_at, updated_at
+        `select id, title, claude_session_id, status, cwd, allowed_tools, last_prompt, source, dingtalk_meta, created_at, updated_at
          from sessions
          order by updated_at desc`
       )
@@ -100,6 +108,8 @@ export class SessionStore {
       allowedTools: row.allowed_tools ? String(row.allowed_tools) : undefined,
       lastPrompt: row.last_prompt ? String(row.last_prompt) : undefined,
       claudeSessionId: row.claude_session_id ? String(row.claude_session_id) : undefined,
+      source: row.source ? String(row.source) as SessionSource : undefined,
+      dingtalkMeta: row.dingtalk_meta ? JSON.parse(String(row.dingtalk_meta)) : undefined,
       createdAt: Number(row.created_at),
       updatedAt: Number(row.updated_at)
     }));
@@ -122,7 +132,7 @@ export class SessionStore {
   getSessionHistory(id: string): SessionHistory | null {
     const sessionRow = this.db
       .prepare(
-        `select id, title, claude_session_id, status, cwd, allowed_tools, last_prompt, created_at, updated_at
+        `select id, title, claude_session_id, status, cwd, allowed_tools, last_prompt, source, dingtalk_meta, created_at, updated_at
          from sessions
          where id = ?`
       )
@@ -145,6 +155,8 @@ export class SessionStore {
         allowedTools: sessionRow.allowed_tools ? String(sessionRow.allowed_tools) : undefined,
         lastPrompt: sessionRow.last_prompt ? String(sessionRow.last_prompt) : undefined,
         claudeSessionId: sessionRow.claude_session_id ? String(sessionRow.claude_session_id) : undefined,
+        source: sessionRow.source ? String(sessionRow.source) as SessionSource : undefined,
+        dingtalkMeta: sessionRow.dingtalk_meta ? JSON.parse(String(sessionRow.dingtalk_meta)) : undefined,
         createdAt: Number(sessionRow.created_at),
         updatedAt: Number(sessionRow.updated_at)
       },
@@ -266,12 +278,24 @@ export class SessionStore {
       )`
     );
     this.db.exec(`create index if not exists messages_session_id on messages(session_id)`);
+
+    // Migration: add source and dingtalk_meta columns
+    try {
+      this.db.exec(`alter table sessions add column source text`);
+    } catch {
+      // Column already exists
+    }
+    try {
+      this.db.exec(`alter table sessions add column dingtalk_meta text`);
+    } catch {
+      // Column already exists
+    }
   }
 
   private loadSessions(): void {
     const rows = this.db
       .prepare(
-        `select id, title, claude_session_id, status, cwd, allowed_tools, last_prompt
+        `select id, title, claude_session_id, status, cwd, allowed_tools, last_prompt, source, dingtalk_meta
          from sessions`
       )
       .all();
@@ -284,10 +308,58 @@ export class SessionStore {
         cwd: row.cwd ? String(row.cwd) : undefined,
         allowedTools: row.allowed_tools ? String(row.allowed_tools) : undefined,
         lastPrompt: row.last_prompt ? String(row.last_prompt) : undefined,
+        source: row.source ? String(row.source) as SessionSource : undefined,
+        dingtalkMeta: row.dingtalk_meta ? JSON.parse(String(row.dingtalk_meta)) : undefined,
         pendingPermissions: new Map()
       };
       this.sessions.set(session.id, session);
     }
+  }
+
+  /**
+   * 按钉钉元数据查找已有 session
+   * 用于在 peerSessionMap 内存缓存丢失后（如应用重启）从 DB 恢复映射
+   *
+   * @param botName 机器人名称
+   * @param peerId  senderId（私聊）或 conversationId（群聊）
+   * @returns 最近一条匹配的 session，若无则返回 undefined
+   */
+  findDingTalkSession(botName: string, peerId: string): Session | undefined {
+    const rows = this.db
+      .prepare(
+        `select id, dingtalk_meta
+         from sessions
+         where source = 'dingtalk' and dingtalk_meta is not null
+         order by updated_at desc
+         limit 100`
+      )
+      .all() as Array<Record<string, unknown>>;
+
+    for (const row of rows) {
+      try {
+        const meta: DingTalkSessionMeta = JSON.parse(String(row.dingtalk_meta));
+        if (meta.botName !== botName) continue;
+        if (meta.senderId === peerId || meta.conversationId === peerId) {
+          const sessionId = String(row.id);
+          return this.sessions.get(sessionId);
+        }
+      } catch {
+        // 跳过无法解析的行
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * 更新 session 的 dingtalkMeta（动态字段如 sessionWebhook 可能随消息变化）
+   */
+  updateDingtalkMeta(id: string, meta: DingTalkSessionMeta): void {
+    const session = this.sessions.get(id);
+    if (!session) return;
+    session.dingtalkMeta = meta;
+    this.db
+      .prepare(`update sessions set dingtalk_meta = ?, updated_at = ? where id = ?`)
+      .run(JSON.stringify(meta), Date.now(), id);
   }
 
   close(): void {

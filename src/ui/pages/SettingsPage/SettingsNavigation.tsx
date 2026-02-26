@@ -5,6 +5,7 @@
 import { useTranslation } from 'react-i18next';
 import {
   MessageSquare,
+  MessageCircle,
   Info,
   Key,
   Plug,
@@ -38,6 +39,7 @@ const SETTINGS_SECTIONS: SectionDef[] = [
 
   // 连接与模型
   { id: 'api', icon: Key, group: 'connection' },
+  { id: 'dingtalk', icon: MessageCircle, group: 'connection' },
 
   // 工具与扩展
   { id: 'mcp', icon: Plug, group: 'tools' },

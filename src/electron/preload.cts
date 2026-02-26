@@ -232,7 +232,22 @@ electron.contextBridge.exposeInMainWorld("electron", {
     getTheme: () =>
         invoke("get-theme"),
     setTheme: (theme: string) =>
-        invoke("set-theme", theme)
+        invoke("set-theme", theme),
+    // DingTalk 操作（多机器人）
+    getDingTalkBotList: () =>
+        invoke("get-dingtalk-bot-list"),
+    getDingTalkBot: (name: string) =>
+        invoke("get-dingtalk-bot", name),
+    saveDingTalkBot: (name: string, config: any) =>
+        invoke("save-dingtalk-bot", name, config),
+    deleteDingTalkBot: (name: string) =>
+        invoke("delete-dingtalk-bot", name),
+    validateDingTalkConfig: (config: any) =>
+        invoke("validate-dingtalk-config", config),
+    testDingTalkConnection: (config: any) =>
+        invoke("test-dingtalk-connection", config),
+    getDingTalkStatus: (name?: string) =>
+        invoke("get-dingtalk-status", name)
 })
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(key: Key, ...args: any[]): Promise<EventPayloadMapping[Key]> {

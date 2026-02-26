@@ -122,6 +122,8 @@ function App() {
   // Handle partial messages from stream events
   const handlePartialMessages = useCallback((partialEvent: ServerEvent) => {
     if (partialEvent.type !== "stream.message" || partialEvent.payload.message.type !== "stream_event") return;
+    // 仅处理当前活跃会话的流式事件，避免后台会话（如钉钉）的响应干扰当前界面
+    if (partialEvent.payload.sessionId !== activeSessionId) return;
 
     const message = partialEvent.payload.message as any;
     if (message.event.type === "content_block_start") {
@@ -165,7 +167,7 @@ function App() {
         setPartialMessage(partialMessageRef.current);
       }, PARTIAL_MESSAGE_CLEAR_DELAY);
     }
-  }, [shouldAutoScroll]);
+  }, [shouldAutoScroll, activeSessionId]);
 
   // Combined event handler
   const onEvent = useCallback((event: ServerEvent) => {
@@ -299,8 +301,13 @@ function App() {
     }
   }, [visibleMessages, isLoadingHistory]);
 
-  // Reset scroll state on session change
+  // Reset scroll state and partial message on session change
   useEffect(() => {
+    // 切换会话时立即清空上一个会话的流式残留，避免内容串台
+    partialMessageRef.current = "";
+    setPartialMessage("");
+    setShowPartialMessage(false);
+
     setShouldAutoScroll(true);
     setHasNewMessages(false);
     prevMessagesLengthRef.current = 0;
