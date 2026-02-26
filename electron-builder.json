@@ -1,6 +1,6 @@
 {
-    "appId": "com.devagentforge.aicowork",
-    "productName": "AICowork",
+    "appId": "com.devagentforge.dtazzicowork",
+    "productName": "DtazziCowork",
     "compression": "maximum",
     "files": [
         "package.json",

@@ -74,7 +74,7 @@ export function getAppName(): string {
   if (app && app.getName) {
     return app.getName();
   }
-  return 'AICowork';
+  return 'DtazziCowork';
 }
 
 /** 获取系统信息 */

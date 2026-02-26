@@ -66,7 +66,7 @@ export default {
 		subtitle: "ヘルプとドキュメントを取得",
 		quickStart: {
 			title: "クイックスタート",
-			description: "AICowork を使用して最初のタスクを開始する方法を学ぶ",
+			description: "DtazziCowork を使用して最初のタスクを開始する方法を学ぶ",
 		},
 		faq: {
 			title: "よくある質問",
@@ -87,14 +87,14 @@ export default {
 			title: "バグ報告",
 			description: "GitHub で問題を報告する",
 			link: "GitHub へ移動",
-			url: "https://github.com/BrainPicker-L/AICowork",
+			url: "https://github.com/BrainPicker-L/DtazziCowork",
 		},
 		thankYou: "フィードバックありがとうございます！すべてのフィードバックを真摯に確認いたします。",
 	},
 
 	about: {
-		title: "AICowork について",
-		subtitle: "AI 協業ワークベンチ——AICowork！",
+		title: "DtazziCowork について",
+		subtitle: "AI 協業ワークベンチ——DtazziCowork！",
 		version: {
 			title: "バージョン情報",
 			description: "バージョン 1.0.0",
@@ -111,7 +111,7 @@ export default {
 			title: "ライセンス",
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
-		tagline: "AICowork は AI をあなたの作業パートナーにします。",
+		tagline: "DtazziCowork は AI をあなたの作業パートナーにします。",
 	},
 
 	language: {
@@ -506,7 +506,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "まだメッセージがありません",
-		startConversation: "AICowork との会話を開始",
+		startConversation: "DtazziCowork との会話を開始",
 		beginningOfConversation: "会話の始まり",
 		loadingMessages: "読み込み中...",
 		newMessages: "新しいメッセージ",

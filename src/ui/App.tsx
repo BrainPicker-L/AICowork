@@ -404,7 +404,7 @@ function App() {
           className="flex items-center justify-between gap-2 h-12 border-b border-ink-900/10 bg-surface-cream select-none relative z-10 px-4"
           style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
         >
-          <span className="text-sm font-medium text-ink-700 flex-1 text-center">{activeSession?.title || "AICowork"}</span>
+          <span className="text-sm font-medium text-ink-700 flex-1 text-center">{activeSession?.title || "DtazziCowork"}</span>
           <button
             onClick={() => setCurrentPage('settings')}
             className="p-2 rounded-lg hover:bg-surface-tertiary transition-colors"

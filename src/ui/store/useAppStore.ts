@@ -349,7 +349,7 @@ export const useAppStore = create<AppState>()(
       }
     }),
     {
-      name: 'aicowork-app-storage',
+      name: 'dtazzicowork-app-storage',
       partialize: (state) => ({
         activeSessionId: state.activeSessionId,
         cwd: state.cwd,

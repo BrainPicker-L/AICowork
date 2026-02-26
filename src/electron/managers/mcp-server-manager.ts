@@ -7,7 +7,7 @@
  *
  * 只负责配置读取，实例管理由 SDK 处理
  * 用户的增删改查操作在 mcp-store.ts 中
- * 内置记忆 MCP（aicowork-memory）自动注入，供对话中 memory_recall / memory_store / memory_forget
+ * 内置记忆 MCP（dtazzicowork-memory）自动注入，供对话中 memory_recall / memory_store / memory_forget
  */
 
 import path from "path";
@@ -21,7 +21,7 @@ const _dir = path.dirname(fileURLToPath(import.meta.url));
 /**
  * 获取 MCP 服务器配置
  * 在传递给 SDK 前，移除 type 字段让 SDK 自动识别
- * 自动注入内置记忆 MCP（aicowork-memory），使对话中可检索/存储设置里的记忆
+ * 自动注入内置记忆 MCP（dtazzicowork-memory），使对话中可检索/存储设置里的记忆
  */
 export async function getMcpServers(): Promise<Record<string, McpServerConfig>> {
   const servers: Record<string, McpServerConfig> = {};
@@ -66,15 +66,15 @@ export async function getMcpServers(): Promise<Record<string, McpServerConfig>> 
   try {
     const memoryDir = getMemoryDirPath();
     const memoryServerPath = path.join(_dir, "..", "mcp-servers", "memory", "index.js");
-    servers["aicowork-memory"] = {
+    servers["dtazzicowork-memory"] = {
       command: "node",
       args: [memoryServerPath, "--db", memoryDir],
       env: { ...process.env, PATH: getEnhancedPath(), MEMORY_DB_PATH: memoryDir },
       enabled: true,
-      displayName: "AICowork 记忆",
+      displayName: "DtazziCowork 记忆",
       description: "设置中管理的记忆，对话中可检索与存储",
     };
-    log.info("[MCP Config] Built-in memory MCP (aicowork-memory) injected");
+    log.info("[MCP Config] Built-in memory MCP (dtazzicowork-memory) injected");
   } catch (err) {
     log.warn("[MCP Config] Failed to inject built-in memory MCP:", err);
   }

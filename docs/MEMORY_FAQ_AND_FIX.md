@@ -17,7 +17,7 @@
 - **实现内置记忆 MCP 并注入到会话**  
   - 在应用内实现一个小型 MCP Server（stdio），暴露工具：`memory_recall`（按 query/kindId 等从 memory-store 查）、`memory_store`、`memory_forget`。  
   - 数据读写仍用现有 memory-store（同一 userData 路径）。  
-  - 在 `mcp-server-manager`（或 Runner）里，把该 MCP 作为固定的一项（例如 `aicowork-memory`）合并进 `getMcpServers()` 的返回值，这样每次会话都会带上，模型就能在对话中调用 `memory_recall` 等，从而检索到你接入的工号等记忆。
+  - 在 `mcp-server-manager`（或 Runner）里，把该 MCP 作为固定的一项（例如 `dtazzicowork-memory`）合并进 `getMcpServers()` 的返回值，这样每次会话都会带上，模型就能在对话中调用 `memory_recall` 等，从而检索到你接入的工号等记忆。
 
 修复后：**检索逻辑 = 模型在对话中调用 memory_recall → 内置 MCP 调用 memory-store 的 searchMemoryEntries → 返回匹配条目给模型**。
 
@@ -56,5 +56,5 @@
 
 ## 实施状态（已完成）
 
-- **内置记忆 MCP**：已实现并注入。`getMcpServers()` 自动注入 `aicowork-memory`（node 子进程，stdio），暴露 `memory_recall` / `memory_store` / `memory_forget`，与设置页共用同一 memory 目录；对话中模型可调用 `memory_recall` 检索你存的工号等记忆。
+- **内置记忆 MCP**：已实现并注入。`getMcpServers()` 自动注入 `dtazzicowork-memory`（node 子进程，stdio），暴露 `memory_recall` / `memory_store` / `memory_forget`，与设置页共用同一 memory 目录；对话中模型可调用 `memory_recall` 检索你存的工号等记忆。
 - **摘要必填 + 检索优先**：已实现——摘要改为必填并作为“标题（检索索引）”，检索时优先匹配 summary，再 content/entities。

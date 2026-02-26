@@ -415,7 +415,7 @@ ${config.skills.map(name => `- ${name}`).join('\n')}
 
 ## 使用方法
 
-1. 在 AICowork 中打开设置
+1. 在 DtazziCowork 中打开设置
 2. 进入"贾维斯配置"页面
 3. 点击"导入配置"
 4. 选择此 .jarvis 文件
@@ -430,6 +430,6 @@ ${config.dependencies.npm.length > 0 ? config.dependencies.npm.map(pkg => `- ${p
 
 ---
 
-由 AICowork 导出
+由 DtazziCowork 导出
 `;
 }

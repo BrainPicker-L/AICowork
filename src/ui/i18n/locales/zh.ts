@@ -77,14 +77,14 @@ export default {
 			title: "Bug 报告",
 			description: "在 GitHub 上提交问题报告",
 			link: "前往 GitHub",
-			url: "https://github.com/BrainPicker-L/AICowork",
+			url: "https://github.com/BrainPicker-L/DtazziCowork",
 		},
 		thankYou: "感谢您的反馈！我们会认真阅读每一条反馈意见。",
 	},
 
 	about: {
-		title: "关于 AICowork",
-		subtitle: "AI 协作工作台——AICowork！",
+		title: "关于 DtazziCowork",
+		subtitle: "AI 协作工作台——DtazziCowork！",
 		version: {
 			title: "版本信息",
 			description: "版本 1.0.0",
@@ -101,7 +101,7 @@ export default {
 			title: "许可证",
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
-		tagline: "AICowork 让 AI 成为你的工作协作伙伴。",
+		tagline: "DtazziCowork 让 AI 成为你的工作协作伙伴。",
 	},
 
 	display: {
@@ -515,7 +515,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "暂无消息",
-		startConversation: "开始与 AICowork 对话",
+		startConversation: "开始与 DtazziCowork 对话",
 		beginningOfConversation: "对话开始",
 		loadingMessages: "加载中...",
 		newMessages: "新消息",

@@ -132,7 +132,7 @@ searchMemoryEntries(params: {
 ```ts
 const memoryServerPath = path.join(__dirname, 'mcp-servers', 'memory', 'index.js');
 const memoryStorePath = getMemoryStorePath(); // 与 memory-store 一致
-allMcpServers['aicowork-memory'] = {
+allMcpServers['dtazzicowork-memory'] = {
   command: process.execPath,
   args: [memoryServerPath, '--db', memoryStorePath],
   env: { MEMORY_DB_PATH: memoryStorePath },
@@ -140,7 +140,7 @@ allMcpServers['aicowork-memory'] = {
 };
 ```
 
-- 这样 `getMcpServers()` 返回的列表中包含 `aicowork-memory`，Runner 已有逻辑会把 `allMcpServers` 传给 SDK，无需改 SDK 调用方式。
+- 这样 `getMcpServers()` 返回的列表中包含 `dtazzicowork-memory`，Runner 已有逻辑会把 `allMcpServers` 传给 SDK，无需改 SDK 调用方式。
 
 **方式二：仅使用外部 Memory MCP**
 
@@ -190,7 +190,7 @@ preload 与 `electron.d.ts` 中为上述 API 增加类型与暴露，与现有 M
   - 支持编辑、软删（或硬删）。
 - **与 MCP 的关系**：说明「对话中 AI 会通过记忆 MCP 自动存储与回忆；此处可管理种类与预填内容」。
 
-可选：在「MCP」设置页增加提示——若启用内置记忆，会看到 `aicowork-memory`；或在该页提供「打开记忆设置」的快捷入口。
+可选：在「MCP」设置页增加提示——若启用内置记忆，会看到 `dtazzicowork-memory`；或在该页提供「打开记忆设置」的快捷入口。
 
 ### 4.3 状态与请求
 
@@ -226,7 +226,7 @@ preload 与 `electron.d.ts` 中为上述 API 增加类型与暴露，与现有 M
 2. **前端**  
    - 增加设置导航项与 `MemorySection`；实现种类 CRUD 与条目列表/增删改/搜索（调用 IPC）。
 3. **MCP**  
-   - 实现内置记忆 MCP（stdio，读同一 memory-store），在 runner 或 mcp-server-manager 中注入 `aicowork-memory`。
+   - 实现内置记忆 MCP（stdio，读同一 memory-store），在 runner 或 mcp-server-manager 中注入 `dtazzicowork-memory`。
 4. **打磨**  
    - 多语言、错误提示、空状态、可选「导出/导入」记忆数据。
 
@@ -241,6 +241,6 @@ preload 与 `electron.d.ts` 中为上述 API 增加类型与暴露，与现有 M
 | Claude Cowork / Desktop | 对话历史本地、部分产品带记忆 | 我们做「用户自定义种类 + 条目」，更结构化 |
 | claude-memory-mcp | FTS5、store/recall/forget、软删、token 预算 | 首版用 JSON + 简单筛选；后续可升级 SQLite+FTS5 |
 | @modelcontextprotocol/server-memory | 官方记忆 MCP | 工具命名与参数尽量兼容，便于用户切换或复用 |
-| 现有 AICowork | MCP 在 mcp-store + runner 传入 SDK；设置用 IPC | 记忆数据独立 store，MCP 注入方式与现有 MCP 一致 |
+| 现有 DtazziCowork | MCP 在 mcp-store + runner 传入 SDK；设置用 IPC | 记忆数据独立 store，MCP 注入方式与现有 MCP 一致 |
 
 以上为前后端整体设计方案，可直接作为开发任务拆解与实现的依据。

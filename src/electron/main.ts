@@ -1,5 +1,5 @@
 /**
- * AICowork Electron 应用主入口
+ * DtazziCowork Electron 应用主入口
  * 负责应用初始化和模块协调
  */
 

@@ -66,7 +66,7 @@ export default {
 		subtitle: "Получите помощь и документацию",
 		quickStart: {
 			title: "Быстрый старт",
-			description: "Узнайте, как использовать AICowork для выполнения первой задачи",
+			description: "Узнайте, как использовать DtazziCowork для выполнения первой задачи",
 		},
 		faq: {
 			title: "ЧЗВ",
@@ -87,14 +87,14 @@ export default {
 			title: "Сообщить об ошибке",
 			description: "Отправьте отчёты о проблемах на GitHub",
 			link: "Перейти на GitHub",
-			url: "https://github.com/BrainPicker-L/AICowork",
+			url: "https://github.com/BrainPicker-L/DtazziCowork",
 		},
 		thankYou: "Спасибо за вашу обратную связь! Мы внимательно рассмотрим каждый отзыв.",
 	},
 
 	about: {
-		title: "О программе AICowork",
-		subtitle: "Рабочее место для сотрудничества с ИИ - AICowork!",
+		title: "О программе DtazziCowork",
+		subtitle: "Рабочее место для сотрудничества с ИИ - DtazziCowork!",
 		version: {
 			title: "Версия",
 			description: "Версия 1.0.0",
@@ -111,7 +111,7 @@ export default {
 			title: "Лицензия",
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
-		tagline: "AICowork делает ИИ вашим партнером по совместной работе.",
+		tagline: "DtazziCowork делает ИИ вашим партнером по совместной работе.",
 	},
 
 	language: {
@@ -500,7 +500,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "Пока нет сообщений",
-		startConversation: "Начните разговор с AICowork",
+		startConversation: "Начните разговор с DtazziCowork",
 		beginningOfConversation: "Начало разговора",
 		loadingMessages: "Загрузка...",
 		newMessages: "Новые сообщения",

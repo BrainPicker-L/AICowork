@@ -1,4 +1,4 @@
-AICowork - AI 智能协作助手
+DtazziCowork - AI 智能协作助手
 Copyright (C) 2026 Alan
 
 This program is licensed under the GNU Affero General Public License v3.0 only.

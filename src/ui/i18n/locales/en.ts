@@ -78,14 +78,14 @@ export default {
 			title: "Bug Report",
 			description: "Submit issue reports on GitHub",
 			link: "Go to GitHub",
-			url: "https://github.com/BrainPicker-L/AICowork",
+			url: "https://github.com/BrainPicker-L/DtazziCowork",
 		},
 		thankYou: "Thank you for your feedback! We will carefully review every feedback.",
 	},
 
 	about: {
-		title: "About AICowork",
-		subtitle: "AI Collaboration Workbench - AICowork!",
+		title: "About DtazziCowork",
+		subtitle: "AI Collaboration Workbench - DtazziCowork!",
 		version: {
 			title: "Version",
 			description: "Version 1.0.0",
@@ -102,7 +102,7 @@ export default {
 			title: "License",
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
-		tagline: "AICowork makes AI your collaborative work partner.",
+		tagline: "DtazziCowork makes AI your collaborative work partner.",
 	},
 
 	display: {
@@ -513,7 +513,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "No messages yet",
-		startConversation: "Start a conversation with AICowork",
+		startConversation: "Start a conversation with DtazziCowork",
 		beginningOfConversation: "Beginning of conversation",
 		loadingMessages: "Loading...",
 		newMessages: "New messages",

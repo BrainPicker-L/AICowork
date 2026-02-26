@@ -66,7 +66,7 @@ export default {
 		subtitle: "Obtenir de l'aide et de la documentation",
 		quickStart: {
 			title: "Démarrage Rapide",
-			description: "Apprenez à utiliser AICowork pour démarrer votre première tâche",
+			description: "Apprenez à utiliser DtazziCowork pour démarrer votre première tâche",
 		},
 		faq: {
 			title: "FAQ",
@@ -87,14 +87,14 @@ export default {
 			title: "Rapport de Bug",
 			description: "Soumettre des rapports de problmes sur GitHub",
 			link: "Aller sur GitHub",
-			url: "https://github.com/BrainPicker-L/AICowork",
+			url: "https://github.com/BrainPicker-L/DtazziCowork",
 		},
 		thankYou: "Merci pour vos commentaires! Nous examinerons attentivement chaque commentaire.",
 	},
 
 	about: {
-		title: "À propos d'AICowork",
-		subtitle: "Espace de Travail Collaboratif IA - AICowork!",
+		title: "À propos d'DtazziCowork",
+		subtitle: "Espace de Travail Collaboratif IA - DtazziCowork!",
 		version: {
 			title: "Version",
 			description: "Version 1.0.0",
@@ -111,7 +111,7 @@ export default {
 			title: "Licence",
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
-		tagline: "AICowork fait de l'IA votre partenaire de travail collaboratif.",
+		tagline: "DtazziCowork fait de l'IA votre partenaire de travail collaboratif.",
 	},
 
 	language: {
@@ -496,7 +496,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "Aucun message pour le moment",
-		startConversation: "Commencer une conversation avec AICowork",
+		startConversation: "Commencer une conversation avec DtazziCowork",
 		beginningOfConversation: "Début de la conversation",
 		loadingMessages: "Chargement...",
 		newMessages: "Nouveaux messages",

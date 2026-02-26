@@ -71,7 +71,7 @@ export function writeEnvFile(envVars: Record<string, string>): void {
 
     // 构建 .env 文件内容
     const lines: string[] = [
-      '# AICowork API 配置',
+      '# DtazziCowork API 配置',
       '# 自动生成，请勿手动编辑',
       '',
     ];

@@ -9,7 +9,7 @@ export function FeedbackSection() {
 
   // 反馈链接配置
   const feedbackLinks = {
-    bugReport: 'https://github.com/BrainPicker-L/AICowork',
+    bugReport: 'https://github.com/BrainPicker-L/DtazziCowork',
   };
 
   // 统一使用浏览器打开链接

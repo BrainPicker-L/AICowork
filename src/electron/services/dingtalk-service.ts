@@ -874,7 +874,7 @@ async function sendMarkdownMessage(
   const title = text
     .split("\n")[0]
     .replace(/^[#*\s\->]+/, "")
-    .slice(0, 20) || "AICowork";
+    .slice(0, 20) || "DtazziCowork";
 
   const msgParam = hasMarkdown
     ? JSON.stringify({ title, text })

@@ -66,7 +66,7 @@ export default {
 		subtitle: "도움말 및 문서 가져오기",
 		quickStart: {
 			title: "빠른 시작",
-			description: "AICowork를 사용하여 첫 번째 작업을 시작하는 방법을 알아보세요",
+			description: "DtazziCowork를 사용하여 첫 번째 작업을 시작하는 방법을 알아보세요",
 		},
 		faq: {
 			title: "자주 묻는 질문",
@@ -87,14 +87,14 @@ export default {
 			title: "버그 보고",
 			description: "GitHub에서 문제 보고서 제출",
 			link: "GitHub로 이동",
-			url: "https://github.com/BrainPicker-L/AICowork",
+			url: "https://github.com/BrainPicker-L/DtazziCowork",
 		},
 		thankYou: "피드백 주셔서 감사합니다! 모든 피드백을 신중하게 검토하겠습니다.",
 	},
 
 	about: {
-		title: "AICowork 정보",
-		subtitle: "AI 협업 워크벤치——AICowork!",
+		title: "DtazziCowork 정보",
+		subtitle: "AI 협업 워크벤치——DtazziCowork!",
 		version: {
 			title: "버전 정보",
 			description: "버전 1.0.0",
@@ -111,7 +111,7 @@ export default {
 			title: "라이선스",
 			description: "GNU Affero General Public License v3.0 (AGPL-3.0)",
 		},
-		tagline: "AICowork는 AI를 귀하의 작업 파트너로 만들어줍니다.",
+		tagline: "DtazziCowork는 AI를 귀하의 작업 파트너로 만들어줍니다.",
 	},
 
 	language: {
@@ -506,7 +506,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "아직 메시지가 없습니다",
-		startConversation: "AICowork와 대화를 시작하세요",
+		startConversation: "DtazziCowork와 대화를 시작하세요",
 		beginningOfConversation: "대화의 시작",
 		loadingMessages: "로드 중...",
 		newMessages: "새 메시지",

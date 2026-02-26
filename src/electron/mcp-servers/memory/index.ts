@@ -17,7 +17,7 @@ const MEMORY_DB_PATH = process.env.MEMORY_DB_PATH || (() => {
 })();
 
 if (!MEMORY_DB_PATH) {
-  console.error('[aicowork-memory] MEMORY_DB_PATH env or --db <path> required');
+  console.error('[dtazzicowork-memory] MEMORY_DB_PATH env or --db <path> required');
   process.exit(1);
 }
 
@@ -67,7 +67,7 @@ function text(content: string) {
 }
 
 const mcpServer = new McpServer({
-  name: 'aicowork-memory',
+  name: 'dtazzicowork-memory',
   version: '1.0.0',
 });
 
@@ -161,6 +161,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('[aicowork-memory]', err);
+  console.error('[dtazzicowork-memory]', err);
   process.exit(1);
 });

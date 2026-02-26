@@ -68,14 +68,14 @@ export default {
 			title: "Bug 報告",
 			description: "在 GitHub 上提交問題報告",
 			link: "前往 GitHub",
-			url: "https://github.com/BrainPicker-L/AICowork",
+			url: "https://github.com/BrainPicker-L/DtazziCowork",
 		},
 		thankYou: "感謝您的反饋！我們會認真閱讀每一條反饋意見。",
 	},
 
 	about: {
-		title: "關於 AICowork",
-		subtitle: "AI 協作工作台——AICowork！",
+		title: "關於 DtazziCowork",
+		subtitle: "AI 協作工作台——DtazziCowork！",
 		version: { title: "版本信息", description: "版本 1.0.0" },
 		techStack: {
 			title: "技術棧",
@@ -86,7 +86,7 @@ export default {
 			claude: "• AI Agent SDK - AI 集成",
 		},
 		license: { title: "許可證", description: "GNU Affero General Public License v3.0 (AGPL-3.0)" },
-		tagline: "AICowork 讓 AI 成為你的工作協作夥伴。",
+		tagline: "DtazziCowork 讓 AI 成為你的工作協作夥伴。",
 	},
 
 	language: {
@@ -391,7 +391,7 @@ export default {
 	// App
 	app: {
 		noMessagesYet: "暫無訊息",
-		startConversation: "開始與 AICowork 對話",
+		startConversation: "開始與 DtazziCowork 對話",
 		beginningOfConversation: "對話開始",
 		loadingMessages: "載入中...",
 		newMessages: "新訊息",
