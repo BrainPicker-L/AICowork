@@ -9,6 +9,19 @@ export function getPreloadPath() {
     return path.join(basePath, 'dist-electron', 'electron', 'preload.cjs');
 }
 
+export function getFloatingPreloadPath() {
+    const basePath = isDev() ? process.cwd() : app.getAppPath();
+    return path.join(basePath, 'dist-electron', 'electron', 'preload-floating.cjs');
+}
+
+/** 悬浮窗页面 URL：开发用 dev server，生产用打包后的 html */
+export function getFloatingWindowUrl(devPort?: number): string {
+    if (isDev() && devPort) {
+        return `http://localhost:${devPort}/floating.html`;
+    }
+    return `file://${path.join(app.getAppPath(), 'dist-react', 'floating.html')}`;
+}
+
 export function getUIPath() {
     // 开发环境：使用开发服务器 URL（在 main.ts 中处理）
     // 生产环境：从 app.asar 内的 dist-react 加载

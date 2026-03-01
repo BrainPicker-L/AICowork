@@ -8,6 +8,7 @@ type StaticData = {
     totalStorage: number;
     cpuModel: string;
     totalMemoryGB: number;
+    platform?: string;
 }
 
 type UnsubscribeFunction = () => void;
@@ -166,6 +167,10 @@ type EventPayloadMapping = {
     "get-session-history": any;
     "recover-session": { success: boolean; error?: string; sessionId?: string };
     "delete-session": { success: boolean; error?: string };
+    "get-voice-settings": { voiceApiConfig?: { baseURL: string; apiKey: string; model?: string } | null; voiceCwd?: string; fnVoiceEnabled: boolean };
+    "set-voice-api-config": { success: boolean };
+    "set-voice-cwd": { success: boolean };
+    "set-fn-voice-enabled": { success: boolean };
 }
 
 interface Window {
@@ -175,6 +180,8 @@ interface Window {
         // Claude Agent IPC APIs
         sendClientEvent: (event: any) => void;
         onServerEvent: (callback: (event: any) => void) => UnsubscribeFunction;
+        /** 独立通道接收 Fn 键（长任务时不被 server-event 队列阻塞） */
+        registerVoiceFnKey: (callback: (key: "down" | "up") => void) => UnsubscribeFunction;
         generateSessionTitle: (userInput: string | null) => Promise<string>;
         getRecentCwds: (limit?: number) => Promise<string[]>;
         selectDirectory: () => Promise<string | null>;
@@ -504,5 +511,13 @@ interface Window {
         updateMemoryEntry: (id: string, patch: any) => Promise<{ success: boolean; error?: string }>;
         deleteMemoryEntry: (id: string, soft?: boolean) => Promise<{ success: boolean; error?: string }>;
         searchMemoryEntries: (params: { kindId?: string; query?: string; importance?: 'low' | 'medium' | 'high'; limit?: number }) => Promise<Array<{ id: string; kindId: string; content: string; summary?: string; entities?: string[]; importance?: 'low' | 'medium' | 'high'; createdAt: number; updatedAt: number; deletedAt?: number }>>;
+        /** 语音设置 */
+        getVoiceSettings: () => Promise<{ voiceApiConfig?: { baseURL: string; apiKey: string; model?: string } | null; voiceCwd?: string; fnVoiceEnabled: boolean }>;
+        testVoiceApiConnection: (config: { baseURL: string; apiKey: string; model?: string; apiType?: string }) => Promise<{ success: boolean; message: string; details?: string; responseTime?: number }>;
+        setVoiceApiConfig: (config: { baseURL: string; apiKey: string; model?: string } | null) => Promise<{ success: boolean }>;
+        setVoiceCwd: (cwd: string) => Promise<{ success: boolean }>;
+        setFnVoiceEnabled: (enabled: boolean) => Promise<{ success: boolean }>;
+        /** 仅 macOS：打开系统设置 → 隐私与安全性 → 输入监控 */
+        openInputMonitoringSettings: () => Promise<void>;
     }
 }

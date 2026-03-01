@@ -1,5 +1,6 @@
 import { BrowserWindow, app, ipcMain } from "electron";
 import type { ClientEvent, ServerEvent } from "./types.js";
+import type { StreamMessage } from "./types.js";
 import type { RunnerHandle } from "./libs/runner.js";
 import { SessionStore, initSessionStore } from './storage/session-store.js';
 import { join } from "path";
@@ -14,6 +15,7 @@ import {
   handleSessionDelete,
   handlePermissionResponse,
 } from "./handlers/session-handlers.js";
+import { runVoiceTask, cancelVoiceTask } from "./handlers/voice-task-handler.js";
 import { fetchModelList, fetchModelLimits } from './storage/config-store.js';
 import type { ApiConfig } from './storage/config-store.js';
 import { connectDingTalk, disconnectDingTalk } from './services/dingtalk-service.js';
@@ -21,6 +23,45 @@ import { loadDingTalkBot } from './storage/dingtalk-store.js';
 
 let sessions: SessionStore;
 const runnerHandles = new Map<string, RunnerHandle>();
+
+/** 最近一次语音任务完成的 sessionId，用于在会话完成后向悬浮窗发送回复预览 */
+let lastVoiceTaskSessionId: string | null = null;
+
+const REPLY_PREVIEW_MAX_LEN = 120;
+
+/**
+ * 只取最后一次大模型回复的文本（think/多轮执行后仅展示最终回复）
+ * 从消息列表末尾向前收集 assistant/stream_event 的文本，遇到 user_prompt 即停止
+ */
+function extractReplyPreview(messages: StreamMessage[]): string {
+  const parts: string[] = [];
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i] as Record<string, unknown>;
+    if (msg.type === "user_prompt" || msg.type === "user") break;
+    if (msg.type === "assistant" && msg.message && typeof msg.message === "object") {
+      const content = (msg.message as Record<string, unknown>).content;
+      if (Array.isArray(content)) {
+        for (const block of content) {
+          if (block && typeof block === "object" && (block as Record<string, unknown>).type === "text") {
+            const t = (block as Record<string, unknown>).text;
+            if (typeof t === "string") parts.unshift(t);
+          }
+        }
+      }
+      continue;
+    }
+    if (msg.type === "stream_event" && msg.event && typeof msg.event === "object") {
+      const ev = msg.event as Record<string, unknown>;
+      if (ev.type === "content_block_delta" && ev.delta && typeof ev.delta === "object") {
+        const t = (ev.delta as Record<string, unknown>).text;
+        if (typeof t === "string") parts.unshift(t);
+      }
+    }
+  }
+  const full = parts.join("").trim();
+  if (!full) return "";
+  return full.length <= REPLY_PREVIEW_MAX_LEN ? full : full.slice(0, REPLY_PREVIEW_MAX_LEN) + "…";
+}
 
 /**
  * 初始化 SessionStore
@@ -62,8 +103,24 @@ function emit(event: ServerEvent) {
     return;
   }
 
+  if (event.type === "voice-task.status" && event.payload.stage === "done" && event.payload.sessionId) {
+    lastVoiceTaskSessionId = event.payload.sessionId;
+  }
+
   if (event.type === "session.status") {
     sessions.updateSession(event.payload.sessionId, { status: event.payload.status });
+    if (event.payload.status === "completed" && lastVoiceTaskSessionId === event.payload.sessionId) {
+      try {
+        const history = sessions.getSessionHistory(event.payload.sessionId);
+        if (history?.messages?.length) {
+          const preview = extractReplyPreview(history.messages);
+          if (preview) {
+            broadcast({ type: "voice-task.reply-preview", payload: { sessionId: event.payload.sessionId, preview } });
+          }
+        }
+      } catch (_) {}
+      lastVoiceTaskSessionId = null;
+    }
   }
   if (event.type === "stream.message") {
     sessions.recordMessage(event.payload.sessionId, event.payload.message);
@@ -172,6 +229,26 @@ export function handleClientEvent(event: ClientEvent) {
       } catch (error) {
         log.error(`[IPC] 钉钉断开失败 (${botName}):`, error);
       }
+    },
+    "voice-task.submit-audio": () => {
+      const payload = (event as Extract<ClientEvent, { type: "voice-task.submit-audio" }>).payload;
+      const base64 = payload?.audioBase64;
+      if (!base64 || typeof base64 !== "string") {
+        emit({ type: "voice-task.status", payload: { stage: "error", error: "未收到录音数据" } });
+        return;
+      }
+      const minLen = 500;
+      if (base64.length < minLen) {
+        emit({ type: "voice-task.status", payload: { stage: "error", error: "录音过短，请按住 Fn 说话后再松开" } });
+        return;
+      }
+      runVoiceTask(base64, sessions, runnerHandles, emit);
+    },
+    "voice-task.recording-started": () => {
+      broadcast({ type: "voice-task.status", payload: { stage: "recording" } });
+    },
+    "voice-task.cancel": () => {
+      cancelVoiceTask();
     },
   } as const;
 

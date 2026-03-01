@@ -6,7 +6,7 @@
  * @updated 2025-01-24 (添加 API 配置缓存)
  */
 
-import { watch, FSWatcher } from 'fs';
+import { watch, FSWatcher, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 import { app } from 'electron';
@@ -176,8 +176,11 @@ class SdkConfigCacheManager {
       log.warn('[Config Cache] ✗ Failed to watch api-config.json:', error);
     }
 
-    // 监听 plugins 目录
+    // 监听 plugins 目录（不存在则创建，避免 ENOENT）
     try {
+      if (!existsSync(pluginsDir)) {
+        mkdirSync(pluginsDir, { recursive: true });
+      }
       const pluginsWatcher = watch(pluginsDir, { persistent: false }, (eventType, filename) => {
         if (eventType === 'rename' && filename) {
           log.info(`[Config Cache] Plugins directory changed: ${filename}`);
@@ -190,8 +193,11 @@ class SdkConfigCacheManager {
       log.warn('[Config Cache] ✗ Failed to watch plugins directory:', error);
     }
 
-    // 监听 agents 目录
+    // 监听 agents 目录（不存在则创建，避免 ENOENT）
     try {
+      if (!existsSync(agentsDir)) {
+        mkdirSync(agentsDir, { recursive: true });
+      }
       const agentsWatcher = watch(agentsDir, { persistent: false }, (eventType, filename) => {
         if (eventType === 'rename' && filename) {
           log.info(`[Config Cache] Agents directory changed: ${filename}`);

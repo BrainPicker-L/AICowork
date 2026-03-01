@@ -50,6 +50,17 @@ export type SessionInfo = {
 
 // ==================== 事件类型 ====================
 
+/** 语音任务阶段 */
+export type VoiceTaskStage = "recording" | "transcribing" | "session_starting" | "running" | "done" | "error";
+
+/** 语音任务状态（供 UI 小图标展示） */
+export type VoiceTaskStatus = {
+  stage: VoiceTaskStage;
+  sessionId?: string;
+  error?: string;
+  rawText?: string;
+};
+
 /**
  * 服务端 -> 客户端事件
  */
@@ -64,7 +75,12 @@ export type ServerEvent =
   | { type: "runner.error"; payload: { sessionId?: string; message: string } }
   | { type: "api.modelList"; payload: { models: string[] | null; error?: string } }
   | { type: "api.modelLimits"; payload: { limits: { max_tokens?: number; min_tokens?: number } | null; error?: string } }
-  | { type: "dingtalk.status"; payload: { botName: string; status: DingTalkConnectionStatus; error?: string } };
+  | { type: "dingtalk.status"; payload: { botName: string; status: DingTalkConnectionStatus; error?: string } }
+  | { type: "voice-task.status"; payload: VoiceTaskStatus }
+  | { type: "voice-task.fn-key-down" }
+  | { type: "voice-task.fn-key-up" }
+  | { type: "voice-task.reply-preview"; payload: { sessionId: string; preview: string } }
+  | { type: "focus-and-show-session"; payload: { sessionId: string } };
 
 /**
  * 客户端 -> 服务端事件
@@ -80,7 +96,10 @@ export type ClientEvent =
   | { type: "api.fetchModelList"; payload: { apiKey: string; baseURL: string; apiType?: string } }
   | { type: "api.fetchModelLimits"; payload: { apiKey: string; baseURL: string; model: string; apiType?: string } }
   | { type: "dingtalk.connect"; payload: { botName: string } }
-  | { type: "dingtalk.disconnect"; payload: { botName: string } };
+  | { type: "dingtalk.disconnect"; payload: { botName: string } }
+  | { type: "voice-task.submit-audio"; payload: { audioBase64: string } }
+  | { type: "voice-task.cancel" }
+  | { type: "voice-task.recording-started" };
 
 // ==================== 重新导出 SDK 类型 ====================
 

@@ -62,6 +62,7 @@ export default {
 			rules: "规则",
 			claudeMd: "Claude.md",
 			dingtalk: "钉钉机器人",
+			voice: "语音输入",
 		},
 		placeholder: {
 			title: "设置",
@@ -125,6 +126,46 @@ export default {
 			label: "提示",
 			text: "这些设置会保存在本地，下次启动应用时自动应用。",
 		},
+	},
+
+	voice: {
+		title: "语音输入",
+		description: "配置语音转写与 Fn 键触发，用于按住说话创建新任务",
+		api: {
+			title: "语音大模型配置",
+			apiType: "接口类型",
+			apiTypeWhisper: "Whisper 兼容（/audio/transcriptions）",
+			apiTypeQwenAsr: "阿里百炼 Qwen3-ASR（chat/completions）",
+			qwenAsrHint: "Base URL 填 https://dashscope.aliyuncs.com/compatible-mode/v1，模型填 qwen3-asr-flash",
+			baseUrl: "Base URL",
+			baseUrlPlaceholder: "https://api.openai.com/v1",
+			apiKey: "API Key",
+			apiKeyPlaceholder: "sk-...",
+			model: "模型（可选）",
+			modelPlaceholder: "whisper-1",
+			save: "保存配置",
+		},
+		apiType: {
+			whisper: "Whisper 兼容（/audio/transcriptions）",
+			qwenAsr: "阿里百炼 Qwen3-ASR（chat/completions）",
+		},
+		cwd: {
+			title: "语音任务默认工作目录",
+			description: "使用语音创建新会话时的工作目录，必填",
+			placeholder: "选择或输入路径",
+			browse: "浏览",
+		},
+		fnSwitch: {
+			title: "使用 Fn 键进行语音转写",
+			description: "开启后，在应用内按住 Fn 说话、松开结束，自动转写并创建任务",
+			macPermissionHint: "若按 Fn 无反应：请在「系统设置」中为本应用开启「输入监控」权限，才能监听全局 Fn 键。",
+			openInputMonitoring: "打开输入监控设置",
+			off: "关闭",
+			on: "开启",
+		},
+		microphonePermission: "需要麦克风权限才能使用语音输入",
+		saveSuccess: "已保存",
+		saveError: "保存失败",
 	},
 
 	language: {

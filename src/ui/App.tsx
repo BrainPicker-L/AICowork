@@ -12,6 +12,7 @@ import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 import { MessageCard } from "./components/EventCard";
 import { DeletionConfirmDialog } from "./components/DeletionConfirmDialog";
 import { SessionStatusIndicator, type SessionStatusType } from "./components/SessionStatusIndicator";
+import { useVoiceFnRecording } from "./hooks/useVoiceFnRecording";
 import MDContent from "./render/markdown";
 import { isDeletionPermissionRequest } from "@/shared/deletion-detection";
 import { log } from "./utils/logger";
@@ -64,6 +65,12 @@ function App() {
   const setApiConfigChecked = useAppStore((s) => s.setApiConfigChecked);
   const currentPage = useAppStore((s) => s.currentPage);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
+
+  const [voiceSettings, setVoiceSettings] = useState<Awaited<ReturnType<NonNullable<typeof window.electron>["getVoiceSettings"]>> | null>(null);
+  useEffect(() => {
+    if (!window.electron?.getVoiceSettings) return;
+    window.electron.getVoiceSettings().then(setVoiceSettings);
+  }, []);
 
   // 在 hooks 前定义 activeSession 和 isRunning，供后续使用
   const activeSession = activeSessionId ? sessions[activeSessionId] : undefined;
@@ -193,6 +200,7 @@ function App() {
 
   const { connected, sendEvent } = useIPC(onEvent);
   const { handleStartFromModal } = usePromptActions(sendEvent);
+  useVoiceFnRecording(voiceSettings, sendEvent);
 
   const messages = activeSession?.messages ?? [];
   const permissionRequests = activeSession?.permissionRequests ?? [];
@@ -548,6 +556,7 @@ function App() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

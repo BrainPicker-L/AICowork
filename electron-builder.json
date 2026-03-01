@@ -1,45 +1,57 @@
 {
-    "appId": "com.devagentforge.dtazzicowork",
-    "productName": "DtazziCowork",
-    "compression": "maximum",
-    "files": [
-        "package.json",
-        "dist-electron/**/*",
-        "dist-react/**/*",
-        "templateIcon.ico",
-        "node_modules/@qwen-code/sdk/**/*",
-        "node_modules/@anthropic-ai/tokenizer/**/*",
-        "node_modules/@memvid/sdk/**/*",
-        "node_modules/better-sqlite3/**/*",
-        "node_modules/zod/**/*",
-        "node_modules/winston/**/*",
-        "node_modules/**/*",
-        "!**/*.map",
-        "!**/*.d.ts",
-        "!**/*.md",
-        "!**/test/**",
-        "!**/tests/**",
-        "!**/__tests__/**"
-    ],
-    "extraResources": [],
-    "npmRebuild": false,
-    "asarUnpack": [
-        "node_modules/better-sqlite3/build/**/*.node",
-        "node_modules/@memvid/sdk/**/*.node",
-        "node_modules/@qwen-code/sdk/**/*"
-    ],
-    "icon": "./templateIcon.ico",
-    "mac": {
-        "target": "dmg"
-    },
-    "linux": {
-        "target": "AppImage",
-        "category": "Utility"
-    },
-    "win": {
-        "signAndEditExecutable": false,
-        "target": [
-            "portable"
-        ]
+  "appId": "com.devagentforge.dtazzicowork",
+  "productName": "DtazziCowork",
+  "compression": "maximum",
+  "files": [
+    "package.json",
+    "dist-electron/**/*",
+    "dist-react/**/*",
+    "templateIcon.ico",
+    "node_modules/@qwen-code/sdk/**/*",
+    "node_modules/@anthropic-ai/tokenizer/**/*",
+    "node_modules/@memvid/sdk/**/*",
+    "node_modules/better-sqlite3/**/*",
+    "node_modules/zod/**/*",
+    "node_modules/winston/**/*",
+    "node_modules/axios/**/*",
+    "node_modules/form-data/**/*",
+    "node_modules/ajv/**/*",
+    "node_modules/ajv-formats/**/*",
+    "node_modules/**/*",
+    "!**/*.map",
+    "!**/*.d.ts",
+    "!**/*.md",
+    "!**/test/**",
+    "!**/tests/**",
+    "!**/__tests__/**"
+  ],
+  "extraResources": [],
+  "npmRebuild": false,
+  "asarUnpack": [
+    "node_modules/better-sqlite3/build/**/*.node",
+    "node_modules/@memvid/sdk/**/*.node",
+    "node_modules/@qwen-code/sdk/**/*",
+    "node_modules/form-data/**/*",
+    "node_modules/ajv/**/*",
+    "node_modules/ajv-formats/**/*",
+    "node_modules/node-global-key-listener/bin/**",
+    "node_modules/node-global-key-listener/build/**"
+  ],
+  "icon": "./templateIcon.ico",
+  "mac": {
+    "target": "dmg",
+    "extendInfo": {
+      "NSMicrophoneUsageDescription": "用于按住 Fn 键进行语音输入并转写为文字创建任务。"
     }
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Utility"
+  },
+  "win": {
+    "signAndEditExecutable": false,
+    "target": [
+      "portable"
+    ]
+  }
 }

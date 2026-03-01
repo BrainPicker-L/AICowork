@@ -28,6 +28,14 @@ electron.contextBridge.exposeInMainWorld("electron", {
         electron.ipcRenderer.on("server-event", cb);
         return () => electron.ipcRenderer.off("server-event", cb);
     },
+    /** 独立通道接收 Fn 键（避免被 server-event 队列堵住，长任务时仍能及时录入） */
+    registerVoiceFnKey: (callback: (key: "down" | "up") => void) => {
+        const cb = (_: Electron.IpcRendererEvent, key: string) => {
+            if (key === "down" || key === "up") callback(key);
+        };
+        electron.ipcRenderer.on("voice-fn-key", cb);
+        return () => electron.ipcRenderer.off("voice-fn-key", cb);
+    },
     generateSessionTitle: (userInput: string | null) =>
         ipcInvoke("generate-session-title", userInput),
     getRecentCwds: (limit?: number) =>
@@ -247,7 +255,20 @@ electron.contextBridge.exposeInMainWorld("electron", {
     testDingTalkConnection: (config: any) =>
         invoke("test-dingtalk-connection", config),
     getDingTalkStatus: (name?: string) =>
-        invoke("get-dingtalk-status", name)
+        invoke("get-dingtalk-status", name),
+    // 语音设置
+    getVoiceSettings: () =>
+        invoke("get-voice-settings"),
+    testVoiceApiConnection: (config: { baseURL: string; apiKey: string; model?: string; apiType?: string }) =>
+        invoke("test-voice-api-connection", config),
+    setVoiceApiConfig: (config: { baseURL: string; apiKey: string; model?: string } | null) =>
+        invoke("set-voice-api-config", config),
+    setVoiceCwd: (cwd: string) =>
+        invoke("set-voice-cwd", cwd),
+    setFnVoiceEnabled: (enabled: boolean) =>
+        invoke("set-fn-voice-enabled", enabled),
+    openInputMonitoringSettings: () =>
+        invoke("open-input-monitoring-settings"),
 })
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(key: Key, ...args: any[]): Promise<EventPayloadMapping[Key]> {

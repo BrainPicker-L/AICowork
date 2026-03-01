@@ -6,7 +6,8 @@
 import { app, Menu, shell, nativeTheme } from "electron";
 import { log, logStartup, setupErrorHandling } from "./logger.js";
 import { setupLifecycleEventHandlers } from "./main/lifecycle.js";
-import { createMainWindow } from "./main/window-manager.js";
+import { createMainWindow, getMainWindow } from "./main/window-manager.js";
+import { destroyFloatingWindow } from "./main/floating-window.js";
 import { registerIpcHandlers } from "./main/ipc-registry.js";
 import "./services/claude-settings.js";
 import { autoConnectDingTalk } from "./services/dingtalk-service.js";
@@ -71,7 +72,12 @@ app.on("ready", async () => {
     // 1. 设置错误处理（必须在其他操作之前）
     setupErrorHandling();
 
-    // 2. 记录应用启动
+    // 2. 确保 macOS 上应用图标显示在程序坞（避免最小化后图标消失）
+    if (process.platform === "darwin" && app.dock) {
+        app.dock.show();
+    }
+
+    // 3. 记录应用启动
     logStartup();
 
     // 3. 初始化应用服务（后台异步执行）
@@ -93,6 +99,14 @@ app.on("ready", async () => {
     // 7. 创建主窗口（等待 Vite 服务器准备好）
     await createMainWindow();
 
+    // 7.1 主窗口关闭时销毁悬浮窗，确保点击关闭后应用能完全退出（否则悬浮窗会阻止 window-all-closed）
+    const mainWin = getMainWindow();
+    if (mainWin) {
+        mainWin.on("close", () => {
+            destroyFloatingWindow();
+        });
+    }
+
     // 8. 注册所有 IPC 处理器
     registerIpcHandlers();
 
@@ -100,6 +114,17 @@ app.on("ready", async () => {
     autoConnectDingTalk(getEmit()).catch((error) => {
         log.error('[App] DingTalk auto-connect failed:', error);
     });
+});
+
+/**
+ * macOS：点击程序坞图标时恢复主窗口
+ */
+app.on("activate", () => {
+    const win = getMainWindow();
+    if (win && !win.isDestroyed()) {
+        win.show();
+        win.focus();
+    }
 });
 
 /**

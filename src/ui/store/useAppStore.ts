@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ServerEvent, SessionStatus, StreamMessage } from "../types";
+import type { ServerEvent, SessionStatus, StreamMessage, VoiceTaskStatus } from "../types";
 
 export type PermissionRequest = {
   toolUseId: string;
@@ -35,7 +35,8 @@ export type SettingsSection =
   | 'skills'
   | 'jarvis'
   | 'memory'
-  | 'dingtalk';
+  | 'dingtalk'
+  | 'voice';
 
 interface AppState {
   sessions: Record<string, SessionView>;
@@ -58,6 +59,10 @@ interface AppState {
   // 显示设置
   showTokenUsage: boolean;
   showSystemMessage: boolean;
+
+  // 语音任务状态（小图标展示）
+  voiceTaskStatus: VoiceTaskStatus | null;
+  setVoiceTaskStatus: (status: VoiceTaskStatus | null) => void;
 
   setPrompt: (prompt: string) => void;
   setCwd: (cwd: string) => void;
@@ -109,6 +114,9 @@ export const useAppStore = create<AppState>()(
       // 显示设置（默认开启）
       showTokenUsage: true,
       showSystemMessage: true,
+
+      voiceTaskStatus: null,
+      setVoiceTaskStatus: (voiceTaskStatus) => set({ voiceTaskStatus }),
 
       setPrompt: (prompt) => set({ prompt }),
       setCwd: (cwd) => set({ cwd }),
@@ -342,6 +350,21 @@ export const useAppStore = create<AppState>()(
 
           case "runner.error": {
             set({ globalError: event.payload.message });
+            break;
+          }
+
+          case "voice-task.status": {
+            const payload = event.payload;
+            set({ voiceTaskStatus: payload });
+            if (payload.stage === "error" && payload.rawText) {
+              get().setPrompt(payload.rawText);
+            }
+            break;
+          }
+
+          case "focus-and-show-session": {
+            const sessionId = event.payload.sessionId;
+            if (sessionId) set({ activeSessionId: sessionId });
             break;
           }
 

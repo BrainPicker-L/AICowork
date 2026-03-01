@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>语音状态</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 260px;
+      height: 160px;
+      overflow: hidden;
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    /* 气泡紧贴悬浮球上方，小角角在气泡右下、指向球（像球在说话） */
+    #bubble {
+      position: absolute;
+      right: 12px;
+      bottom: 76px;
+      width: 200px;
+      min-height: 44px;
+      max-height: 80px;
+      padding: 8px 12px;
+      background: #fff;
+      border-radius: 12px 12px 4px 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      font-size: 12px;
+      line-height: 1.4;
+      color: #333;
+      overflow: hidden;
+      display: none;
+      cursor: pointer;
+      -webkit-app-region: no-drag;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    /* 小角角：气泡下方、偏右的小三角，指向球（像球在说话） */
+    #bubble::after {
+      content: "";
+      position: absolute;
+      right: 20px;
+      top: 100%;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #fff;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.06));
+    }
+    #bubble.show { display: block; }
+    #bubble-inner {
+      padding-right: 24px;
+      position: relative;
+    }
+    #bubble-close {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      border: none;
+      background: rgba(0,0,0,0.06);
+      color: #666;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-app-region: no-drag;
+    }
+    #bubble-close:hover {
+      background: rgba(0,0,0,0.12);
+      color: #333;
+    }
+    #bubble-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+    #ball {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      -webkit-app-region: drag;
+      transition: background-color 0.2s, transform 0.15s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    #ball:active { transform: scale(0.96); }
+    #ball.idle { background: linear-gradient(145deg, #6b7280, #4b5563); color: #fff; }
+    #ball.recording { background: linear-gradient(145deg, #ef4444, #dc2626); color: #fff; animation: pulse 1.2s ease-in-out infinite; }
+    #ball.transcribing { background: linear-gradient(145deg, #93c5fd, #60a5fa); color: #1e3a5f; animation: pulse 1.5s ease-in-out infinite; }
+    #ball.transcribe_error { background: linear-gradient(145deg, #f59e0b, #d97706); color: #fff; }
+    #ball.running { background: linear-gradient(145deg, #3b82f6, #2563eb); color: #fff; animation: pulse 1.5s ease-in-out infinite; }
+    #ball.done { background: linear-gradient(145deg, #22c55e, #16a34a); color: #fff; }
+    #ball.error { background: linear-gradient(145deg, #ef4444, #dc2626); color: #fff; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+    #label {
+      font-size: 10px;
+      max-width: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="bubble" title="点击跳转到会话">
+    <div id="bubble-inner">
+      <button type="button" id="bubble-close" title="关闭气泡并恢复初始状态" aria-label="关闭">×</button>
+      <div id="bubble-text"></div>
+    </div>
+  </div>
+  <div id="ball" class="idle" title="点击唤起主窗口">
+    <span id="label">语音(fn)</span>
+  </div>
+  <script>
+    (function() {
+      const ball = document.getElementById("ball");
+      const label = document.getElementById("label");
+      const bubble = document.getElementById("bubble");
+      const bubbleText = document.getElementById("bubble-text");
+      const bubbleClose = document.getElementById("bubble-close");
+      var stageLabel = {
+        idle: "语音(fn)",
+        recording: "录音中",
+        transcribing: "转写中",
+        transcribe_error: "转写失败",
+        running: "运行中",
+        done: "完成",
+        error: "失败"
+      };
+      var currentStage = "idle";
+      var lastSessionId = null;
+      var replyPreview = "";
+
+      function setStage(stage) {
+        currentStage = stage;
+        ball.className = stage;
+        label.textContent = stageLabel[stage] || stage;
+      }
+
+      function showBubble(text, sessionId) {
+        lastSessionId = sessionId;
+        replyPreview = text || "";
+        bubbleText.textContent = text || "点击查看";
+        bubble.classList.add("show");
+      }
+
+      function hideBubble() {
+        bubble.classList.remove("show");
+        bubbleText.textContent = "";
+      }
+
+      function closeBubbleAndReset() {
+        hideBubble();
+        lastSessionId = null;
+        replyPreview = "";
+        setStage("idle");
+      }
+
+      function onClick() {
+        if (!window.electron) return;
+        var sessionToShow = null;
+        if (currentStage === "running" || currentStage === "done") sessionToShow = lastSessionId;
+        if (sessionToShow && window.electron.focusMainAndShowSession) {
+          window.electron.focusMainAndShowSession(sessionToShow);
+        } else if (window.electron.focusMain) {
+          window.electron.focusMain();
+        }
+      }
+
+      if (window.electron && window.electron.onServerEvent) {
+        window.electron.onServerEvent(function(ev) {
+          if (!ev) return;
+
+          if (ev.type === "voice-task.status" && ev.payload) {
+            var p = ev.payload;
+            if (p.stage === "recording") {
+              setStage("recording");
+              hideBubble();
+              lastSessionId = null;
+              replyPreview = "";
+            } else if (p.stage === "transcribing") {
+              setStage("transcribing");
+            } else if (p.stage === "session_starting") {
+              setStage("running");
+              hideBubble();
+            } else if (p.stage === "running" && p.sessionId) {
+              setStage("running");
+              lastSessionId = p.sessionId;
+              hideBubble();
+            } else if (p.stage === "done") {
+              setStage("running");
+              if (p.sessionId) lastSessionId = p.sessionId;
+              hideBubble();
+            } else if (p.stage === "error") {
+              if (currentStage === "recording" || currentStage === "transcribing") {
+                setStage("transcribe_error");
+              } else {
+                setStage("error");
+              }
+              hideBubble();
+              lastSessionId = null;
+              replyPreview = "";
+            }
+          }
+
+          if (ev.type === "session.status" && ev.payload && ev.payload.sessionId === lastSessionId) {
+            var status = ev.payload.status;
+            if (status === "completed") {
+              setStage("done");
+              if (!replyPreview) showBubble("点击查看", lastSessionId);
+            } else if (status === "error") {
+              setStage("error");
+              hideBubble();
+            }
+          }
+
+          if (ev.type === "voice-task.reply-preview" && ev.payload && ev.payload.sessionId === lastSessionId) {
+            replyPreview = ev.payload.preview || "";
+            showBubble(replyPreview, lastSessionId);
+          }
+        });
+      }
+
+      ball.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      });
+      bubble.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.target === bubbleClose) return;
+        onClick();
+      });
+      if (bubbleClose) {
+        bubbleClose.addEventListener("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeBubbleAndReset();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

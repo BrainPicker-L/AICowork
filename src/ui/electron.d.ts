@@ -286,6 +286,8 @@ export interface ElectronAPI {
   getStaticData: () => Promise<any>;
   sendClientEvent: (event: any) => void;
   onServerEvent: (callback: (event: any) => void) => () => void;
+  /** 独立通道接收 Fn 键（长任务时不被 server-event 队列阻塞） */
+  registerVoiceFnKey: (callback: (key: "down" | "up") => void) => () => void;
   generateSessionTitle: (userInput: string | null) => Promise<string>;
   getRecentCwds: (limit?: number) => Promise<string[]>;
   selectDirectory: () => Promise<string | null>;
@@ -398,6 +400,33 @@ export interface ElectronAPI {
   deleteSession: (sessionId: string) => Promise<{ success: boolean; error?: string }>;
   /** Language Preference 操作 */
   setLanguagePreference: (language: string) => Promise<{ success: boolean; error?: string }>;
+  /** 语音设置 */
+  getVoiceSettings: () => Promise<VoiceSettings>;
+  testVoiceApiConnection: (config: VoiceApiConfig & { apiType?: "whisper" | "qwen-asr" }) => Promise<VoiceTestResult>;
+  setVoiceApiConfig: (config: VoiceApiConfig | null) => Promise<{ success: boolean }>;
+  setVoiceCwd: (cwd: string) => Promise<{ success: boolean }>;
+  setFnVoiceEnabled: (enabled: boolean) => Promise<{ success: boolean }>;
+  /** 仅 macOS：打开系统设置 → 隐私与安全性 → 输入监控 */
+  openInputMonitoringSettings?: () => Promise<void>;
+}
+
+export interface VoiceTestResult {
+  success: boolean;
+  message: string;
+  details?: string;
+  responseTime?: number;
+}
+
+export interface VoiceApiConfig {
+  baseURL: string;
+  apiKey: string;
+  model?: string;
+}
+
+export interface VoiceSettings {
+  voiceApiConfig?: VoiceApiConfig | null;
+  voiceCwd?: string;
+  fnVoiceEnabled: boolean;
 }
 
 declare global {

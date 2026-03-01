@@ -84,7 +84,8 @@ export function getStaticData() {
     return {
         totalStorage,
         cpuModel,
-        totalMemoryGB
+        totalMemoryGB,
+        platform: process.platform,
     }
 }
 

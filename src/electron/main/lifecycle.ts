@@ -32,6 +32,14 @@ export async function cleanup(): Promise<void> {
     globalShortcut.unregisterAll();
     stopPolling();
     cleanupAllSessions();
+    try {
+        const { stopVoiceFnGlobalListener } = await import("./voice-fn-global.js");
+        stopVoiceFnGlobalListener();
+    } catch (_) {}
+    try {
+        const { destroyFloatingWindow } = await import("./floating-window.js");
+        destroyFloatingWindow();
+    } catch (_) {}
     killViteDevServer();
 }
 

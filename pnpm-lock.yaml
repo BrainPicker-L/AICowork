@@ -32,6 +32,12 @@ importers:
       adm-zip:
         specifier: ^0.5.16
         version: 0.5.16
+      ajv:
+        specifier: ^8.17.1
+        version: 8.17.1
+      ajv-formats:
+        specifier: ^3.0.1
+        version: 3.0.1(ajv@8.17.1)
       axios:
         specifier: ^1.13.5
         version: 1.13.5(debug@4.4.3)
@@ -41,6 +47,9 @@ importers:
       dingtalk-stream:
         specifier: ^2.1.4
         version: 2.1.4
+      form-data:
+        specifier: ^4.0.5
+        version: 4.0.5
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
@@ -50,6 +59,9 @@ importers:
       lucide-react:
         specifier: ^0.562.0
         version: 0.562.0(react@19.2.3)
+      node-global-key-listener:
+        specifier: ^0.3.0
+        version: 0.3.0
       react:
         specifier: ^19.2.3
         version: 19.2.3
@@ -3198,6 +3210,9 @@ packages:
   node-api-version@0.2.1:
     resolution: {integrity: sha512-2xP/IGGMmmSQpI1+O/k72jF/ykvZ89JeuKX3TLJAYPDVLUalrshrLHkeVcCCZqG/eEa635cr8IBYzgnDvM2O8Q==}
 
+  node-global-key-listener@0.3.0:
+    resolution: {integrity: sha512-yWB1OFrDlzXYm3+hYcE8xOscvclpBAQGXcBnc2ytenFLkZfxFipuCwhuIIlIKVtwBuDRkdXJVZMqN99cPVBFFA==}
+
   node-gyp@11.5.0:
     resolution: {integrity: sha512-ra7Kvlhxn5V9Slyus0ygMa2h+UqExPqUIkfk7Pc8QTLT956JLSy51uWFwHtIYy0vI8cB4BDhc/S03+880My/LQ==}
     engines: {node: ^18.17.0 || >=20.5.0}
@@ -3871,6 +3886,10 @@ packages:
 
   style-to-object@1.0.14:
     resolution: {integrity: sha512-LIN7rULI0jBscWQYaSswptyderlarFkjQ+t79nzty8tcIAceVomEVlLzH5VP4Cmsv6MtKhs7qaAiwlcp+Mgaxw==}
+
+  sudo-prompt@9.2.1:
+    resolution: {integrity: sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   sumchecker@3.0.1:
     resolution: {integrity: sha512-MvjXzkz/BOfyVDkG0oFOtBxHX2u3gKbMHIF/dXblZsgD3BWOFLmHovIpZY7BykJdAjcqRCBi1WYBNdEC9yI7vg==}
@@ -7889,6 +7908,10 @@ snapshots:
     dependencies:
       semver: 7.7.3
 
+  node-global-key-listener@0.3.0:
+    dependencies:
+      sudo-prompt: 9.2.1
+
   node-gyp@11.5.0:
     dependencies:
       env-paths: 2.2.1
@@ -8705,6 +8728,8 @@ snapshots:
   style-to-object@1.0.14:
     dependencies:
       inline-style-parser: 0.2.7
+
+  sudo-prompt@9.2.1: {}
 
   sumchecker@3.0.1:
     dependencies:

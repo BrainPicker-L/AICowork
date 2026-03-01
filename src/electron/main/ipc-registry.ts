@@ -3,7 +3,7 @@
  * 组织和注册所有 IPC 通信处理器
  */
 
-import { ipcMain, dialog, shell, nativeTheme } from "electron";
+import { ipcMain, dialog, shell, nativeTheme, BrowserWindow } from "electron";
 import path from "path";
 import { homedir } from "os";
 import { log } from "../logger.js";
@@ -14,6 +14,7 @@ import { handleClientEvent, sessions } from "../ipc-handlers.js";
 import { generateSessionTitle } from '../utils/util.js';
 import { getCachedApiConfig } from '../managers/sdk-config-cache.js';
 import { testApiConnection } from "../api-tester.js";
+import { testVoiceApiConnection } from "../voice-api-tester.js";
 import type { ClientEvent } from "../types.js";
 
 /**
@@ -156,6 +157,21 @@ import {
   getAllDingTalkStatuses,
   testDingTalkConnection,
 } from "../services/dingtalk-service.js";
+
+import {
+  getVoiceSettings,
+  setVoiceApiConfig,
+  setVoiceCwd,
+  setFnVoiceEnabled,
+  type VoiceApiConfig,
+} from "../storage/voice-store.js";
+import { updateVoiceFnGlobalListener } from "./voice-fn-global.js";
+import {
+  createFloatingWindow,
+  showFloatingWindow,
+  hideFloatingWindow,
+} from "./floating-window.js";
+import { canStartVoiceTask } from "../storage/voice-store.js";
 
 // 导入 API 适配器工具函数
 import {
@@ -783,6 +799,75 @@ function registerDingTalkHandlers(): void {
     });
 }
 
+// ==================== 语音设置处理器 ====================
+
+function registerVoiceHandlers(): void {
+    ipcMain.handle("get-voice-settings", () => {
+        return getVoiceSettings();
+    });
+
+    ipcMain.handle("test-voice-api-connection", async (_: unknown, config: VoiceApiConfig) => {
+        return await testVoiceApiConnection(config);
+    });
+
+    ipcMain.handle("floating-focus-main", () => {
+        getMainWindow()?.focus();
+        return Promise.resolve();
+    });
+
+    ipcMain.handle("floating-focus-main-and-session", (_: unknown, sessionId: string) => {
+        const win = getMainWindow();
+        if (win && !win.isDestroyed()) {
+            win.show();
+            win.focus();
+        }
+        const payload = JSON.stringify({ type: "focus-and-show-session", payload: { sessionId } });
+        for (const w of BrowserWindow.getAllWindows()) {
+            try {
+                w.webContents.send("server-event", payload);
+            } catch (_) {}
+        }
+        return Promise.resolve();
+    });
+
+    ipcMain.handle("set-voice-api-config", (_: unknown, config: VoiceApiConfig | null) => {
+        setVoiceApiConfig(config);
+        updateVoiceFnGlobalListener(getMainWindow());
+        if (canStartVoiceTask()) showFloatingWindow();
+        else hideFloatingWindow();
+        return { success: true };
+    });
+
+    ipcMain.handle("set-voice-cwd", (_: unknown, cwd: string) => {
+        setVoiceCwd(cwd);
+        updateVoiceFnGlobalListener(getMainWindow());
+        if (canStartVoiceTask()) showFloatingWindow();
+        else hideFloatingWindow();
+        return { success: true };
+    });
+
+    ipcMain.handle("set-fn-voice-enabled", (_: unknown, enabled: boolean) => {
+        setFnVoiceEnabled(enabled);
+        updateVoiceFnGlobalListener(getMainWindow());
+        if (canStartVoiceTask()) showFloatingWindow();
+        else hideFloatingWindow();
+        return { success: true };
+    });
+
+    /** macOS：打开「系统设置 → 隐私与安全性 → 输入监控」，供用户为应用开启 Fn 全局监听权限 */
+    ipcMain.handle("open-input-monitoring-settings", () => {
+        if (process.platform !== "darwin") return Promise.resolve();
+        const url = "x-apple.systempreferences:com.apple.preference.security?Privacy_InputMonitoring";
+        try {
+            shell.openExternal(url);
+            return Promise.resolve();
+        } catch (e) {
+            log.warn("[ipc-registry] Failed to open Input Monitoring settings", e);
+            return Promise.reject(e);
+        }
+    });
+}
+
 // ==================== 主注册函数 ====================
 
 /**
@@ -804,6 +889,15 @@ export function registerIpcHandlers(): void {
     registerJarvisHandlers();
     registerThemeHandlers();
     registerDingTalkHandlers();
+    registerVoiceHandlers();
+
+    // 若已开启 Fn 语音且配置完整，注册全局 Fn 监听（最小化时也可录音）
+    updateVoiceFnGlobalListener(getMainWindow());
+
+    // 创建悬浮窗，并根据语音设置决定是否显示（配置完成并开启语音输入后显示）
+    createFloatingWindow();
+    if (canStartVoiceTask()) showFloatingWindow();
+    else hideFloatingWindow();
 
     // 启动资源轮询
     const mainWindow = getMainWindow();

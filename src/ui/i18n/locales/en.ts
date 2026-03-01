@@ -63,6 +63,7 @@ export default {
 			rules: "Rules",
 			claudeMd: "Claude.md",
 			dingtalk: "DingTalk Bot",
+			voice: "Voice Input",
 		},
 		placeholder: {
 			title: "Settings",
@@ -126,6 +127,46 @@ export default {
 			label: "Tip",
 			text: "These settings are saved locally and will be applied automatically when you start the app next time.",
 		},
+	},
+
+	voice: {
+		title: "Voice Input",
+		description: "Configure voice transcription and Fn key to create tasks by holding Fn and speaking",
+		api: {
+			title: "Voice API Config",
+			apiType: "API Type",
+			apiTypeWhisper: "Whisper compatible (/audio/transcriptions)",
+			apiTypeQwenAsr: "Alibaba Bailian Qwen3-ASR (chat/completions)",
+			qwenAsrHint: "Base URL: https://dashscope.aliyuncs.com/compatible-mode/v1, Model: qwen3-asr-flash",
+			baseUrl: "Base URL",
+			baseUrlPlaceholder: "https://api.openai.com/v1",
+			apiKey: "API Key",
+			apiKeyPlaceholder: "sk-...",
+			model: "Model (optional)",
+			modelPlaceholder: "whisper-1",
+			save: "Save",
+		},
+		apiType: {
+			whisper: "Whisper compatible (/audio/transcriptions)",
+			qwenAsr: "Alibaba Bailian Qwen3-ASR (chat/completions)",
+		},
+		cwd: {
+			title: "Default Working Directory for Voice Tasks",
+			description: "Required. Used when creating a session from voice",
+			placeholder: "Select or enter path",
+			browse: "Browse",
+		},
+		fnSwitch: {
+			title: "Use Fn Key for Voice",
+			description: "When on, hold Fn to record and release to submit; creates a new task from transcribed text",
+			macPermissionHint: "If Fn does nothing: enable \"Input Monitoring\" for this app in System Settings so it can listen for the global Fn key.",
+			openInputMonitoring: "Open Input Monitoring settings",
+			off: "Off",
+			on: "On",
+		},
+		microphonePermission: "Microphone permission is required for voice input",
+		saveSuccess: "Saved",
+		saveError: "Save failed",
 	},
 
 	language: {

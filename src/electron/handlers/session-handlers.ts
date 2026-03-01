@@ -48,13 +48,14 @@ export function handleSessionHistory(
 
 /**
  * 处理会话启动
+ * @returns 新创建的会话 ID
  */
 export function handleSessionStart(
   sessions: SessionStore,
   runnerHandles: Map<string, RunnerHandle>,
   emit: (event: ServerEvent) => void,
   payload: SessionStartEvent["payload"]
-): void {
+): string {
   const { cwd, title, allowedTools, prompt } = payload;
   const startTime = Date.now();
 
@@ -108,6 +109,8 @@ export function handleSessionStart(
         }
       });
     });
+
+  return session.id;
 }
 
 /**

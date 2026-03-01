@@ -14,6 +14,7 @@ import { MemorySection } from './sections/MemorySection';
 import { SkillsSection } from './sections/SkillsSection';
 import { JarvisSection } from './sections/JarvisSection';
 import { DingTalkSection } from './sections/DingTalkSection';
+import { VoiceSection } from './sections/VoiceSection';
 
 interface SettingsContentProps {
   className?: string;
@@ -61,6 +62,8 @@ export function SettingsContent({ className }: SettingsContentProps) {
         return <JarvisSection />;
       case 'dingtalk':
         return <DingTalkSection />;
+      case 'voice':
+        return <VoiceSection />;
       default:
         return (
           <PlaceholderSection

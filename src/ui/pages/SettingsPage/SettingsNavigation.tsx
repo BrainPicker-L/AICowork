@@ -13,7 +13,8 @@ import {
   Zap,
   Package,
   Brain,
-  Monitor
+  Monitor,
+  Mic
 } from 'lucide-react';
 import type { SettingsSection } from '../../store/useAppStore';
 
@@ -40,6 +41,7 @@ const SETTINGS_SECTIONS: SectionDef[] = [
   // 连接与模型
   { id: 'api', icon: Key, group: 'connection' },
   { id: 'dingtalk', icon: MessageCircle, group: 'connection' },
+  { id: 'voice', icon: Mic, group: 'connection' },
 
   // 工具与扩展
   { id: 'mcp', icon: Plug, group: 'tools' },
