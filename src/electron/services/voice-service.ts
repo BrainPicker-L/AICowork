@@ -7,7 +7,11 @@ import { log } from "../logger.js";
 
 // ========== Whisper 兼容：POST /audio/transcriptions multipart ==========
 
-function buildMultipartBody(audioBuffer: Buffer, model: string): { body: Buffer; boundary: string } {
+function buildMultipartBody(
+  audioBuffer: Buffer,
+  model: string,
+  mimeType: "audio/wav" | "audio/webm"
+): { body: Buffer; boundary: string } {
   const boundary = "----VoiceTaskBoundary" + Date.now();
   const CRLF = "\r\n";
   const parts: Buffer[] = [];
@@ -21,19 +25,24 @@ function buildMultipartBody(audioBuffer: Buffer, model: string): { body: Buffer;
     parts.push(Buffer.from(CRLF, "utf-8"));
   };
 
+  const ext = mimeType === "audio/wav" ? "wav" : "webm";
   field("model", model);
-  file("file", "audio.webm", audioBuffer, "audio/webm");
+  file("file", `audio.${ext}`, audioBuffer, mimeType);
   parts.push(Buffer.from(`--${boundary}--${CRLF}`, "utf-8"));
 
   return { body: Buffer.concat(parts), boundary };
 }
 
-async function transcribeWhisper(audioBuffer: Buffer, config: VoiceApiConfig): Promise<string> {
+async function transcribeWhisper(
+  audioBuffer: Buffer,
+  config: VoiceApiConfig,
+  mimeType: "audio/wav" | "audio/webm"
+): Promise<string> {
   const baseURL = config.baseURL.replace(/\/$/, "");
   const url = `${baseURL}/audio/transcriptions`;
   const model = config.model?.trim() || "whisper-1";
 
-  const { body, boundary } = buildMultipartBody(audioBuffer, model);
+  const { body, boundary } = buildMultipartBody(audioBuffer, model, mimeType);
   const bodyInit = new Uint8Array(body);
 
   const res = await fetch(url, {
@@ -65,16 +74,18 @@ async function transcribeWhisper(audioBuffer: Buffer, config: VoiceApiConfig): P
 // 文档：https://help.aliyun.com/zh/model-studio/qwen-asr-api-reference（或控制台 #/api/?type=model&url=2986952）
 // 入参：model、messages（role=user, content=[{ type:"input_audio", input_audio:{ data } }]）、stream、asr_options（可选）
 // input_audio.data：公网 URL 或 Base64 的 Data URL（data:<mime>;base64,<base64>）。文档示例 MIME：audio/wav、audio/mpeg。
-// 当前使用浏览器录音格式 audio/webm；若识别异常可考虑转为 wav/mp3。编码后总大小需 ≤10MB。
-async function transcribeQwenAsr(audioBuffer: Buffer, config: VoiceApiConfig): Promise<string> {
+// 文档支持 Data URL：audio/wav、audio/mpeg；使用渲染进程转好的 WAV 可避免 webm 返回空。
+async function transcribeQwenAsr(
+  audioBuffer: Buffer,
+  config: VoiceApiConfig,
+  mimeType: "audio/wav" | "audio/webm"
+): Promise<string> {
   const baseURL = config.baseURL.replace(/\/$/, "");
   const url = `${baseURL}/chat/completions`;
   const model = config.model?.trim() || "qwen3-asr-flash";
 
-  // 文档：Base64 用 Data URL 格式 data:<mime>;base64,<base64>
-  // 我们录音格式为 webm，MIME 为 audio/webm
   const base64 = audioBuffer.toString("base64");
-  const dataUri = `data:audio/webm;base64,${base64}`;
+  const dataUri = `data:${mimeType};base64,${base64}`;
 
   const body = {
     model,
@@ -126,15 +137,16 @@ async function transcribeQwenAsr(audioBuffer: Buffer, config: VoiceApiConfig): P
 /**
  * 调用语音 API 进行转写
  * - apiType 为 whisper（默认）：走 OpenAI Whisper 兼容 POST /audio/transcriptions
- * - apiType 为 qwen-asr：走阿里百炼 Qwen3-ASR，OpenAI 兼容 POST /chat/completions
+ * - apiType 为 qwen-asr：走阿里百炼 Qwen3-ASR，使用 audio/wav 以符合文档要求
  */
 export async function transcribeWithVoiceApi(
   audioBuffer: Buffer,
-  config: VoiceApiConfig
+  config: VoiceApiConfig,
+  mimeType: "audio/wav" | "audio/webm"
 ): Promise<string> {
   const apiType = config.apiType ?? "whisper";
   if (apiType === "qwen-asr") {
-    return transcribeQwenAsr(audioBuffer, config);
+    return transcribeQwenAsr(audioBuffer, config, mimeType);
   }
-  return transcribeWhisper(audioBuffer, config);
+  return transcribeWhisper(audioBuffer, config, mimeType);
 }

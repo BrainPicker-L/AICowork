@@ -2,7 +2,7 @@
  * 语音状态悬浮窗：独立于主窗口，始终置顶，展示 录音中 → 转写中 → 任务运行中 → 完成/失败
  */
 
-import { BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, screen } from "electron";
 import { getFloatingPreloadPath, getFloatingWindowUrl } from "../pathResolver.js";
 import { isDev, DEV_PORT } from "../util.js";
 import { log } from "../logger.js";
@@ -52,6 +52,12 @@ export function createFloatingWindow(): void {
 
   floatingWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   floatingWindow.setAlwaysOnTop(true, "floating");
+
+  // setVisibleOnAllWorkspaces(..., { visibleOnFullScreen: true }) 会导致 macOS 程序坞图标消失（Electron #26350）
+  // 创建悬浮窗后立即恢复程序坞显示
+  if (process.platform === "darwin" && app.dock) {
+    app.dock.show();
+  }
 
   const url = getFloatingWindowUrl(DEV_PORT);
   floatingWindow.loadURL(url).catch((err) => {

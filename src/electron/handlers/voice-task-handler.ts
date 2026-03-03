@@ -18,9 +18,11 @@ let cancelCurrentVoiceTask: (() => void) | null = null;
 /**
  * 运行语音任务：转写 → 生成标题 → session.start
  * 通过 emit 发送 voice-task.status；可被 cancel 中断
+ * mimeType 由渲染进程根据语音 API 类型传入（qwen-asr 用 audio/wav，whisper 用 audio/webm）
  */
 export function runVoiceTask(
   audioBase64: string,
+  mimeType: "audio/wav" | "audio/webm",
   sessions: SessionStore,
   runnerHandles: Map<string, RunnerHandle>,
   emit: (event: ServerEvent) => void
@@ -63,7 +65,7 @@ export function runVoiceTask(
     try {
       const buffer = Buffer.from(audioBase64, "base64");
       if (cancelled) return;
-      text = await transcribeWithVoiceApi(buffer, config);
+      text = await transcribeWithVoiceApi(buffer, config, mimeType);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       log.error("[voice-task] Transcribe failed", err);

@@ -24,6 +24,49 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+/** 将 AudioBuffer 编码为 16-bit PCM WAV Blob（Qwen ASR 等需要 wav/mpeg 格式） */
+function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const length = buffer.length;
+  const dataSize = length * numChannels * 2;
+  const arrayBuffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(arrayBuffer);
+  const writeStr = (offset: number, str: string) => {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  };
+  writeStr(0, "RIFF");
+  view.setUint32(4, 36 + dataSize, true);
+  writeStr(8, "WAVE");
+  writeStr(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * 2, true);
+  view.setUint16(32, numChannels * 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, "data");
+  view.setUint32(40, dataSize, true);
+  const pcm = new Int16Array(arrayBuffer, 44, length * numChannels);
+  for (let i = 0; i < length; i++) {
+    for (let c = 0; c < numChannels; c++) {
+      const s = Math.max(-1, Math.min(1, buffer.getChannelData(c)[i]));
+      pcm[i * numChannels + c] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+  }
+  return new Blob([arrayBuffer], { type: "audio/wav" });
+}
+
+/** WebM Blob 转为 WAV Base64（用于 Qwen ASR 等仅支持 wav/mpeg 的接口） */
+async function webmBlobToWavBase64(blob: Blob): Promise<string> {
+  const ctx = new AudioContext();
+  const arrayBuffer = await blob.arrayBuffer();
+  const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
+  const wavBlob = audioBufferToWavBlob(audioBuffer);
+  return blobToBase64(wavBlob);
+}
+
 export function useVoiceFnRecording(
   voiceSettings: { fnVoiceEnabled: boolean; voiceApiConfig?: { baseURL?: string; apiKey?: string } | null; voiceCwd?: string } | null,
   sendEvent: (event: ClientEvent) => void
@@ -81,8 +124,26 @@ export function useVoiceFnRecording(
             stopRecording();
             return;
           }
-          const base64 = await blobToBase64(blob);
-          sendEvent({ type: "voice-task.submit-audio", payload: { audioBase64: base64 } });
+          const isQwenAsr = voiceSettings?.voiceApiConfig?.apiType === "qwen-asr";
+          let base64: string;
+          let payloadMime: "audio/wav" | "audio/webm" | undefined;
+          if (isQwenAsr) {
+            try {
+              base64 = await webmBlobToWavBase64(blob);
+              payloadMime = "audio/wav";
+            } catch (e) {
+              setVoiceTaskStatus({ stage: "error", error: "转 WAV 失败，请重试" });
+              stopRecording();
+              return;
+            }
+          } else {
+            base64 = await blobToBase64(blob);
+            payloadMime = "audio/webm";
+          }
+          sendEvent({
+            type: "voice-task.submit-audio",
+            payload: { audioBase64: base64, mimeType: payloadMime },
+          });
           stopRecording();
         };
         mr.start(100);
@@ -97,6 +158,7 @@ export function useVoiceFnRecording(
       ev?.preventDefault();
       const mr = mediaRecorderRef.current;
       if (mr && mr.state === "recording") {
+        mr.requestData(); // 确保最后一段数据在 stop 前写入 chunks，避免录音结尾丢失
         mr.stop();
       } else if (recordingRef.current) {
         recordingRef.current = false;

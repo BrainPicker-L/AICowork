@@ -242,7 +242,8 @@ export function handleClientEvent(event: ClientEvent) {
         emit({ type: "voice-task.status", payload: { stage: "error", error: "录音过短，请按住 Fn 说话后再松开" } });
         return;
       }
-      runVoiceTask(base64, sessions, runnerHandles, emit);
+      const mimeType = payload.mimeType ?? "audio/webm";
+      runVoiceTask(base64, mimeType, sessions, runnerHandles, emit);
     },
     "voice-task.recording-started": () => {
       broadcast({ type: "voice-task.status", payload: { stage: "recording" } });

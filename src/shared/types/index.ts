@@ -97,7 +97,7 @@ export type ClientEvent =
   | { type: "api.fetchModelLimits"; payload: { apiKey: string; baseURL: string; model: string; apiType?: string } }
   | { type: "dingtalk.connect"; payload: { botName: string } }
   | { type: "dingtalk.disconnect"; payload: { botName: string } }
-  | { type: "voice-task.submit-audio"; payload: { audioBase64: string } }
+  | { type: "voice-task.submit-audio"; payload: { audioBase64: string; mimeType?: "audio/wav" | "audio/webm" } }
   | { type: "voice-task.cancel" }
   | { type: "voice-task.recording-started" };
 
